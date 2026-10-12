@@ -1,0 +1,741 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { 
+  LogOut, 
+  LoaderCircle, 
+  Home, 
+  Users, 
+  Eye, 
+  Clock, 
+  ShieldCheck,
+  Layers,
+  Coins,
+  TrendingUp,
+  Award,
+  Zap,
+  Menu,
+  X,
+  UserCheck,
+  GripVertical,
+  KeyRound,
+  Settings as SettingsIcon
+} from 'lucide-react';
+import { Brand } from '@/components/brand';
+import { Button } from '@/components/ui/button';
+import { HomeTab } from '@/components/home-tab';
+import { UserManagementTab, resolveNavIcon } from '@/components/user-management-tab';
+import { EarningOpportunitiesView } from '@/components/earning-opportunities/EarningOpportunitiesView';
+import { KeyPointsView } from '@/components/key-points/KeyPointsView';
+import { SettingsView } from '@/components/settings/SettingsView';
+import { RankCalculatorApp } from '@/components/rank-calculator/RankCalculatorApp';
+import { TwelveLevelBonusView } from '@/components/twelve-level-bonus/TwelveLevelBonusView';
+import { DcbNinetyDaysView } from '@/components/dcb-bonus/DcbNinetyDaysView';
+import { CustomerView } from '@/components/customer-view/CustomerView';
+import { AccessDeniedView } from '@/components/AccessDeniedView';
+import { supabase } from '@/integrations/supabase/client';
+import { pageMeta } from '@/lib/page-meta';
+import { 
+  getUserAllowedTabs, 
+  isUserAdminOrOwner, 
+  getRegisteredNavigationFields, 
+  getOrderedNavigationFields,
+  saveSidebarNavOrder,
+  getAccessibleLandingPage 
+} from '@/lib/permissions';
+import { useSessionTimer } from '@/hooks/use-session-timer';
+import { loadRankCalculatorState } from '@/lib/rank-storage';
+
+export const Route = createFileRoute('/_authenticated/maintenance')({
+  head: () => pageMeta('Workspace Directory & Management · Nexora', 'Nexora connected workspace, team management, and Profile Guardian security center.'),
+  component: Maintenance,
+});
+
+function Maintenance() {
+  const { user } = Route.useRouteContext();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [, setRefreshKey] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const previewUserEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
+  const loggedInEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || user?.email;
+  const effectiveEmail = previewUserEmail || loggedInEmail;
+  const allowedTabs = getUserAllowedTabs(effectiveEmail);
+  const effectiveAllowed = allowedTabs.filter((t) => t !== 'status');
+
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const urlTab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
+    const initialAllowed = getUserAllowedTabs(effectiveEmail).filter((t) => t !== 'status');
+    if (initialAllowed.length === 0) {
+      return 'access-denied';
+    }
+    if (urlTab && initialAllowed.includes(urlTab)) {
+      return urlTab;
+    }
+    if (initialAllowed.includes('home')) {
+      return 'home';
+    }
+    return initialAllowed[0] || 'access-denied';
+  });
+
+  const [navItems, setNavItems] = useState(() => 
+    getOrderedNavigationFields()
+      .filter((f) => f.id !== 'status')
+      .map((f) => ({ ...f, icon: f.icon || resolveNavIcon(f.id, f.iconName) }))
+  );
+
+  // Ranks count for Ranks indicator badge in the top navigation area
+  const [rankCount, setRankCount] = useState<number>(() => {
+    try {
+      const saved = loadRankCalculatorState();
+      return saved?.ranks?.length ?? 7;
+    } catch {
+      return 7;
+    }
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      try {
+        const saved = loadRankCalculatorState();
+        if (saved?.ranks?.length) {
+          setRankCount(saved.ranks.length);
+        }
+      } catch {
+        // preserve current count
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorage);
+      window.addEventListener('nexora_ranks_updated', handleStorage);
+      return () => {
+        window.removeEventListener('storage', handleStorage);
+        window.removeEventListener('nexora_ranks_updated', handleStorage);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleNavUpdate = () => {
+      setNavItems(
+        getOrderedNavigationFields()
+          .filter((f) => f.id !== 'status')
+          .map((f) => ({ ...f, icon: f.icon || resolveNavIcon(f.id, f.iconName) }))
+      );
+    };
+    window.addEventListener('nexora_nav_fields_updated', handleNavUpdate);
+    window.addEventListener('nexora_permissions_updated', handleNavUpdate);
+    window.addEventListener('nexora_nav_order_updated', handleNavUpdate);
+    return () => {
+      window.removeEventListener('nexora_nav_fields_updated', handleNavUpdate);
+      window.removeEventListener('nexora_permissions_updated', handleNavUpdate);
+      window.removeEventListener('nexora_nav_order_updated', handleNavUpdate);
+    };
+  }, []);
+
+  // Automatic sidebar layout adjustment: scales height, gap, and padding so all items fit cleanly with no scrollbars
+  const [sidebarNavStyle, setSidebarNavStyle] = useState<React.CSSProperties>({});
+  const sidebarNavRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const adjustSidebarLayout = () => {
+      const visibleCount = navItems.filter((item) => allowedTabs.includes(item.id)).length;
+      if (visibleCount === 0) return;
+
+      const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+      // Heights of non-nav sidebar elements
+      const reservedHeight = vh < 630 ? 130 : vh < 760 ? 180 : 230;
+      const availableNavHeight = Math.max(120, vh - reservedHeight);
+
+      // Compute optimal per-item height and gap with comfortable minimum for smooth scrolling
+      const slotHeight = availableNavHeight / visibleCount;
+      const computedGap = slotHeight < 32 ? 2 : 3;
+      const computedHeight = Math.min(36, Math.max(34, Math.floor(slotHeight - computedGap)));
+      const computedPy = computedHeight < 35 ? 5 : 7;
+      const computedFontSize = 13;
+
+      setSidebarNavStyle({
+        ['--sidebar-item-height' as any]: `${computedHeight}px`,
+        ['--sidebar-item-min-height' as any]: `${computedHeight}px`,
+        ['--sidebar-item-gap' as any]: `${computedGap}px`,
+        ['--sidebar-item-py' as any]: `${computedPy}px`,
+        ['--sidebar-item-font-size' as any]: `${computedFontSize}px`,
+      });
+    };
+
+    adjustSidebarLayout();
+    window.addEventListener('resize', adjustSidebarLayout);
+    return () => window.removeEventListener('resize', adjustSidebarLayout);
+  }, [navItems, allowedTabs]);
+
+  // Drag and drop state for sidebar reordering
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dropTarget, setDropTarget] = useState<{ index: number; position: 'before' | 'after' } | null>(null);
+  const isDraggingGestureRef = useRef(false);
+  const touchStartYRef = useRef<number | null>(null);
+  const touchStartIndexRef = useRef<number | null>(null);
+  const isTouchDraggingRef = useRef(false);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    isDraggingGestureRef.current = false;
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    try {
+      e.dataTransfer.setData('text/plain', String(index));
+    } catch {}
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    isDraggingGestureRef.current = true;
+
+    if (draggedIndex === null || draggedIndex === targetIndex) {
+      return;
+    }
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const isUpperHalf = e.clientY < rect.top + rect.height / 2;
+    setDropTarget({ index: targetIndex, position: isUpperHalf ? 'before' : 'after' });
+  };
+
+  const handleDragLeave = (e: React.DragEvent, index: number) => {
+    if (dropTarget?.index === index && !e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDropTarget(null);
+    }
+  };
+
+  const performReorder = (fromIndex: number, toIndex: number, position: 'before' | 'after') => {
+    if (fromIndex === toIndex) return;
+
+    const updated = [...navItems];
+    const [movedItem] = updated.splice(fromIndex, 1);
+    if (!movedItem) return;
+
+    let targetIdx = updated.findIndex((item) => item.id === navItems[toIndex]?.id);
+    if (targetIdx === -1) {
+      targetIdx = toIndex > fromIndex ? toIndex - 1 : toIndex;
+    }
+    if (position === 'after') {
+      targetIdx += 1;
+    }
+
+    updated.splice(targetIdx, 0, movedItem);
+    setNavItems(updated);
+    saveSidebarNavOrder(updated.map((i) => i.id));
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex !== null && dropTarget) {
+      performReorder(draggedIndex, targetIndex, dropTarget.position);
+    }
+    setDraggedIndex(null);
+    setDropTarget(null);
+    setTimeout(() => {
+      isDraggingGestureRef.current = false;
+    }, 50);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDropTarget(null);
+    setTimeout(() => {
+      isDraggingGestureRef.current = false;
+    }, 50);
+  };
+
+  // Touch device support
+  const handleTouchStart = (e: React.TouchEvent, index: number) => {
+    touchStartYRef.current = e.touches[0].clientY;
+    touchStartIndexRef.current = index;
+    isTouchDraggingRef.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartYRef.current === null || touchStartIndexRef.current === null) return;
+    const currentY = e.touches[0].clientY;
+    const deltaY = Math.abs(currentY - touchStartYRef.current);
+
+    if (deltaY > 8) {
+      isTouchDraggingRef.current = true;
+      isDraggingGestureRef.current = true;
+      setDraggedIndex(touchStartIndexRef.current);
+
+      const element = document.elementFromPoint(e.touches[0].clientX, currentY);
+      const navBtn = element?.closest('.sidebar-nav-btn') as HTMLElement | null;
+      if (navBtn && navBtn.dataset.index) {
+        const targetIdx = parseInt(navBtn.dataset.index, 10);
+        if (!isNaN(targetIdx) && targetIdx !== touchStartIndexRef.current) {
+          const rect = navBtn.getBoundingClientRect();
+          const isUpperHalf = currentY < rect.top + rect.height / 2;
+          setDropTarget({ index: targetIdx, position: isUpperHalf ? 'before' : 'after' });
+        }
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (isTouchDraggingRef.current && touchStartIndexRef.current !== null && dropTarget !== null) {
+      performReorder(touchStartIndexRef.current, dropTarget.index, dropTarget.position);
+    }
+    touchStartYRef.current = null;
+    touchStartIndexRef.current = null;
+    isTouchDraggingRef.current = false;
+    setDraggedIndex(null);
+    setDropTarget(null);
+    setTimeout(() => {
+      isDraggingGestureRef.current = false;
+    }, 50);
+  };
+
+  const handleNavButtonClick = (itemId: string) => {
+    if (isDraggingGestureRef.current) {
+      isDraggingGestureRef.current = false;
+      return;
+    }
+    handleSelectTab(itemId);
+  };
+
+  const isAdmin = isUserAdminOrOwner(effectiveEmail, 'sivaji491@gmail.com');
+
+  const isLoggingOutRef = useRef(false);
+
+  // Session timer expiration handler (only for regular users, NOT admin)
+  const handleSessionExpired = useCallback(async () => {
+    if (isLoggingOutRef.current) return;
+    if (isUserAdminOrOwner(effectiveEmail, 'sivaji491@gmail.com')) return;
+    isLoggingOutRef.current = true;
+    setBusy(true);
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('nexora-user-email');
+      window.localStorage.removeItem('nexora-preview-user-email');
+      window.localStorage.setItem('nexora_last_disabled_reason', 'SESSIONTIMEEXPIRED');
+      window.localStorage.setItem('nexora-timer-status', 'expired');
+    }
+
+    try {
+      await queryClient.cancelQueries();
+      queryClient.clear();
+    } catch {
+      // Ignore query cancellation errors
+    }
+
+    try {
+      // Timeout race: ensures slow network or hanging Supabase signOut never freezes the screen
+      await Promise.race([
+        supabase.auth.signOut(),
+        new Promise((resolve) => setTimeout(resolve, 1200)),
+      ]);
+    } catch {
+      // Proceed even if network signOut throws
+    }
+
+    try {
+      await navigate({ to: '/auth', replace: true });
+    } catch {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth';
+      }
+    }
+  }, [effectiveEmail, navigate, queryClient]);
+
+  // Live session countdown timer
+  const sessionTimer = useSessionTimer(effectiveEmail, handleSessionExpired);
+
+  // Auto redirect if session is expired or disabled (regular users only)
+  useEffect(() => {
+    if (!isAdmin && sessionTimer.isExpired && !isLoggingOutRef.current) {
+      handleSessionExpired();
+    }
+  }, [isAdmin, sessionTimer.isExpired, handleSessionExpired]);
+
+  // Listen for real-time permission updates and storage changes
+  useEffect(() => {
+    const handleUpdate = () => setRefreshKey((k) => k + 1);
+    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('nexora_permissions_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('nexora_permissions_updated', handleUpdate);
+    };
+  }, []);
+
+  useEffect(() => {
+    const currentAllowed = allowedTabs.filter((t) => t !== 'status');
+    if (currentAllowed.length === 0) {
+      if (activeTab !== 'access-denied') {
+        setActiveTab('access-denied');
+      }
+      return;
+    }
+
+    const urlTab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
+
+    if (urlTab && currentAllowed.includes(urlTab)) {
+      if (activeTab !== urlTab) {
+        setActiveTab(urlTab);
+      }
+      return;
+    }
+
+    if (!currentAllowed.includes(activeTab) || activeTab === 'access-denied') {
+      const fallback = currentAllowed.includes('home') ? 'home' : currentAllowed[0];
+      if (fallback && activeTab !== fallback) {
+        setActiveTab(fallback);
+        if (typeof window !== 'undefined' && window.history.replaceState) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('tab', fallback);
+          window.history.replaceState({}, '', url.toString());
+        }
+      }
+    }
+  }, [allowedTabs, activeTab]);
+
+  const handleSelectTab = (tabId: string) => {
+    if (!allowedTabs.includes(tabId)) {
+      return;
+    }
+    setActiveTab(tabId);
+    setMobileMenuOpen(false);
+    if (typeof window !== 'undefined' && window.history.replaceState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', tabId);
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
+
+  async function signOut() {
+    setBusy(true); setError('');
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('nexora-user-email');
+      window.localStorage.removeItem('nexora-preview-user-email');
+      window.localStorage.removeItem('nexora-simulated-user');
+      window.localStorage.removeItem('nexora-simulated-user');
+    }
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    const { error: authError } = await supabase.auth.signOut();
+    if (authError) { setError('Unable to sign out. Please try again.'); setBusy(false); return; }
+    await navigate({ to: '/auth', replace: true });
+  }
+
+  function exitPreview() {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('nexora-preview-user-email');
+      window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+    }
+    handleSelectTab('users');
+  }
+
+  return (
+    <div className={`app-shell ${activeTab === 'earning-opportunities' ? 'earning-opportunities-active' : ''}`}>
+      {/* Left-Side Navigation Sidebar */}
+      <aside className={`app-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-top">
+          <Brand onLogoClick={() => handleSelectTab('home')} />
+        </div>
+
+        <div className="sidebar-section-label">WORKSPACE MENU</div>
+        
+        <nav 
+          ref={sidebarNavRef}
+          className={`sidebar-nav ${draggedIndex !== null ? 'is-reordering' : ''}`}
+          style={sidebarNavStyle} 
+          aria-label="Main Navigation"
+        >
+          {navItems.map((item, index) => {
+            if (!allowedTabs.includes(item.id)) return null;
+            const Icon = item.icon;
+            const isDragging = draggedIndex === index;
+            const isDropTargetBefore = dropTarget?.index === index && dropTarget.position === 'before';
+            const isDropTargetAfter = dropTarget?.index === index && dropTarget.position === 'after';
+
+            return (
+              <button 
+                key={item.id}
+                type="button" 
+                draggable={true}
+                data-index={index}
+                data-item-id={item.id}
+                className={`sidebar-nav-btn group ${activeTab === item.id ? 'active' : ''} ${isDragging ? 'is-dragging' : ''} ${isDropTargetBefore ? 'drop-target-before' : ''} ${isDropTargetAfter ? 'drop-target-after' : ''}`}
+                onClick={() => handleNavButtonClick(item.id)}
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={(e) => handleDragLeave(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                onTouchStart={(e) => handleTouchStart(e, index)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                title={`Drag to reorder · ${item.label}`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span className="truncate">{item.label}</span>
+                <span 
+                  className="sidebar-drag-handle" 
+                  title="Drag to reorder"
+                  aria-hidden="true"
+                >
+                  <GripVertical className="w-3.5 h-3.5" />
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="sidebar-bottom">
+          <div className="sidebar-growth-card">
+            <div className="sidebar-growth-card-header">
+              <TrendingUp className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="sidebar-growth-card-title">Plan Your Growth</span>
+            </div>
+            <p className="sidebar-growth-card-desc">
+              Better Planning Builds a Stronger Tomorrow.
+            </p>
+          </div>
+
+          <div className="sidebar-user-badge" title={effectiveEmail || 'User'}>
+            <span className="font-medium truncate block">{effectiveEmail}</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={signOut} disabled={busy} className="sidebar-signout-btn">
+            {busy ? <LoaderCircle className="w-4 h-4 animate-spin mr-1.5" /> : <LogOut className="w-4 h-4 mr-1.5" />}
+            Sign out
+          </Button>
+        </div>
+      </aside>
+
+      {/* Mobile Backdrop */}
+      {mobileMenuOpen && (
+        <div 
+          className="sidebar-mobile-backdrop mobile-open" 
+          onClick={() => setMobileMenuOpen(false)} 
+          aria-hidden="true" 
+        />
+      )}
+
+      {/* Main Content Area */}
+      <div className={`app-main-content ${activeTab === 'earning-opportunities' ? 'earning-opportunities-active' : ''}`}>
+        {/* Top Bar with Navigation Tabs & Live Session Countdown */}
+        <header className={`app-topbar ${activeTab === 'earning-opportunities' ? 'earning-opportunities-topbar' : ''}`}>
+          <div className="topbar-left">
+            <button
+              type="button"
+              className="sidebar-mobile-toggle"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+            <nav className="topbar-nav-tabs" aria-label="Top Tabs Navigation">
+              {navItems.map((item) => {
+                if (!allowedTabs.includes(item.id)) return null;
+                const Icon = item.icon;
+                const isSelected = activeTab === item.id;
+                return (
+                  <button
+                    key={`top-${item.id}`}
+                    type="button"
+                    className={`topbar-tab-item ${isSelected ? 'active' : ''}`}
+                    onClick={() => handleSelectTab(item.id)}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+          <div className="topbar-actions">
+            {/* Green Ranks Indicator (e.g. Ranks 7) */}
+            {activeTab === 'ranks' && (
+              <div 
+                className="topbar-ranks-badge"
+                title={`Total Ranks: ${rankCount}`}
+              >
+                <Layers className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">Ranks</span>
+                <span className="topbar-ranks-count">{rankCount}</span>
+              </div>
+            )}
+
+            {/* 12 Level Bonus Indicator */}
+            {activeTab === '12-level-bonus' && (
+              <div 
+                className="topbar-ranks-badge bg-amber-600 border-amber-500"
+                title={`12 Level Bonus · ${rankCount} Ranks Available`}
+              >
+                <Award className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">12 Level Bonus</span>
+              </div>
+            )}
+
+            {/* DCB (90 days) Indicator */}
+            {activeTab === 'dcb-90-days' && (
+              <div 
+                className="topbar-ranks-badge bg-amber-600 border-amber-500"
+                title={`DCB (90 days) · 30% Double Connect Bonus`}
+              >
+                <Zap className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">DCB (90 days)</span>
+              </div>
+            )}
+
+            {/* Customer View Indicator */}
+            {activeTab === 'customer-view' && (
+              <div 
+                className="topbar-ranks-badge bg-blue-600 border-blue-500"
+                title={`Customer View · Rank-Based Benefits Display`}
+              >
+                <UserCheck className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">Customer View</span>
+              </div>
+            )}
+
+            {/* Key Points Indicator */}
+            {activeTab === 'key-points' && (
+              <div 
+                className="topbar-ranks-badge bg-emerald-600 border-emerald-500"
+                title="Key Points · Executive Business Principles"
+              >
+                <KeyRound className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">Key Points</span>
+              </div>
+            )}
+
+            {/* Settings Indicator */}
+            {activeTab === 'settings' && (
+              <div 
+                className="topbar-ranks-badge bg-indigo-600 border-indigo-500"
+                title="Settings · Application Configuration & Key Points Management"
+              >
+                <SettingsIcon className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">Settings</span>
+              </div>
+            )}
+
+            {/* Live Session Countdown Timer Widget - Only for regular users, NOT admin! */}
+            {!isAdmin ? (
+              <div 
+                className={`session-timer-badge ${sessionTimer.isUrgent ? 'timer-urgent' : sessionTimer.isWarning ? 'timer-warning' : ''}`}
+                title={`Session duration: ${sessionTimer.loginDuration}`}
+              >
+                <Clock className="w-3.5 h-3.5" />
+              </div>
+            ) : (
+              <div className="session-timer-badge" title="Administrator has unlimited access anytime">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="timer-label">Admin Access:</span>
+                <span className="font-semibold text-xs text-emerald-300">Unlimited</span>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* Preview Mode Banner */}
+        {previewUserEmail && (
+          <div className="preview-active-banner">
+            <span>Viewing workspace permissions as <strong>{previewUserEmail}</strong></span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="exit-preview-btn"
+              onClick={exitPreview}
+            >
+              Exit Preview & Return to Admin
+            </Button>
+          </div>
+        )}
+
+        {/* Tab Content */}
+        <div className={`app-tab-body ${activeTab === 'earning-opportunities' ? 'earning-opportunities-body' : ''} ${activeTab === 'users' ? 'users-tab-body' : ''} ${activeTab === '12-level-bonus' ? 'twelve-bonus-tab-body' : ''}`}>
+          {activeTab === 'access-denied' || effectiveAllowed.length === 0 || !allowedTabs.includes(activeTab) ? (
+            <AccessDeniedView
+              pageName={activeTab !== 'access-denied' ? (navItems.find((i) => i.id === activeTab)?.label || activeTab) : undefined}
+              userEmail={effectiveEmail}
+              authorizedPageName={effectiveAllowed.length > 0 ? (effectiveAllowed.includes('home') ? 'Home' : (navItems.find((i) => i.id === effectiveAllowed[0])?.label || effectiveAllowed[0])) : null}
+              onNavigateToAuthorized={effectiveAllowed.length > 0 ? () => {
+                const target = effectiveAllowed.includes('home') ? 'home' : effectiveAllowed[0];
+                handleSelectTab(target);
+              } : undefined}
+              onSignOut={signOut}
+            />
+          ) : (
+            <>
+              {activeTab === 'ranks' && allowedTabs.includes('ranks') && (
+                <main className="home-main-container ranks-container">
+                  <RankCalculatorApp initialTab="ranks" embedded={true} isAdmin={isAdmin} allowedTabs={allowedTabs} />
+                </main>
+              )}
+              {activeTab === '12-level-bonus' && allowedTabs.includes('12-level-bonus') && (
+                <main className="home-main-container ranks-container twelve-bonus-container">
+                  <TwelveLevelBonusView isAdmin={isAdmin} userEmail={effectiveEmail} />
+                </main>
+              )}
+              {activeTab === 'dcb-90-days' && allowedTabs.includes('dcb-90-days') && (
+                <main className="home-main-container ranks-container">
+                  <DcbNinetyDaysView isAdmin={isAdmin} userEmail={effectiveEmail} />
+                </main>
+              )}
+              {activeTab === 'customer-view' && allowedTabs.includes('customer-view') && (
+                <main className="home-main-container ranks-container">
+                  <CustomerView isAdmin={isAdmin} userEmail={effectiveEmail} />
+                </main>
+              )}
+              {activeTab === 'currency' && allowedTabs.includes('currency') && (
+                <main className="home-main-container ranks-container">
+                  <RankCalculatorApp initialTab="currency" embedded={true} isAdmin={isAdmin} allowedTabs={allowedTabs} />
+                </main>
+              )}
+              {activeTab === 'configuration' && allowedTabs.includes('configuration') && (
+                <main className="home-main-container ranks-container">
+                  <RankCalculatorApp initialTab="ranks" embedded={true} isAdmin={isAdmin} initialOpenConfig={true} allowedTabs={allowedTabs} />
+                </main>
+              )}
+              {activeTab === 'home' && allowedTabs.includes('home') && (
+                <main className="home-main-container home-real-estate-container p-0">
+                  <HomeTab 
+                    userEmail={effectiveEmail} 
+                    onNavigateToTab={handleSelectTab} 
+                  />
+                </main>
+              )}
+              {activeTab === 'users' && allowedTabs.includes('users') && (
+                <main className="home-main-container users-container">
+                  <UserManagementTab currentUserEmail={loggedInEmail} />
+                </main>
+              )}
+              {activeTab === 'earning-opportunities' && allowedTabs.includes('earning-opportunities') && (
+                <main className="home-main-container earning-opportunities-container p-0">
+                  <EarningOpportunitiesView isAdmin={isAdmin} userEmail={effectiveEmail} />
+                </main>
+              )}
+              {activeTab === 'key-points' && allowedTabs.includes('key-points') && (
+                <main className="home-main-container key-points-container p-0">
+                  <KeyPointsView 
+                    isAdmin={isAdmin} 
+                    userEmail={effectiveEmail} 
+                    onNavigateToTab={handleSelectTab} 
+                  />
+                </main>
+              )}
+              {activeTab === 'settings' && allowedTabs.includes('settings') && (
+                <main className="home-main-container settings-container p-0">
+                  <SettingsView 
+                    isAdmin={isAdmin} 
+                    userEmail={effectiveEmail} 
+                    onNavigateToTab={handleSelectTab} 
+                  />
+                </main>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

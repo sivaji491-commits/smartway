@@ -1,0 +1,4 @@
+- [x] Build premium right-aligned login and maintenance pages.
+- [x] Connect real email authentication, profiles, recovery, and sign-out.
+- [x] Create and verify a test account; share credentials in chat.
+- [x] Verify protected access, session persistence, and mobile layout.
