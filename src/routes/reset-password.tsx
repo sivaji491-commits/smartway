@@ -6,7 +6,7 @@ import { Brand } from '@/components/brand';
 import { supabase } from '@/integrations/supabase/client';
 import { pageMeta } from '@/lib/page-meta';
 
-export const Route = createFileRoute('/reset-password')({ head: () => pageMeta('Set a new password', 'Securely reset your Nexora workspace password.'), component: ResetPassword });
+export const Route = createFileRoute('/reset-password')({ head: () => pageMeta('Set a new password', 'Securely reset your IG Infra workspace password.'), component: ResetPassword });
 function ResetPassword() {
   const [valid, setValid] = useState(false);
   const [checking, setChecking] = useState(true);

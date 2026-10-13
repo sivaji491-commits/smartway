@@ -415,7 +415,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <span>Workspace Preferences</span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Nexora enterprise workspace running with profile guardian protection and real-time synchronisation across active sessions.
+              IG Infra enterprise workspace running with profile guardian protection and real-time synchronisation across active sessions.
             </p>
             <div className="pt-2 text-[11px] text-slate-400 space-y-1">
               <div><strong>Sync Protocol:</strong> Real-time broadcast and persistent storage</div>

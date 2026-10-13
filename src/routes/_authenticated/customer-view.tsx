@@ -3,7 +3,7 @@ import { pageMeta } from '@/lib/page-meta';
 import { getUserAllowedTabs, getAccessibleLandingPage } from '@/lib/permissions';
 
 export const Route = createFileRoute('/_authenticated/customer-view')({
-  head: () => pageMeta('Customer View · Nexora Business Plan', 'Customer rank-based benefits display, direct referral benefits, and DCB release potential.'),
+  head: () => pageMeta('Customer View · IG Infra Business Plan', 'Customer rank-based benefits display, direct referral benefits, and DCB release potential.'),
   beforeLoad: async ({ context }) => {
     const previewEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
     const userEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || (context as any)?.user?.email;

@@ -48,7 +48,7 @@ import { useSessionTimer } from '@/hooks/use-session-timer';
 import { loadRankCalculatorState } from '@/lib/rank-storage';
 
 export const Route = createFileRoute('/_authenticated/maintenance')({
-  head: () => pageMeta('Workspace Directory & Management · Nexora', 'Nexora connected workspace, team management, and Profile Guardian security center.'),
+  head: () => pageMeta('Workspace Directory & Management · IG Infra', 'IG Infra connected workspace, team management, and Profile Guardian security center.'),
   component: Maintenance,
 });
 
@@ -437,8 +437,16 @@ function Maintenance() {
     <div className={`app-shell ${activeTab === 'earning-opportunities' ? 'earning-opportunities-active' : ''}`}>
       {/* Left-Side Navigation Sidebar */}
       <aside className={`app-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-        <div className="sidebar-top">
+        <div className="sidebar-top flex items-center justify-between">
           <Brand onLogoClick={() => handleSelectTab('home')} />
+          <button
+            type="button"
+            className="sidebar-close-mobile md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <X className="w-4 h-4 text-slate-400 hover:text-white" />
+          </button>
         </div>
 
         <div className="sidebar-section-label">WORKSPACE MENU</div>

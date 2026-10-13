@@ -3,7 +3,7 @@ import { pageMeta } from '@/lib/page-meta';
 import { getUserAllowedTabs, getAccessibleLandingPage } from '@/lib/permissions';
 
 export const Route = createFileRoute('/_authenticated/ranks')({
-  head: () => pageMeta('Ranks · Nexora Business Plan', 'Rank calculator, pricing tiers, and accumulation details.'),
+  head: () => pageMeta('Ranks · IG Infra Business Plan', 'Rank calculator, pricing tiers, and accumulation details.'),
   beforeLoad: async ({ context }) => {
     const previewEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
     const userEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || (context as any)?.user?.email;

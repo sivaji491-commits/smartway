@@ -725,7 +725,7 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
         <div className="users-header-info">
           <div className="home-badge">
             <Users className="w-3 h-3 text-primary" />
-            <span>NEXORA ACCESS CONTROL</span>
+            <span>IG INFRA ACCESS CONTROL</span>
             <span className="badge-divider">·</span>
             <span className="badge-highlight">SESSION DURATION & EXPIRATION</span>
           </div>

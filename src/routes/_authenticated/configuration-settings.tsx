@@ -3,7 +3,7 @@ import { pageMeta } from '@/lib/page-meta';
 import { getUserAllowedTabs, getAccessibleLandingPage, isUserAdminOrOwner } from '@/lib/permissions';
 
 export const Route = createFileRoute('/_authenticated/configuration-settings')({
-  head: () => pageMeta('Configuration Settings · Nexora Business Plan', 'Network fee percentage, exchange rates, and rank names configuration.'),
+  head: () => pageMeta('Configuration Settings · IG Infra Business Plan', 'Network fee percentage, exchange rates, and rank names configuration.'),
   beforeLoad: async ({ context }) => {
     const previewEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
     const userEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || (context as any)?.user?.email;

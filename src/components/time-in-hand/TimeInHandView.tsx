@@ -800,7 +800,7 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
           aria-modal="true"
           aria-labelledby="admin-settings-title"
         >
-          <div className="bg-white rounded-xl shadow-xl border border-slate-200 max-w-lg w-full max-h-[90vh] overflow-y-auto p-4 sm:p-5 space-y-4">
+          <div className="bg-white rounded-xl shadow-xl border border-slate-200 max-w-lg w-full max-h-[90dvh] overflow-y-auto p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Settings className="w-4 h-4 text-teal-600" />
@@ -1009,7 +1009,7 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
           aria-modal="true"
           aria-labelledby="admin-row-modal-title"
         >
-          <div className="bg-white rounded-xl shadow-xl border border-slate-200 max-w-sm w-full p-4 sm:p-5 space-y-4">
+          <div className="bg-white rounded-xl shadow-xl border border-slate-200 max-w-sm w-full max-h-[90dvh] overflow-y-auto p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h2 id="admin-row-modal-title" className="text-sm font-bold text-slate-900">
                 {editingRow ? 'Edit Table Row' : 'Add New Table Row'}
