@@ -98,6 +98,10 @@ export const NAV_ICON_MAP: Record<string, any> = {
   keypoints: KeyRound,
   keyround: KeyRound,
   key: KeyRound,
+  'time-in-hand': Clock,
+  'time_in_hand': Clock,
+  timeinhand: Clock,
+  clock: Clock,
   settings: Settings,
   status: Construction,
 };

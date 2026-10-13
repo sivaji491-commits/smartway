@@ -24,6 +24,7 @@ import { Route as AuthenticatedKeyPointsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
 import { Route as AuthenticatedRanksRouteImport } from './routes/_authenticated/ranks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedTimeInHandRouteImport } from './routes/_authenticated/time-in-hand'
 import { Route as AuthenticatedUserManagementRouteImport } from './routes/_authenticated/user-management'
 
 const IndexRoute = IndexRouteImport.update({
@@ -106,6 +107,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTimeInHandRoute = AuthenticatedTimeInHandRouteImport.update({
+  id: '/time-in-hand',
+  path: '/time-in-hand',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUserManagementRoute =
   AuthenticatedUserManagementRouteImport.update({
     id: '/user-management',
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/ranks': typeof AuthenticatedRanksRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
 }
 export interface FileRoutesByTo {
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/ranks': typeof AuthenticatedRanksRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
 }
 export interface FileRoutesById {
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
   '/_authenticated/ranks': typeof AuthenticatedRanksRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/_authenticated/user-management': typeof AuthenticatedUserManagementRoute
 }
 export interface FileRouteTypes {
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/ranks'
     | '/settings'
+    | '/time-in-hand'
     | '/user-management'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/ranks'
     | '/settings'
+    | '/time-in-hand'
     | '/user-management'
   id:
     | '__root__'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/_authenticated/maintenance'
     | '/_authenticated/ranks'
     | '/_authenticated/settings'
+    | '/_authenticated/time-in-hand'
     | '/_authenticated/user-management'
   fileRoutesById: FileRoutesById
 }
@@ -335,6 +347,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/time-in-hand': {
+      id: '/_authenticated/time-in-hand'
+      path: '/time-in-hand'
+      fullPath: '/time-in-hand'
+      preLoaderRoute: typeof AuthenticatedTimeInHandRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/user-management': {
       id: '/_authenticated/user-management'
       path: '/user-management'
@@ -357,6 +376,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
   AuthenticatedRanksRoute: typeof AuthenticatedRanksRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTimeInHandRoute: typeof AuthenticatedTimeInHandRoute
   AuthenticatedUserManagementRoute: typeof AuthenticatedUserManagementRoute
 }
 
@@ -374,6 +394,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
   AuthenticatedRanksRoute: AuthenticatedRanksRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTimeInHandRoute: AuthenticatedTimeInHandRoute,
   AuthenticatedUserManagementRoute: AuthenticatedUserManagementRoute,
 }
 

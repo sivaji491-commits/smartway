@@ -3864,3 +3864,56 @@
   background: #08111D !important;
   box-sizing: border-box !important;
 }
+
+/* ==========================================================================
+   Time-In Hand – Table & Viewport Styling
+   ========================================================================== */
+.home-main-container.time-in-hand-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 8px 16px 16px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .home-main-container.time-in-hand-container {
+    padding: 6px 10px 12px;
+  }
+}
+
+/* ==========================================================================
+   Time In-hand Card – Animated Continuously Scrolling Border Beam
+   ========================================================================== */
+@keyframes border-beam-travel {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.time-in-hand-animated-border {
+  position: absolute;
+  inset: -150%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    #f97316 0deg,
+    #f59e0b 45deg,
+    #fbbf24 90deg,
+    #f97316 135deg,
+    rgba(251, 146, 60, 0.25) 180deg,
+    transparent 225deg,
+    rgba(251, 146, 60, 0.25) 315deg,
+    #f97316 360deg
+  );
+  animation: border-beam-travel 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .time-in-hand-animated-border {
+    animation: none !important;
+  }
+}

@@ -1,4 +1,4 @@
-export type NavigationField = 'home' | 'users' | 'earning-opportunities' | 'status' | 'ranks' | '12-level-bonus' | 'dcb-90-days' | 'customer-view' | 'currency' | string;
+export type NavigationField = 'home' | 'users' | 'earning-opportunities' | 'status' | 'ranks' | '12-level-bonus' | 'dcb-90-days' | 'customer-view' | 'currency' | 'time-in-hand' | string;
 
 export interface NavigationFieldDef {
   id: NavigationField;
@@ -71,6 +71,12 @@ export const DEFAULT_NAVIGATION_FIELDS: NavigationFieldDef[] = [
     label: 'Key Points',
     description: 'Essential business plan key points, rules, and guidelines',
     iconName: 'KeyRound',
+  },
+  {
+    id: 'time-in-hand',
+    label: 'Time-In hand',
+    description: 'In-hand time calculation table and working hours analysis',
+    iconName: 'Clock',
   },
   {
     id: 'settings',
@@ -149,6 +155,18 @@ export function getOrderedNavigationFields(): NavigationFieldDef[] {
             fieldMap.delete(id);
           }
         });
+
+        // If time-in-hand is not in the custom saved order, place it right above settings
+        if (fieldMap.has('time-in-hand')) {
+          const timeInHandDef = fieldMap.get('time-in-hand')!;
+          fieldMap.delete('time-in-hand');
+          const settingsIdx = ordered.findIndex((f) => f.id === 'settings');
+          if (settingsIdx >= 0) {
+            ordered.splice(settingsIdx, 0, timeInHandDef);
+          } else {
+            ordered.push(timeInHandDef);
+          }
+        }
 
         // Append any newly registered or missing fields in natural order
         fieldMap.forEach((f) => ordered.push(f));

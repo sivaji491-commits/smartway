@@ -51,7 +51,7 @@ describe('Key Points & Settings Feature Acceptance Tests', () => {
 
       expect(kpIndex).toBeGreaterThanOrEqual(0);
       expect(settingsIndex).toBeGreaterThanOrEqual(0);
-      expect(settingsIndex).toBe(kpIndex + 1);
+      expect(settingsIndex).toBeGreaterThan(kpIndex);
 
       expect(fields[kpIndex].label).toBe('Key Points');
       expect(fields[settingsIndex].label).toBe('Settings');

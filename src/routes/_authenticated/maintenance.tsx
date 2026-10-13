@@ -27,6 +27,7 @@ import { HomeTab } from '@/components/home-tab';
 import { UserManagementTab, resolveNavIcon } from '@/components/user-management-tab';
 import { EarningOpportunitiesView } from '@/components/earning-opportunities/EarningOpportunitiesView';
 import { KeyPointsView } from '@/components/key-points/KeyPointsView';
+import { TimeInHandView } from '@/components/time-in-hand/TimeInHandView';
 import { SettingsView } from '@/components/settings/SettingsView';
 import { RankCalculatorApp } from '@/components/rank-calculator/RankCalculatorApp';
 import { TwelveLevelBonusView } from '@/components/twelve-level-bonus/TwelveLevelBonusView';
@@ -607,6 +608,17 @@ function Maintenance() {
               </div>
             )}
 
+            {/* In-hand time Indicator */}
+            {activeTab === 'time-in-hand' && (
+              <div 
+                className="topbar-ranks-badge bg-teal-600 border-teal-500"
+                title="In-hand time · Working Hours & Time Calculation Table"
+              >
+                <Clock className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">In-hand time</span>
+              </div>
+            )}
+
             {/* Settings Indicator */}
             {activeTab === 'settings' && (
               <div 
@@ -717,6 +729,15 @@ function Maintenance() {
               {activeTab === 'key-points' && allowedTabs.includes('key-points') && (
                 <main className="home-main-container key-points-container p-0">
                   <KeyPointsView 
+                    isAdmin={isAdmin} 
+                    userEmail={effectiveEmail} 
+                    onNavigateToTab={handleSelectTab} 
+                  />
+                </main>
+              )}
+              {activeTab === 'time-in-hand' && allowedTabs.includes('time-in-hand') && (
+                <main className="home-main-container ranks-container time-in-hand-container">
+                  <TimeInHandView 
                     isAdmin={isAdmin} 
                     userEmail={effectiveEmail} 
                     onNavigateToTab={handleSelectTab} 
