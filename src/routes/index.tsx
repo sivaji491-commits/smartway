@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { RankCalculatorApp } from '@/components/rank-calculator/RankCalculatorApp';
+import { createFileRoute } from '@tanstack/react-router';
+import { LoginPage } from '@/components/login-page';
 import { pageMeta } from '@/lib/page-meta';
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
   head: () => pageMeta(
-    'Rank Management & Cost Calculator · Network Business Tiers',
-    'Calculate network business rank costs with 3% gas fees, cumulative multi-tier totals, USD to INR conversions, and auto-save.'
+    'Sign in to your workspace',
+    'Securely sign in to your IG Infra connected workspace.'
   ),
-  component: RankCalculatorApp,
+  component: LoginPage,
 });
