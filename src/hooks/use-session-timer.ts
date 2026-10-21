@@ -12,6 +12,9 @@ import { isUserAdminOrOwner } from '@/lib/permissions';
 export interface SessionTimerState {
   remainingSeconds: number;
   formattedTime: string; // HH:MM:SS
+  elapsedSeconds: number;
+  formattedElapsedTime: string; // HH:MM:SS
+  sessionStartTime: number | null;
   isWarning: boolean; // <= 5 minutes (300s)
   isUrgent: boolean; // <= 1 minute (60s)
   isExpired: boolean;
@@ -19,6 +22,48 @@ export interface SessionTimerState {
   timerStatus: TimerStatus;
   sessionExpireTime: number | null;
   loginDuration: string;
+}
+
+function resolveSessionStartTime(id: string | null, userObj?: any): number | null {
+  if (typeof window === 'undefined') return null;
+  if (!id) return null;
+
+  // 1. Direct dedicated timestamp key
+  const startRaw = window.localStorage.getItem('nexora-session-start');
+  if (startRaw) {
+    const parsed = parseInt(startRaw, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+
+  // 2. Active session metadata object
+  try {
+    const activeRaw = window.localStorage.getItem('nexora_active_session');
+    if (activeRaw) {
+      const activeObj = JSON.parse(activeRaw);
+      const parsed = activeObj?.sessionStartTime || activeObj?.startedAt;
+      if (typeof parsed === 'number' && parsed > 0) {
+        window.localStorage.setItem('nexora-session-start', String(parsed));
+        return parsed;
+      }
+    }
+  } catch {
+    // Ignore JSON errors
+  }
+
+  // 3. User record in store
+  if (userObj?.sessionStartTime && typeof userObj.sessionStartTime === 'number' && userObj.sessionStartTime > 0) {
+    window.localStorage.setItem('nexora-session-start', String(userObj.sessionStartTime));
+    return userObj.sessionStartTime;
+  }
+  if (userObj?.startedAt && typeof userObj.startedAt === 'number' && userObj.startedAt > 0) {
+    window.localStorage.setItem('nexora-session-start', String(userObj.startedAt));
+    return userObj.startedAt;
+  }
+
+  // 4. If user is authenticated but no start time was recorded, initialize it once
+  const now = Date.now();
+  window.localStorage.setItem('nexora-session-start', String(now));
+  return now;
 }
 
 export function useSessionTimer(userIdentifier?: string | null, onExpire?: () => void): SessionTimerState {
@@ -44,9 +89,15 @@ export function useSessionTimer(userIdentifier?: string | null, onExpire?: () =>
   const [state, setState] = useState<SessionTimerState>(() => {
     const id = getEffectiveId();
     if (isUserAdminOrOwner(id, 'sivaji491@gmail.com')) {
+      const sessionStartTime = resolveSessionStartTime(id);
+      const now = Date.now();
+      const elapsed = sessionStartTime ? Math.max(0, Math.floor((now - sessionStartTime) / 1000)) : 0;
       return {
         remainingSeconds: Infinity,
         formattedTime: 'Unlimited',
+        elapsedSeconds: elapsed,
+        formattedElapsedTime: formatSecondsToDuration(elapsed),
+        sessionStartTime,
         isWarning: false,
         isUrgent: false,
         isExpired: false,
@@ -73,11 +124,18 @@ export function useSessionTimer(userIdentifier?: string | null, onExpire?: () =>
     const effectiveExpireTime = user?.sessionExpireTime || user?.expiresAt || (expireRaw ? parseInt(expireRaw, 10) : null);
     const effectiveDuration = user?.loginDuration || user?.assignedDuration || durationRaw || '01:00:00';
 
+    const sessionStartTime = resolveSessionStartTime(id, user);
+    const now = Date.now();
+    const elapsed = sessionStartTime ? Math.max(0, Math.floor((now - sessionStartTime) / 1000)) : 0;
+
     const remaining = check.valid ? check.remainingSeconds : 0;
     const isExpired = !check.valid || remaining <= 0;
     return {
       remainingSeconds: remaining,
       formattedTime: formatSecondsToDuration(remaining),
+      elapsedSeconds: elapsed,
+      formattedElapsedTime: formatSecondsToDuration(elapsed),
+      sessionStartTime,
       isWarning: remaining > 0 && remaining <= 300 && remaining > 60,
       isUrgent: remaining > 0 && remaining <= 60,
       isExpired,
@@ -98,9 +156,15 @@ export function useSessionTimer(userIdentifier?: string | null, onExpire?: () =>
 
       if (isUserAdminOrOwner(id, 'sivaji491@gmail.com')) {
         hasExpiredRef.current = false;
+        const sessionStartTime = resolveSessionStartTime(id);
+        const now = Date.now();
+        const elapsed = sessionStartTime ? Math.max(0, Math.floor((now - sessionStartTime) / 1000)) : 0;
         setState({
           remainingSeconds: Infinity,
           formattedTime: 'Unlimited',
+          elapsedSeconds: elapsed,
+          formattedElapsedTime: formatSecondsToDuration(elapsed),
+          sessionStartTime,
           isWarning: false,
           isUrgent: false,
           isExpired: false,
@@ -128,10 +192,17 @@ export function useSessionTimer(userIdentifier?: string | null, onExpire?: () =>
       const effectiveExpireTime = user?.sessionExpireTime || user?.expiresAt || (expireRaw ? parseInt(expireRaw, 10) : null);
       const effectiveDuration = user?.loginDuration || user?.assignedDuration || durationRaw || '01:00:00';
 
+      const sessionStartTime = resolveSessionStartTime(id, user);
+      const now = Date.now();
+      const elapsed = sessionStartTime ? Math.max(0, Math.floor((now - sessionStartTime) / 1000)) : 0;
+
       if (!check.valid || check.remainingSeconds <= 0) {
         setState({
           remainingSeconds: 0,
           formattedTime: '00:00:00',
+          elapsedSeconds: elapsed,
+          formattedElapsedTime: formatSecondsToDuration(elapsed),
+          sessionStartTime,
           isWarning: false,
           isUrgent: false,
           isExpired: true,
@@ -160,6 +231,9 @@ export function useSessionTimer(userIdentifier?: string | null, onExpire?: () =>
       setState({
         remainingSeconds: remaining,
         formattedTime: formatSecondsToDuration(remaining),
+        elapsedSeconds: elapsed,
+        formattedElapsedTime: formatSecondsToDuration(elapsed),
+        sessionStartTime,
         isWarning: remaining > 0 && remaining <= 300 && remaining > 60,
         isUrgent: remaining > 0 && remaining <= 60,
         isExpired: false,
@@ -183,6 +257,7 @@ export function useSessionTimer(userIdentifier?: string | null, onExpire?: () =>
     const handleStorage = (e: StorageEvent) => {
       if (
         e.key === 'nexora-session-expire' || 
+        e.key === 'nexora-session-start' || 
         e.key === 'nexora_workspace_users' || 
         e.key === 'nexora_active_session'
       ) {

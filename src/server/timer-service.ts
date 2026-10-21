@@ -5,6 +5,12 @@ import {
   formatSecondsToDuration, 
   getStoredWorkspaceUsers, 
   saveStoredWorkspaceUsers,
+  adminCreateUser,
+  adminDeleteUser,
+  adminUpdateUserPermissions,
+  adminUpdateLoginDuration,
+  adminEnableUser,
+  adminDisableUser,
   type TimerStatus,
   type AccountStatus,
   type DisableReason,
@@ -313,4 +319,94 @@ export const adminExtendTimerServerFn = createServerFn({ method: 'POST' })
   .validator((data: { adminIdentifier: string; targetUserId: string; additionalSeconds: number }) => data)
   .handler(async ({ data }) => {
     return validateAndExtendTimerServer(data.adminIdentifier, data.targetUserId, data.additionalSeconds);
+  });
+
+export function validateAndCreateUserServer(
+  adminIdentifier: string,
+  userData: {
+    username: string;
+    email?: string;
+    password?: string;
+    permissions?: string[];
+    loginDuration?: string;
+    mfaEnabled?: boolean;
+  }
+) {
+  return adminCreateUser(adminIdentifier, userData);
+}
+
+export function validateAndDeleteUserServer(
+  adminIdentifier: string,
+  targetUserId: string
+) {
+  return adminDeleteUser(adminIdentifier, targetUserId);
+}
+
+export function validateAndUpdatePermissionsServer(
+  adminIdentifier: string,
+  targetUserId: string,
+  permissions: string[]
+) {
+  return adminUpdateUserPermissions(adminIdentifier, targetUserId, permissions);
+}
+
+export function validateAndUpdateDurationServer(
+  adminIdentifier: string,
+  targetUserId: string,
+  newDuration: string,
+  resetTimerNow = false
+) {
+  return adminUpdateLoginDuration(targetUserId, newDuration, adminIdentifier, resetTimerNow);
+}
+
+export function validateAndEnableUserServer(
+  adminIdentifier: string,
+  targetUserId: string
+) {
+  const success = adminEnableUser(targetUserId, adminIdentifier);
+  return { success, error: success ? undefined : 'Failed to enable user or unauthorized.' };
+}
+
+export function validateAndDisableUserServer(
+  adminIdentifier: string,
+  targetUserId: string
+) {
+  const success = adminDisableUser(targetUserId, adminIdentifier);
+  return { success, error: success ? undefined : 'Failed to disable user or unauthorized.' };
+}
+
+export const adminCreateUserServerFn = createServerFn({ method: 'POST' })
+  .validator((data: { adminIdentifier: string; userData: any }) => data)
+  .handler(async ({ data }) => {
+    return validateAndCreateUserServer(data.adminIdentifier, data.userData);
+  });
+
+export const adminDeleteUserServerFn = createServerFn({ method: 'POST' })
+  .validator((data: { adminIdentifier: string; targetUserId: string }) => data)
+  .handler(async ({ data }) => {
+    return validateAndDeleteUserServer(data.adminIdentifier, data.targetUserId);
+  });
+
+export const adminUpdatePermissionsServerFn = createServerFn({ method: 'POST' })
+  .validator((data: { adminIdentifier: string; targetUserId: string; permissions: string[] }) => data)
+  .handler(async ({ data }) => {
+    return validateAndUpdatePermissionsServer(data.adminIdentifier, data.targetUserId, data.permissions);
+  });
+
+export const adminUpdateDurationServerFn = createServerFn({ method: 'POST' })
+  .validator((data: { adminIdentifier: string; targetUserId: string; newDuration: string; resetTimerNow?: boolean }) => data)
+  .handler(async ({ data }) => {
+    return validateAndUpdateDurationServer(data.adminIdentifier, data.targetUserId, data.newDuration, data.resetTimerNow);
+  });
+
+export const adminEnableUserServerFn = createServerFn({ method: 'POST' })
+  .validator((data: { adminIdentifier: string; targetUserId: string }) => data)
+  .handler(async ({ data }) => {
+    return validateAndEnableUserServer(data.adminIdentifier, data.targetUserId);
+  });
+
+export const adminDisableUserServerFn = createServerFn({ method: 'POST' })
+  .validator((data: { adminIdentifier: string; targetUserId: string }) => data)
+  .handler(async ({ data }) => {
+    return validateAndDisableUserServer(data.adminIdentifier, data.targetUserId);
   });

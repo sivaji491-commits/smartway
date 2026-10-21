@@ -118,7 +118,7 @@ describe('Real Estate Business Home Page Acceptance Tests', () => {
       render(<HomeTab userEmail="user@example.com" />);
 
       // Verify the required message is rendered
-      const messages = screen.getAllByText('Understand the subject first, or face the loss. Stay updated!');
+      const messages = screen.getAllByText("It's like ONE TIME SMART WORK FOR ASSET EARNING, FIRST UNDERSTAND THE BUSINESS PLAN");
       expect(messages.length).toBeGreaterThanOrEqual(1);
 
       // Verify marquee announcement region is present

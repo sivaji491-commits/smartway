@@ -6,7 +6,7 @@ interface HomeScrollingMarqueeProps {
   className?: string;
 }
 
-export const DEFAULT_MARQUEE_TEXT = 'Understand the subject first, or face the loss. Stay updated!';
+export const DEFAULT_MARQUEE_TEXT = "It's like ONE TIME SMART WORK FOR ASSET EARNING, FIRST UNDERSTAND THE BUSINESS PLAN";
 
 export function HomeScrollingMarquee({
   text = DEFAULT_MARQUEE_TEXT,

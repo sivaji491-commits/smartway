@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { 
   LogOut, 
@@ -42,7 +42,8 @@ import {
   getRegisteredNavigationFields, 
   getOrderedNavigationFields,
   saveSidebarNavOrder,
-  getAccessibleLandingPage 
+  getAccessibleLandingPage,
+  resolveEffectiveUserIdentifier 
 } from '@/lib/permissions';
 import { useSessionTimer } from '@/hooks/use-session-timer';
 import { loadRankCalculatorState } from '@/lib/rank-storage';
@@ -55,17 +56,19 @@ export const Route = createFileRoute('/_authenticated/maintenance')({
 function Maintenance() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [, setRefreshKey] = useState(0);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [previewUserEmail, setPreviewUserEmail] = useState<string | null>(() => {
+    return typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
+  });
 
-  const previewUserEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
-  const loggedInEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || user?.email;
-  const effectiveEmail = previewUserEmail || loggedInEmail;
-  const allowedTabs = getUserAllowedTabs(effectiveEmail);
-  const effectiveAllowed = allowedTabs.filter((t) => t !== 'status');
+  const effectiveEmail = resolveEffectiveUserIdentifier(user?.email);
+  const allowedTabs = useMemo(() => getUserAllowedTabs(effectiveEmail), [effectiveEmail, refreshKey]);
+  const effectiveAllowed = useMemo(() => allowedTabs.filter((t) => t !== 'status'), [allowedTabs]);
 
   const [activeTab, setActiveTab] = useState<string>(() => {
     const urlTab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
@@ -126,14 +129,18 @@ function Maintenance() {
           .filter((f) => f.id !== 'status')
           .map((f) => ({ ...f, icon: f.icon || resolveNavIcon(f.id, f.iconName) }))
       );
+      setPreviewUserEmail(typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null);
+      setRefreshKey((k) => k + 1);
     };
     window.addEventListener('nexora_nav_fields_updated', handleNavUpdate);
     window.addEventListener('nexora_permissions_updated', handleNavUpdate);
     window.addEventListener('nexora_nav_order_updated', handleNavUpdate);
+    window.addEventListener('storage', handleNavUpdate);
     return () => {
       window.removeEventListener('nexora_nav_fields_updated', handleNavUpdate);
       window.removeEventListener('nexora_permissions_updated', handleNavUpdate);
       window.removeEventListener('nexora_nav_order_updated', handleNavUpdate);
+      window.removeEventListener('storage', handleNavUpdate);
     };
   }, []);
 
@@ -153,17 +160,31 @@ function Maintenance() {
 
       // Compute optimal per-item height and gap with comfortable minimum for smooth scrolling
       const slotHeight = availableNavHeight / visibleCount;
-      const computedGap = slotHeight < 32 ? 2 : 3;
-      const computedHeight = Math.min(36, Math.max(34, Math.floor(slotHeight - computedGap)));
-      const computedPy = computedHeight < 35 ? 5 : 7;
+      const computedGap = slotHeight < 36 ? 2 : 3;
+      const computedHeight = Math.min(46, Math.max(38, Math.floor(slotHeight - computedGap)));
+      const computedPy = computedHeight < 40 ? 4 : 5;
       const computedFontSize = 13;
 
-      setSidebarNavStyle({
-        ['--sidebar-item-height' as any]: `${computedHeight}px`,
-        ['--sidebar-item-min-height' as any]: `${computedHeight}px`,
-        ['--sidebar-item-gap' as any]: `${computedGap}px`,
-        ['--sidebar-item-py' as any]: `${computedPy}px`,
-        ['--sidebar-item-font-size' as any]: `${computedFontSize}px`,
+      setSidebarNavStyle((prev) => {
+        const nextH = `${computedHeight}px`;
+        const nextGap = `${computedGap}px`;
+        const nextPy = `${computedPy}px`;
+        const nextFs = `${computedFontSize}px`;
+        if (
+          prev['--sidebar-item-height' as any] === nextH &&
+          prev['--sidebar-item-gap' as any] === nextGap &&
+          prev['--sidebar-item-py' as any] === nextPy &&
+          prev['--sidebar-item-font-size' as any] === nextFs
+        ) {
+          return prev;
+        }
+        return {
+          ['--sidebar-item-height' as any]: nextH,
+          ['--sidebar-item-min-height' as any]: nextH,
+          ['--sidebar-item-gap' as any]: nextGap,
+          ['--sidebar-item-py' as any]: nextPy,
+          ['--sidebar-item-font-size' as any]: nextFs,
+        };
       });
     };
 
@@ -355,16 +376,6 @@ function Maintenance() {
     }
   }, [isAdmin, sessionTimer.isExpired, handleSessionExpired]);
 
-  // Listen for real-time permission updates and storage changes
-  useEffect(() => {
-    const handleUpdate = () => setRefreshKey((k) => k + 1);
-    window.addEventListener('storage', handleUpdate);
-    window.addEventListener('nexora_permissions_updated', handleUpdate);
-    return () => {
-      window.removeEventListener('storage', handleUpdate);
-      window.removeEventListener('nexora_permissions_updated', handleUpdate);
-    };
-  }, []);
 
   useEffect(() => {
     const currentAllowed = allowedTabs.filter((t) => t !== 'status');
@@ -411,18 +422,99 @@ function Maintenance() {
   };
 
   async function signOut() {
-    setBusy(true); setError('');
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem('nexora-user-email');
-      window.localStorage.removeItem('nexora-preview-user-email');
-      window.localStorage.removeItem('nexora-simulated-user');
-      window.localStorage.removeItem('nexora-simulated-user');
+    if (busy || isLoggingOutRef.current) return;
+    isLoggingOutRef.current = true;
+    setBusy(true);
+    setSignOutError(null);
+
+    try {
+      // 1. Race server-side sign out against a timeout to prevent indefinite hanging
+      const timeoutMs = 4000;
+      let timedOut = false;
+      const timeoutPromise = new Promise<{ error: Error | null }>((resolve) => {
+        setTimeout(() => {
+          timedOut = true;
+          resolve({ error: new Error('Network timeout during sign out') });
+        }, timeoutMs);
+      });
+
+      const res = await Promise.race([
+        supabase.auth.signOut(),
+        timeoutPromise,
+      ]);
+
+      // If server returned an error, verify whether session is already absent on the server
+      if (res?.error && !timedOut) {
+        const msg = res.error.message?.toLowerCase() || '';
+        const isSessionAlreadyGone = msg.includes('session missing') ||
+          msg.includes('auth session missing') ||
+          msg.includes('session_not_found') ||
+          msg.includes('jwt expired');
+
+        if (!isSessionAlreadyGone) {
+          // Genuine failure from auth provider: report error and allow user to retry
+          setSignOutError(res.error.message || 'Unable to sign out. Please try again.');
+          return;
+        }
+      }
+
+      // If timed out or if session was already gone on server, ensure local Supabase token is cleared
+      if (timedOut || res?.error) {
+        try {
+          await supabase.auth.signOut({ scope: 'local' });
+        } catch {
+          // Local cleanup completed
+        }
+      }
+
+      // 2. Clear client-side authentication and session storage
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('nexora-user-email');
+        window.localStorage.removeItem('nexora-preview-user-email');
+        window.localStorage.removeItem('nexora-simulated-user');
+        window.localStorage.removeItem('nexora-user-role');
+        window.localStorage.removeItem('nexora_active_session');
+        window.localStorage.removeItem('nexora-session-expire');
+        window.localStorage.removeItem('nexora-session-start');
+        window.localStorage.removeItem('nexora-session-duration');
+        window.localStorage.removeItem('nexora-timer-status');
+        window.localStorage.removeItem('nexora-session-only');
+        window.localStorage.removeItem('nexora_last_disabled_reason');
+
+        window.sessionStorage.removeItem('nexora-session-only');
+        window.sessionStorage.removeItem('nexora-recovery');
+      }
+
+      // 3. Clear query caches so no stale user data persists
+      try {
+        await queryClient.cancelQueries();
+        queryClient.clear();
+      } catch {
+        // Query client cleanup completed
+      }
+
+      // 4. Invalidate router cache so protected route loaders re-evaluate
+      try {
+        await router.invalidate();
+      } catch {
+        // Router invalidated
+      }
+
+      // 5. Immediately redirect the user to the login page
+      try {
+        await navigate({ to: '/auth', replace: true });
+      } catch {
+        if (typeof window !== 'undefined') {
+          window.location.replace('/auth');
+        }
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unable to sign out. Please try again.';
+      setSignOutError(errorMessage);
+    } finally {
+      setBusy(false);
+      isLoggingOutRef.current = false;
     }
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    const { error: authError } = await supabase.auth.signOut();
-    if (authError) { setError('Unable to sign out. Please try again.'); setBusy(false); return; }
-    await navigate({ to: '/auth', replace: true });
   }
 
   function exitPreview() {
@@ -430,6 +522,7 @@ function Maintenance() {
       window.localStorage.removeItem('nexora-preview-user-email');
       window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
     }
+    setPreviewUserEmail(null);
     handleSelectTab('users');
   }
 
@@ -463,6 +556,7 @@ function Maintenance() {
             const isDragging = draggedIndex === index;
             const isDropTargetBefore = dropTarget?.index === index && dropTarget.position === 'before';
             const isDropTargetAfter = dropTarget?.index === index && dropTarget.position === 'after';
+            const isOtherSidebarItem = item.id !== 'home';
 
             return (
               <button 
@@ -471,7 +565,8 @@ function Maintenance() {
                 draggable={true}
                 data-index={index}
                 data-item-id={item.id}
-                className={`sidebar-nav-btn group ${activeTab === item.id ? 'active' : ''} ${isDragging ? 'is-dragging' : ''} ${isDropTargetBefore ? 'drop-target-before' : ''} ${isDropTargetAfter ? 'drop-target-after' : ''}`}
+                aria-label={item.label}
+                className={`sidebar-nav-btn group ${activeTab === item.id ? 'active' : ''} ${isDragging ? 'is-dragging' : ''} ${isDropTargetBefore ? 'drop-target-before' : ''} ${isDropTargetAfter ? 'drop-target-after' : ''} ${isOtherSidebarItem ? 'has-submessage' : ''}`}
                 onClick={() => handleNavButtonClick(item.id)}
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
@@ -484,7 +579,17 @@ function Maintenance() {
                 title={`Drag to reorder · ${item.label}`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
-                <span className="truncate">{item.label}</span>
+                <div className="sidebar-nav-label-container flex flex-col min-w-0 flex-1 text-left">
+                  <span className="truncate">{item.label}</span>
+                  {isOtherSidebarItem && (
+                    <span 
+                      className="sidebar-blinking-msg"
+                      data-testid="sidebar-blinking-message"
+                    >
+                      One Time Work in entire life
+                    </span>
+                  )}
+                </div>
                 <span 
                   className="sidebar-drag-handle" 
                   title="Drag to reorder"
@@ -511,6 +616,11 @@ function Maintenance() {
           <div className="sidebar-user-badge" title={effectiveEmail || 'User'}>
             <span className="font-medium truncate block">{effectiveEmail}</span>
           </div>
+          {signOutError && (
+            <div role="alert" className="text-[11px] text-red-400 bg-red-950/60 border border-red-500/30 rounded px-2.5 py-1 leading-tight mb-2 text-center">
+              {signOutError}
+            </div>
+          )}
           <Button variant="ghost" size="sm" onClick={signOut} disabled={busy} className="sidebar-signout-btn">
             {busy ? <LoaderCircle className="w-4 h-4 animate-spin mr-1.5" /> : <LogOut className="w-4 h-4 mr-1.5" />}
             Sign out
@@ -530,7 +640,7 @@ function Maintenance() {
       {/* Main Content Area */}
       <div className={`app-main-content ${activeTab === 'earning-opportunities' ? 'earning-opportunities-active' : ''}`}>
         {/* Top Bar with Navigation Tabs & Live Session Countdown */}
-        <header className={`app-topbar ${activeTab === 'earning-opportunities' ? 'earning-opportunities-topbar' : ''}`}>
+        <header className={`app-topbar ${activeTab === 'earning-opportunities' ? 'earning-opportunities-topbar' : ''} ${!isAdmin ? 'regular-user-topbar' : ''}`}>
           <div className="topbar-left">
             <button
               type="button"
@@ -540,28 +650,30 @@ function Maintenance() {
             >
               {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
-            <nav className="topbar-nav-tabs" aria-label="Top Tabs Navigation">
-              {navItems.map((item) => {
-                if (!allowedTabs.includes(item.id)) return null;
-                const Icon = item.icon;
-                const isSelected = activeTab === item.id;
-                return (
-                  <button
-                    key={`top-${item.id}`}
-                    type="button"
-                    className={`topbar-tab-item ${isSelected ? 'active' : ''}`}
-                    onClick={() => handleSelectTab(item.id)}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+            {isAdmin && (
+              <nav className="topbar-nav-tabs" aria-label="Top Tabs Navigation">
+                {navItems.map((item) => {
+                  if (!allowedTabs.includes(item.id)) return null;
+                  const Icon = item.icon;
+                  const isSelected = activeTab === item.id;
+                  return (
+                    <button
+                      key={`top-${item.id}`}
+                      type="button"
+                      className={`topbar-tab-item ${isSelected ? 'active' : ''}`}
+                      onClick={() => handleSelectTab(item.id)}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            )}
           </div>
           <div className="topbar-actions">
             {/* Green Ranks Indicator (e.g. Ranks 7) */}
-            {activeTab === 'ranks' && (
+            {isAdmin && activeTab === 'ranks' && (
               <div 
                 className="topbar-ranks-badge"
                 title={`Total Ranks: ${rankCount}`}
@@ -573,7 +685,7 @@ function Maintenance() {
             )}
 
             {/* 12 Level Bonus Indicator */}
-            {activeTab === '12-level-bonus' && (
+            {isAdmin && activeTab === '12-level-bonus' && (
               <div 
                 className="topbar-ranks-badge bg-amber-600 border-amber-500"
                 title={`12 Level Bonus · ${rankCount} Ranks Available`}
@@ -584,7 +696,7 @@ function Maintenance() {
             )}
 
             {/* DCB (90 days) Indicator */}
-            {activeTab === 'dcb-90-days' && (
+            {isAdmin && activeTab === 'dcb-90-days' && (
               <div 
                 className="topbar-ranks-badge bg-amber-600 border-amber-500"
                 title={`DCB (90 days) · 30% Double Connect Bonus`}
@@ -595,7 +707,7 @@ function Maintenance() {
             )}
 
             {/* Customer View Indicator */}
-            {activeTab === 'customer-view' && (
+            {isAdmin && activeTab === 'customer-view' && (
               <div 
                 className="topbar-ranks-badge bg-blue-600 border-blue-500"
                 title={`Customer View · Rank-Based Benefits Display`}
@@ -606,7 +718,7 @@ function Maintenance() {
             )}
 
             {/* Key Points Indicator */}
-            {activeTab === 'key-points' && (
+            {isAdmin && activeTab === 'key-points' && (
               <div 
                 className="topbar-ranks-badge bg-emerald-600 border-emerald-500"
                 title="Key Points · Executive Business Principles"
@@ -617,7 +729,7 @@ function Maintenance() {
             )}
 
             {/* In-hand time Indicator */}
-            {activeTab === 'time-in-hand' && (
+            {isAdmin && activeTab === 'time-in-hand' && (
               <div 
                 className="topbar-ranks-badge bg-teal-600 border-teal-500"
                 title="In-hand time · Working Hours & Time Calculation Table"
@@ -628,7 +740,7 @@ function Maintenance() {
             )}
 
             {/* Settings Indicator */}
-            {activeTab === 'settings' && (
+            {isAdmin && activeTab === 'settings' && (
               <div 
                 className="topbar-ranks-badge bg-indigo-600 border-indigo-500"
                 title="Settings · Application Configuration & Key Points Management"
@@ -638,19 +750,44 @@ function Maintenance() {
               </div>
             )}
 
-            {/* Live Session Countdown Timer Widget - Only for regular users, NOT admin! */}
-            {!isAdmin ? (
+            {/* Live Access Time Countdown Widget */}
+            {effectiveEmail && (
               <div 
-                className={`session-timer-badge ${sessionTimer.isUrgent ? 'timer-urgent' : sessionTimer.isWarning ? 'timer-warning' : ''}`}
-                title={`Session duration: ${sessionTimer.loginDuration}`}
+                className={`session-timer-badge ${!isAdmin && sessionTimer.isUrgent ? 'timer-urgent' : !isAdmin && sessionTimer.isWarning ? 'timer-warning' : ''}`}
+                title={
+                  isAdmin 
+                    ? 'Access Valid For: Unlimited · Administrator Account' 
+                    : `Access Valid For: ${sessionTimer.formattedTime} · Expiry: ${sessionTimer.sessionExpireTime ? new Date(sessionTimer.sessionExpireTime).toLocaleTimeString() : 'N/A'}`
+                }
+                aria-label={isAdmin ? 'Access Valid For: Unlimited' : `Access Valid For: ${sessionTimer.formattedTime}`}
+                data-testid="session-timer-badge"
               >
-                <Clock className="w-3.5 h-3.5" />
-              </div>
-            ) : (
-              <div className="session-timer-badge" title="Administrator has unlimited access anytime">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="timer-label">Admin Access:</span>
-                <span className="font-semibold text-xs text-emerald-300">Unlimited</span>
+                {isAdmin ? (
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                ) : (
+                  <Clock className={`w-3.5 h-3.5 shrink-0 ${sessionTimer.isUrgent ? 'text-rose-400' : sessionTimer.isWarning ? 'text-amber-400' : 'text-slate-300'}`} />
+                )}
+                <span className="timer-label font-medium">
+                  {isAdmin ? (
+                    <>
+                      <span className="hidden sm:inline">Access Valid For:</span>
+                      <span className="sm:hidden">Access:</span>
+                    </>
+                  ) : (
+                    <span>Access Valid For:</span>
+                  )}
+                </span>
+                <span className={`timer-countdown font-semibold text-xs tabular-nums ${isAdmin ? 'text-emerald-300' : 'text-foreground'}`}>
+                  {isAdmin ? 'Unlimited' : sessionTimer.formattedTime}
+                </span>
+                {isAdmin && (
+                  <span 
+                    className="hidden md:inline-flex items-center text-[10px] font-semibold text-emerald-400/90 ml-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20"
+                    title="Administrator account with permanent access"
+                  >
+                    Admin
+                  </span>
+                )}
               </div>
             )}
           </div>
@@ -679,10 +816,12 @@ function Maintenance() {
               userEmail={effectiveEmail}
               authorizedPageName={effectiveAllowed.length > 0 ? (effectiveAllowed.includes('home') ? 'Home' : (navItems.find((i) => i.id === effectiveAllowed[0])?.label || effectiveAllowed[0])) : null}
               onNavigateToAuthorized={effectiveAllowed.length > 0 ? () => {
-                const target = effectiveAllowed.includes('home') ? 'home' : effectiveAllowed[0];
+                const target = effectiveAllowed.includes('home') ? 'home' : (effectiveAllowed[0] || 'home');
                 handleSelectTab(target);
               } : undefined}
               onSignOut={signOut}
+              isSigningOut={busy}
+              signOutError={signOutError}
             />
           ) : (
             <>
@@ -726,7 +865,7 @@ function Maintenance() {
               )}
               {activeTab === 'users' && allowedTabs.includes('users') && (
                 <main className="home-main-container users-container">
-                  <UserManagementTab currentUserEmail={loggedInEmail} />
+                  <UserManagementTab currentUserEmail={effectiveEmail} />
                 </main>
               )}
               {activeTab === 'earning-opportunities' && allowedTabs.includes('earning-opportunities') && (

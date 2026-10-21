@@ -82,6 +82,15 @@ export function loadPublishedHomePage(): HomePageData {
       return DEFAULT_HOME_PAGE_DATA;
     }
 
+    if (
+      parsed.marqueeText === 'Understand the subject first, or face the loss. Stay updated!' ||
+      parsed.marqueeText === "It's like ONE TIME SMART WORK" ||
+      parsed.marqueeText === "It's like ONE TIME SMART WORK FOR ASSET EARNING"
+    ) {
+      parsed.marqueeText = DEFAULT_HOME_PAGE_DATA.marqueeText;
+      savePublishedHomePageLocal({ ...DEFAULT_HOME_PAGE_DATA, ...parsed });
+    }
+
     return {
       ...DEFAULT_HOME_PAGE_DATA,
       ...parsed,
@@ -106,6 +115,13 @@ export function loadDraftHomePage(): HomePageData {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object' && parsed.hero) {
+        if (
+          parsed.marqueeText === 'Understand the subject first, or face the loss. Stay updated!' ||
+          parsed.marqueeText === "It's like ONE TIME SMART WORK" ||
+          parsed.marqueeText === "It's like ONE TIME SMART WORK FOR ASSET EARNING"
+        ) {
+          parsed.marqueeText = DEFAULT_HOME_PAGE_DATA.marqueeText;
+        }
         return {
           ...DEFAULT_HOME_PAGE_DATA,
           ...parsed,

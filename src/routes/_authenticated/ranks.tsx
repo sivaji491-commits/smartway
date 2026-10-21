@@ -1,13 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { pageMeta } from '@/lib/page-meta';
-import { getUserAllowedTabs, getAccessibleLandingPage } from '@/lib/permissions';
+import { getUserAllowedTabs, getAccessibleLandingPage, resolveEffectiveUserIdentifier } from '@/lib/permissions';
 
 export const Route = createFileRoute('/_authenticated/ranks')({
   head: () => pageMeta('Ranks · IG Infra Business Plan', 'Rank calculator, pricing tiers, and accumulation details.'),
   beforeLoad: async ({ context }) => {
-    const previewEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
-    const userEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || (context as any)?.user?.email;
-    const effectiveEmail = previewEmail || userEmail;
+    const effectiveEmail = resolveEffectiveUserIdentifier((context as any)?.user?.email);
     const allowed = getUserAllowedTabs(effectiveEmail);
 
     if (!allowed.includes('ranks')) {

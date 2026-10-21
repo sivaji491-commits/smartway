@@ -73,9 +73,12 @@ export async function apiUpdateUserPermissions(
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const users = JSON.parse(raw);
-        if (Array.isArray(users)) {
+          const targetLower = targetUserId.toLowerCase().trim();
           const updated = users.map((u: any) => {
-            if (u.id === targetUserId) {
+            const matchId = u.id && u.id.toLowerCase().trim() === targetLower;
+            const matchUser = u.username && u.username.toLowerCase().trim() === targetLower;
+            const matchEmail = u.email && u.email.toLowerCase().trim() === targetLower;
+            if (matchId || matchUser || matchEmail) {
               return { ...u, permissions: newPermissions };
             }
             return u;
@@ -84,7 +87,6 @@ export async function apiUpdateUserPermissions(
           window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
         }
       }
-    }
 
     return {
       success: true,

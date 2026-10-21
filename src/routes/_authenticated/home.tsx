@@ -1,13 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { pageMeta } from '@/lib/page-meta';
-import { getUserAllowedTabs, getAccessibleLandingPage } from '@/lib/permissions';
+import { getUserAllowedTabs, getAccessibleLandingPage, resolveEffectiveUserIdentifier } from '@/lib/permissions';
 
 export const Route = createFileRoute('/_authenticated/home')({
   head: () => pageMeta('Workspace Home · IG Infra Business Plan', 'Workspace dashboard and summary.'),
   beforeLoad: async ({ context }) => {
-    const previewEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
-    const userEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || (context as any)?.user?.email;
-    const effectiveEmail = previewEmail || userEmail;
+    const effectiveEmail = resolveEffectiveUserIdentifier((context as any)?.user?.email);
     const allowed = getUserAllowedTabs(effectiveEmail);
 
     if (!allowed.includes('home')) {

@@ -455,7 +455,7 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
       )}
 
       {/* 2. Key Parameter Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+      <div className="time-in-hand-summary-grid">
         <div className="bg-slate-50/80 rounded-lg p-2.5 sm:p-3 border border-slate-200/80">
           <div className="text-[11px] text-slate-500 font-medium flex items-center justify-between">
             <span>Daily Hours</span>
@@ -777,17 +777,17 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
       </div>
 
       {/* 4. Promotional & Motivational Quotes matching reference screenshot */}
-      <div className="pt-2 pb-1 text-center space-y-2">
-        <p className="text-slate-800 text-xs sm:text-sm md:text-base font-medium">
+      <div className="pt-2 pb-1 text-center space-y-2 break-words px-2 max-w-full overflow-hidden">
+        <p className="text-slate-800 text-xs sm:text-sm md:text-base font-medium break-words">
           {config.quote1 || 'Just give 2 perfect referrals, your life will be settled financially.'}
         </p>
 
-        <p className="text-rose-600 text-xs sm:text-sm md:text-base font-bold flex items-center justify-center gap-1.5 flex-wrap">
-          <span>{config.quote2.replace('👈', '').trim()}</span>
+        <p className="text-rose-600 text-xs sm:text-sm md:text-base font-bold flex items-center justify-center gap-1.5 flex-wrap break-words">
+          <span>{config.quote2 ? (config.quote2.includes('👈') ? config.quote2.replace('👈', '').trim() : config.quote2.trim()) : ''}</span>
           <span className="text-lg leading-none" role="img" aria-label="point left">👈</span>
         </p>
 
-        <p className="text-slate-900 text-sm sm:text-base md:text-lg font-extrabold tracking-tight">
+        <p className="text-slate-900 text-sm sm:text-base md:text-lg font-extrabold tracking-tight break-words">
           {config.quote3 || "Everything is smart nowadays, so why shouldn't earning also be smart?"}
         </p>
       </div>

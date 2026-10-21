@@ -87,7 +87,7 @@ export interface HomePageData {
 }
 
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
-  marqueeText: 'Understand the subject first, or face the loss. Stay updated!',
+  marqueeText: "It's like ONE TIME SMART WORK FOR ASSET EARNING, FIRST UNDERSTAND THE BUSINESS PLAN",
   hero: {
     headline: 'Your Future. Your Opportunity.',
     highlightHeadline: 'Understand the Possibilities.',

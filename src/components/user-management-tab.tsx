@@ -34,7 +34,8 @@ import {
   Award,
   Zap,
   KeyRound,
-  Settings
+  Settings,
+  ShieldAlert
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -180,7 +181,6 @@ function isUserAdminOrOwner(u: any, ownerEmail?: string | null): boolean {
       lower.includes('sivaji') ||
       lower === 'preview@nexora.example' ||
       lower === 'usr-owner' ||
-      lower === 'usr-1' ||
       lower === 'admin' ||
       lower === 'owner'
     );
@@ -198,7 +198,6 @@ function isUserAdminOrOwner(u: any, ownerEmail?: string | null): boolean {
     username.includes('sivaji') ||
     email === 'preview@nexora.example' ||
     id === 'usr-owner' ||
-    id === 'usr-1' ||
     role === 'owner' ||
     role === 'admin'
   );
@@ -222,7 +221,7 @@ function loadDynamicUsers(ownerEmail: string): WorkspaceUser[] {
     name: `${capitalizedOwnerName} (Owner)`,
     email: effectiveOwnerEmail,
     password: 'Vijashya@2828',
-    permissions: ['home', 'users', 'earning-opportunities', 'status'],
+    permissions: getAllNavigationFieldIds(),
     status: 'ACTIVE',
     guardianProtected: true,
     mfaEnabled: true,
@@ -248,10 +247,10 @@ function loadDynamicUsers(ownerEmail: string): WorkspaceUser[] {
           .map((u: any) => {
             const isOwner = isUserAdminOrOwner(u, effectiveOwnerEmail);
             const username = u.username || (isOwner ? 'sivaji' : (u.name || (u.email ? u.email.split('@')[0] : 'user')));
-            // Admin/Owner MUST always have full access to all navigation tabs: Home, User Management, Earning Opportunities, Platform Status
+            // Admin/Owner MUST always have full access to all navigation tabs
             const permissions: NavigationField[] = isOwner
-              ? ['home', 'users', 'earning-opportunities', 'status']
-              : Array.isArray(u.permissions) && u.permissions.length > 0
+              ? getAllNavigationFieldIds()
+              : Array.isArray(u.permissions)
               ? u.permissions
               : ['home', 'earning-opportunities', 'status'];
 
@@ -299,13 +298,18 @@ function loadDynamicUsers(ownerEmail: string): WorkspaceUser[] {
 
 interface UserManagementTabProps {
   currentUserEmail?: string | null | undefined;
+  isAdmin?: boolean;
 }
 
-export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) {
-  const defaultOwnerEmail = currentUserEmail || 'sivaji491@gmail.com';
+export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementTabProps) {
+  const primaryOwnerEmail = 'sivaji491@gmail.com';
+  const effectiveCallerEmail = currentUserEmail || primaryOwnerEmail;
+  const isCurrentUserAdmin = typeof isAdmin === 'boolean'
+    ? isAdmin
+    : (currentUserEmail ? isUserAdminOrOwner(currentUserEmail, primaryOwnerEmail) : true);
 
   const [users, setUsers] = useState<WorkspaceUser[]>(() => {
-    return loadDynamicUsers(defaultOwnerEmail);
+    return loadDynamicUsers(primaryOwnerEmail);
   });
 
   // Search & Filter
@@ -346,7 +350,7 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
   useEffect(() => {
     const handleUpdate = () => {
       setNavFields(getResolvedNavigationFields());
-      setUsers(loadDynamicUsers(defaultOwnerEmail));
+      setUsers(loadDynamicUsers(primaryOwnerEmail));
     };
     window.addEventListener('storage', handleUpdate);
     window.addEventListener('nexora_session_updated', handleUpdate);
@@ -358,7 +362,7 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
       window.removeEventListener('nexora_account_disabled', handleUpdate);
       window.removeEventListener('nexora_nav_fields_updated', handleUpdate);
     };
-  }, [defaultOwnerEmail]);
+  }, [primaryOwnerEmail]);
 
   // Persist users to localStorage whenever state updates and dispatch update event
   useEffect(() => {
@@ -431,6 +435,10 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
   // Handle Create User with Duration validation
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isCurrentUserAdmin) {
+      setCreateError('Unauthorized: Only administrators can create users.');
+      return;
+    }
     if (isSaving) return;
     setCreateError('');
 
@@ -503,6 +511,10 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
       };
 
       const nextUsers = [newUser, ...users];
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUsers));
+        window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+      }
       setUsers(nextUsers);
       setIsCreateOpen(false);
       setCreateUsername('');
@@ -529,12 +541,20 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
 
   // Open Edit Permissions Modal
   const openEditPermissions = (user: WorkspaceUser) => {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can edit permissions.');
+      return;
+    }
     setEditingPermissionsUser(user);
     setEditPermissionsSelection((user.permissions || []).filter((p) => p !== 'status'));
   };
 
   // Save Permissions
   const handleSavePermissions = () => {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can modify permissions.');
+      return;
+    }
     if (!editingPermissionsUser) return;
     if (editPermissionsSelection.length === 0) {
       showToast('User must have access to at least one navigation field.');
@@ -542,8 +562,12 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
     }
 
     const updated = users.map((u) => 
-      u.id === editingPermissionsUser.id ? { ...u, permissions: editPermissionsSelection } : u
+      u.id === editingPermissionsUser.id ? { ...u, permissions: [...editPermissionsSelection] } : u
     );
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+    }
     setUsers(updated);
     showToast(`Navigation permissions updated for ${editingPermissionsUser.name}`);
     setEditingPermissionsUser(null);
@@ -551,6 +575,10 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
 
   // Open Edit Duration Modal
   const openEditDuration = (user: WorkspaceUser) => {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can edit access duration.');
+      return;
+    }
     setEditingDurationUser(user);
     setEditingDurationValue(user.assignedDuration || user.loginDuration || DEFAULT_LOGIN_DURATION);
     setEditingDurationError('');
@@ -559,6 +587,10 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
 
   // Save Duration
   const handleSaveDuration = () => {
+    if (!isCurrentUserAdmin) {
+      setEditingDurationError('Unauthorized: Only administrators can change access duration.');
+      return;
+    }
     if (!editingDurationUser) return;
     const validation = validateLoginDuration(editingDurationValue);
     if (!validation.valid) {
@@ -569,7 +601,7 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
     const res = adminUpdateLoginDuration(
       editingDurationUser.id, 
       editingDurationValue, 
-      defaultOwnerEmail, 
+      effectiveCallerEmail, 
       resetTimerImmediately
     );
     if (!res.success) {
@@ -577,7 +609,7 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
       return;
     }
 
-    setUsers(loadDynamicUsers(defaultOwnerEmail));
+    setUsers(loadDynamicUsers(primaryOwnerEmail));
     showToast(
       resetTimerImmediately
         ? `Timer for @${editingDurationUser.username || editingDurationUser.name} reset to ${editingDurationValue.trim()} now!`
@@ -589,83 +621,114 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
 
   // Admin action: Reset User Timer
   const handleResetUserTimer = (user: WorkspaceUser, newDuration?: string) => {
-    if (isUserAdminOrOwner(user, defaultOwnerEmail)) {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can reset user timers.');
+      return;
+    }
+    if (isUserAdminOrOwner(user, primaryOwnerEmail)) {
       showToast('Workspace administrator accounts have permanent unlimited access.');
       return;
     }
-    const result = adminResetUserTimer(user.id, defaultOwnerEmail, newDuration);
+    const result = adminResetUserTimer(user.id, effectiveCallerEmail, newDuration);
     if (!result.success) {
       showToast(result.error || 'Failed to reset user timer.');
       return;
     }
-    setUsers(loadDynamicUsers(defaultOwnerEmail));
+    setUsers(loadDynamicUsers(primaryOwnerEmail));
     showToast(`Timer for @${user.username || user.name} reset to ${result.loginDuration || user.loginDuration}!`);
   };
 
   // Admin action: Extend User Timer
   const handleExtendUserTimer = (user: WorkspaceUser, additionalMinutes: number) => {
-    if (isUserAdminOrOwner(user, defaultOwnerEmail)) {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can extend user timers.');
+      return;
+    }
+    if (isUserAdminOrOwner(user, primaryOwnerEmail)) {
       showToast('Workspace administrator accounts have permanent unlimited access.');
       return;
     }
-    const result = adminExtendUserTimer(user.id, defaultOwnerEmail, additionalMinutes * 60);
+    const result = adminExtendUserTimer(user.id, effectiveCallerEmail, additionalMinutes * 60);
     if (!result.success) {
       showToast(result.error || 'Failed to extend user timer.');
       return;
     }
-    setUsers(loadDynamicUsers(defaultOwnerEmail));
+    setUsers(loadDynamicUsers(primaryOwnerEmail));
     showToast(`Added +${additionalMinutes}m to @${user.username || user.name}'s timer.`);
   };
 
   // Admin action: Enable User
   const handleEnableUser = (user: WorkspaceUser) => {
-    adminEnableUser(user.id, defaultOwnerEmail.split('@')[0] || 'sivaji');
-    setUsers(loadDynamicUsers(defaultOwnerEmail));
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can enable users.');
+      return;
+    }
+    adminEnableUser(user.id, effectiveCallerEmail.split('@')[0] || 'sivaji');
+    setUsers(loadDynamicUsers(primaryOwnerEmail));
     showToast(`User @${user.username || user.name} enabled. Fresh session timer will start on next login.`);
   };
 
   // Admin action: Disable User
   const handleDisableUser = (user: WorkspaceUser) => {
-    if (user.id === 'usr-owner' || isUserAdminOrOwner(user, defaultOwnerEmail)) {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can disable users.');
+      return;
+    }
+    if (user.id === 'usr-owner' || isUserAdminOrOwner(user, primaryOwnerEmail)) {
       showToast('Cannot disable workspace owner.');
       return;
     }
-    adminDisableUser(user.id);
-    setUsers(loadDynamicUsers(defaultOwnerEmail));
+    adminDisableUser(user.id, effectiveCallerEmail);
+    setUsers(loadDynamicUsers(primaryOwnerEmail));
     showToast(`User @${user.username || user.name} disabled by administrator.`);
   };
 
   // Admin action: Force Logout
   const handleForceLogout = (user: WorkspaceUser) => {
-    adminForceLogoutUser(user.id);
-    setUsers(loadDynamicUsers(defaultOwnerEmail));
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can terminate user sessions.');
+      return;
+    }
+    adminForceLogoutUser(user.id, effectiveCallerEmail);
+    setUsers(loadDynamicUsers(primaryOwnerEmail));
     showToast(`Active session terminated for @${user.username || user.name}.`);
   };
 
   // Delete user
   const handleDeleteUser = (id: string, name: string) => {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can remove users.');
+      return;
+    }
     const target = users.find((u) => u.id === id);
     if (!target) return;
-    if (target.id === 'usr-owner' || isUserAdminOrOwner(target, defaultOwnerEmail)) {
+    if (target.id === 'usr-owner' || isUserAdminOrOwner(target, primaryOwnerEmail)) {
       showToast('Cannot remove workspace owner.');
       return;
     }
 
-    setUsers(users.filter((u) => u.id !== id));
+    const nextUsers = users.filter((u) => u.id !== id);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUsers));
+      window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+    }
+    setUsers(nextUsers);
     showToast(`${name} has been removed from workspace`);
   };
 
   // Reset to only dynamic owner account
   const handleResetData = () => {
+    if (!isCurrentUserAdmin) {
+      showToast('Unauthorized: Only administrators can reset directory data.');
+      return;
+    }
     if (window.confirm('Reset directory to only your active authenticated account?')) {
-      const ownerName = (defaultOwnerEmail ? defaultOwnerEmail.split('@')[0] : 'Owner') || 'Owner';
-      const capitalizedOwnerName = ownerName.charAt(0).toUpperCase() + ownerName.slice(1);
       const reset: WorkspaceUser[] = [
         {
           id: 'usr-owner',
           username: 'sivaji',
-          name: `${capitalizedOwnerName} (Owner)`,
-          email: defaultOwnerEmail,
+          name: 'Sivaji (Owner)',
+          email: primaryOwnerEmail,
           password: 'Vijashya@2828',
           permissions: ['home', 'users', 'status'],
           status: 'ACTIVE',
@@ -709,6 +772,29 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
       </div>
     );
   };
+
+  if (!isCurrentUserAdmin) {
+    return (
+      <div className="users-dashboard animate-in fade-in duration-300">
+        <div className="max-w-xl mx-auto my-12 p-8 rounded-2xl bg-card border border-border shadow-xl text-center space-y-5">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-destructive/10 text-destructive flex items-center justify-center border border-destructive/20 shadow-inner">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Administrator Access Required</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
+              User Management, access duration settings, and account permissions are strictly reserved for authorized administrators.
+            </p>
+          </div>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground border border-border/40 font-mono">
+            <span>Identity: {currentUserEmail || 'Standard User'}</span>
+            <span>·</span>
+            <span className="text-destructive font-medium">Access Restricted</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="users-dashboard animate-in fade-in duration-300">
@@ -889,7 +975,7 @@ export function UserManagementTab({ currentUserEmail }: UserManagementTabProps) 
                   .substring(0, 2)
                   .toUpperCase();
 
-                const isOwner = isUserAdminOrOwner(user, defaultOwnerEmail);
+                const isOwner = isUserAdminOrOwner(user, primaryOwnerEmail);
                 const normStatus = normalizeStatus(user.status);
                 const hasActiveSession = Boolean(
                   user.sessionStartTime && 

@@ -1,13 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { pageMeta } from '@/lib/page-meta';
-import { getUserAllowedTabs, getAccessibleLandingPage } from '@/lib/permissions';
+import { getUserAllowedTabs, getAccessibleLandingPage, resolveEffectiveUserIdentifier } from '@/lib/permissions';
 
 export const Route = createFileRoute('/_authenticated/12-level-bonus')({
   head: () => pageMeta('12 Level Bonus · IG Infra Business Plan', '12-level compressed matrix bonus structure and dynamic rank calculation.'),
   beforeLoad: async ({ context }) => {
-    const previewEmail = typeof window !== 'undefined' ? window.localStorage.getItem('nexora-preview-user-email') : null;
-    const userEmail = (typeof window !== 'undefined' && window.localStorage.getItem('nexora-user-email')) || (context as any)?.user?.email;
-    const effectiveEmail = previewEmail || userEmail;
+    const effectiveEmail = resolveEffectiveUserIdentifier((context as any)?.user?.email);
     const allowed = getUserAllowedTabs(effectiveEmail);
 
     if (!allowed.includes('12-level-bonus')) {

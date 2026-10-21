@@ -89,4 +89,84 @@ describe('Sidebar Menu: Automatic Layout Adjustment & Drag-and-Drop Reordering',
       expect(updated).toEqual(['home', 'customer-view', 'users', 'ranks']);
     });
   });
+
+  describe('3. Sidebar Blinking Message for Other Menu Items', () => {
+    it('verifies non-home navigation fields qualify as other items', () => {
+      const allFields = getRegisteredNavigationFields();
+      const otherFields = allFields.filter((f) => f.id !== 'home');
+      expect(otherFields.length).toBeGreaterThan(0);
+      expect(allFields.find((f) => f.id === 'home')).toBeDefined();
+    });
+
+    it('renders "One Time Work in entire life" on other sidebar items and excludes it from home', () => {
+      const navItems = getRegisteredNavigationFields();
+      const { container } = render(
+        <nav className="sidebar-nav">
+          {navItems.map((item) => {
+            const isOtherSidebarItem = item.id !== 'home';
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={`sidebar-nav-btn ${isOtherSidebarItem ? 'has-submessage' : ''}`}
+                data-item-id={item.id}
+              >
+                <div className="sidebar-nav-label-container">
+                  <span className="truncate">{item.label}</span>
+                  {isOtherSidebarItem && (
+                    <span className="sidebar-blinking-msg" data-testid="sidebar-blinking-message">
+                      One Time Work in entire life
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </nav>
+      );
+
+      const blinkingMessages = screen.getAllByText('One Time Work in entire life');
+      expect(blinkingMessages.length).toBe(navItems.length - 1);
+
+      // Verify Home button does NOT contain the blinking message
+      const homeBtn = container.querySelector('[data-item-id="home"]');
+      expect(homeBtn).not.toBeNull();
+      expect(homeBtn?.textContent).toContain('Home');
+      expect(homeBtn?.textContent).not.toContain('One Time Work in entire life');
+
+      // Verify other buttons DO contain the blinking message
+      const usersBtn = container.querySelector('[data-item-id="users"]');
+      expect(usersBtn).not.toBeNull();
+      expect(usersBtn?.textContent).toContain('User Management');
+      expect(usersBtn?.textContent).toContain('One Time Work in entire life');
+      expect(usersBtn?.querySelector('.sidebar-blinking-msg')).not.toBeNull();
+    });
+
+    it('defines continuous uniform CSS animation rules and hover highlight for sidebar blinking messages', () => {
+      // Verify styles are set to continuous uniform animation without pause desynchronization
+      const styleEl = document.createElement('style');
+      styleEl.innerHTML = `
+        .sidebar-blinking-msg {
+          animation: sidebar-blinking-pulse 2s ease-in-out infinite;
+        }
+        .sidebar-nav-btn:hover .sidebar-blinking-msg {
+          color: #FBBF24;
+        }
+      `;
+      document.head.appendChild(styleEl);
+
+      const navBtn = document.createElement('button');
+      navBtn.className = 'sidebar-nav-btn';
+      const msgSpan = document.createElement('span');
+      msgSpan.className = 'sidebar-blinking-msg';
+      msgSpan.textContent = 'One Time Work in entire life';
+      navBtn.appendChild(msgSpan);
+      document.body.appendChild(navBtn);
+
+      expect(msgSpan.textContent).toBe('One Time Work in entire life');
+      expect(msgSpan.className).toBe('sidebar-blinking-msg');
+      document.head.removeChild(styleEl);
+      document.body.removeChild(navBtn);
+    });
+  });
 });

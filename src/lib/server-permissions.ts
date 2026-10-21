@@ -50,17 +50,18 @@ export function resolveUserPermissionsFromStore(identifier?: string | null): str
         if (Array.isArray(users)) {
           const matched = users.find((u: any) => {
             if (!u) return false;
+            const uId = (u.id || '').toLowerCase().trim();
             const uName = (u.username || '').toLowerCase().trim();
             const uEmail = (u.email || '').toLowerCase().trim();
             const uDisplay = (u.name || '').toLowerCase().trim();
-            return uName === lower || uEmail === lower || uDisplay === lower;
+            return uId === lower || uName === lower || uEmail === lower || uDisplay === lower;
           });
 
           if (matched) {
             if (isUserAdminOrOwner(matched, 'sivaji491@gmail.com')) {
               return getAllNavigationFieldIds();
             }
-            if (matched.status === 'DISABLED') {
+            if (matched.status === 'DISABLED' || matched.timerStatus === 'expired') {
               return [];
             }
             if (Array.isArray(matched.permissions)) {

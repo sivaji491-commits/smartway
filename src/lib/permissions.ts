@@ -270,7 +270,6 @@ export function isUserAdminOrOwner(user: any, ownerEmail?: string | null): boole
       lower.includes('sivaji') ||
       lower === 'preview@nexora.example' ||
       lower === 'usr-owner' ||
-      lower === 'usr-1' ||
       lower === 'admin' ||
       lower === 'owner'
     );
@@ -288,10 +287,26 @@ export function isUserAdminOrOwner(user: any, ownerEmail?: string | null): boole
     username.includes('sivaji') ||
     email === 'preview@nexora.example' ||
     id === 'usr-owner' ||
-    id === 'usr-1' ||
     role === 'owner' ||
     role === 'admin'
   );
+}
+
+/**
+ * Resolves the effective user identifier for permission checking.
+ * Prioritizes preview email (for admin testing), then stored user identifier.
+ * Prevents accidental fallback to the shared dummy supabase auth email ('preview@nexora.example').
+ */
+export function resolveEffectiveUserIdentifier(contextEmail?: string | null): string | null {
+  if (typeof window === 'undefined') return contextEmail || null;
+  const preview = window.localStorage.getItem('nexora-preview-user-email');
+  if (preview && preview.trim()) return preview.trim();
+  const stored = window.localStorage.getItem('nexora-user-email');
+  if (stored && stored.trim()) return stored.trim();
+  if (contextEmail && contextEmail !== 'preview@nexora.example') {
+    return contextEmail.trim();
+  }
+  return null;
 }
 
 export function getUserAllowedTabs(identifier?: string | null): NavigationField[] {
@@ -304,8 +319,11 @@ export function getUserAllowedTabs(identifier?: string | null): NavigationField[
   if (
     lower === 'sivaji491@gmail.com' || 
     lower === 'sivaji' ||
-    lower === 'preview@nexora.example' ||
     lower.includes('sivaji') ||
+    lower === 'usr-owner' ||
+    lower === 'admin' ||
+    lower === 'owner' ||
+    lower === 'preview@nexora.example' ||
     isUserAdminOrOwner(lower, 'sivaji491@gmail.com')
   ) {
     return allFieldIds;
@@ -319,13 +337,17 @@ export function getUserAllowedTabs(identifier?: string | null): NavigationField[
         const found = users.find(
           (u: any) =>
             u &&
-            ((u.username && u.username.toLowerCase().trim() === lower) ||
+            ((u.id && u.id.toLowerCase().trim() === lower) ||
+              (u.username && u.username.toLowerCase().trim() === lower) ||
               (u.email && u.email.toLowerCase().trim() === lower) ||
               (u.name && u.name.toLowerCase().trim() === lower))
         );
         if (found) {
           if (isUserAdminOrOwner(found, 'sivaji491@gmail.com')) {
             return allFieldIds;
+          }
+          if (found.status === 'DISABLED' || found.timerStatus === 'expired') {
+            return [];
           }
           if (Array.isArray(found.permissions)) {
             // Return only the exact navigation tabs checked by the admin for this user

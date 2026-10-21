@@ -19,7 +19,7 @@ export const DEFAULT_LOGIN_DURATION = '01:00:00'; // Safe fallback: 1 hour
 export const DEFAULT_DURATION_SECONDS = 3600;
 
 export const EXPIRED_ACCOUNT_MESSAGE = 
-  'Your access time has expired. Please contact your administrator to restore access.';
+  'Session expired. Your access time has ended. Please contact the administrator.';
 
 /**
  * Validates duration in HH:MM:SS format.
@@ -86,6 +86,7 @@ export function parseDurationToSeconds(duration?: string | null): number {
  * Formats seconds into HH:MM:SS.
  */
 export function formatSecondsToDuration(totalSeconds: number): string {
+  if (totalSeconds === Infinity || !isFinite(totalSeconds)) return 'Unlimited';
   if (isNaN(totalSeconds) || totalSeconds < 0) return '00:00:00';
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -435,7 +436,8 @@ export function checkCurrentSessionValidity(identifier?: string | null): {
     };
   }
 
-  const remainingSeconds = expireTime > 0 ? Math.max(0, Math.ceil((expireTime - now) / 1000)) : DEFAULT_DURATION_SECONDS;
+  const userDuration = user?.durationSeconds || parseDurationToSeconds(user?.loginDuration || user?.assignedDuration) || DEFAULT_DURATION_SECONDS;
+  const remainingSeconds = expireTime > 0 ? Math.max(0, Math.ceil((expireTime - now) / 1000)) : userDuration;
 
   return {
     valid: true,
@@ -878,28 +880,26 @@ export function adminUpdateLoginDuration(
   }
 
   const now = Date.now();
-  const updatedUser = {
-    ...users[index],
+  const currentTarget = users[index];
+  const isCurrentlyActive = Boolean(currentTarget.sessionExpireTime && now < currentTarget.sessionExpireTime && currentTarget.status === 'ACTIVE');
+
+  const updatedUser: any = {
+    ...currentTarget,
     loginDuration: newDuration.trim(),
     assignedDuration: newDuration.trim(),
     durationSeconds: validation.totalSeconds,
+    status: 'ACTIVE',
+    timerStatus: 'active',
     sessionStartTime: resetTimerNow ? now : null,
     sessionExpireTime: resetTimerNow ? now + validation.totalSeconds * 1000 : null,
     startedAt: resetTimerNow ? now : null,
     expiresAt: resetTimerNow ? now + validation.totalSeconds * 1000 : null,
+    remainingTimeSeconds: validation.totalSeconds,
+    disableReason: null,
+    disabledAt: null,
+    reEnabledAt: now,
+    reEnabledBy: adminIdentifier,
   };
-
-  if (resetTimerNow) {
-    updatedUser.status = 'ACTIVE';
-    updatedUser.timerStatus = 'active';
-    updatedUser.sessionStartTime = now;
-    updatedUser.sessionExpireTime = now + validation.totalSeconds * 1000;
-    updatedUser.startedAt = now;
-    updatedUser.expiresAt = now + validation.totalSeconds * 1000;
-    updatedUser.remainingTimeSeconds = validation.totalSeconds;
-    updatedUser.disableReason = null;
-    updatedUser.disabledAt = null;
-  }
 
   users[index] = updatedUser;
   saveStoredWorkspaceUsers(users);
@@ -955,4 +955,184 @@ export function sweepExpiredSessions(): number {
   }
 
   return disabledCount;
+}
+
+/**
+ * Admin-Only Action: Creates a new user in workspace storage.
+ * Enforces admin authorization. Countdown timer NEVER starts at creation (sessionStartTime & sessionExpireTime remain null).
+ */
+export function adminCreateUser(
+  adminIdentifier: string,
+  userData: {
+    username: string;
+    email?: string;
+    password?: string;
+    permissions?: string[];
+    loginDuration?: string;
+    mfaEnabled?: boolean;
+  }
+): {
+  success: boolean;
+  error?: string;
+  user?: any;
+} {
+  if (!isUserAdminOrOwner(adminIdentifier, 'sivaji491@gmail.com')) {
+    return {
+      success: false,
+      error: 'Unauthorized: Only an administrator can create users.',
+    };
+  }
+
+  const trimmedUsername = (userData.username || '').trim();
+  const trimmedEmail = (userData.email || '').trim().toLowerCase();
+
+  if (!trimmedUsername) {
+    return { success: false, error: 'Please enter a username.' };
+  }
+  if (trimmedUsername.includes('@')) {
+    return { success: false, error: 'Username cannot be an email address.' };
+  }
+  if (/\s/.test(trimmedUsername)) {
+    return { success: false, error: 'Username cannot contain spaces.' };
+  }
+
+  const users = getStoredWorkspaceUsers();
+  const lowerUser = trimmedUsername.toLowerCase();
+  if (users.some((u) => u.username && u.username.toLowerCase() === lowerUser)) {
+    return { success: false, error: 'A user with this username already exists in the workspace.' };
+  }
+  if (trimmedEmail && users.some((u) => u.email && u.email.toLowerCase() === trimmedEmail)) {
+    return { success: false, error: 'A user with this email address already exists in the workspace.' };
+  }
+
+  const durationStr = userData.loginDuration || DEFAULT_LOGIN_DURATION;
+  const durationCheck = validateLoginDuration(durationStr);
+  if (!durationCheck.valid) {
+    return { success: false, error: durationCheck.error || 'Invalid login duration.' };
+  }
+
+  const newUser = {
+    id: `usr-${Date.now()}`,
+    username: trimmedUsername,
+    name: trimmedUsername,
+    email: trimmedEmail || undefined,
+    password: userData.password || 'Nexora!2026',
+    permissions: userData.permissions || ['home', 'ranks', 'currency', 'configuration'],
+    status: 'ACTIVE',
+    guardianProtected: true,
+    mfaEnabled: userData.mfaEnabled ?? true,
+    lastActive: 'Never logged in',
+    joinedDate: 'Just now',
+    loginDuration: durationStr.trim(),
+    assignedDuration: durationStr.trim(),
+    durationSeconds: durationCheck.totalSeconds,
+    sessionStartTime: null, // Timer NEVER starts at creation! Starts ONLY on first successful login.
+    sessionExpireTime: null,
+    disableReason: null,
+    disabledAt: null,
+    lastLoginTime: null,
+  };
+
+  users.unshift(newUser);
+  saveStoredWorkspaceUsers(users);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+  }
+
+  return { success: true, user: newUser };
+}
+
+/**
+ * Admin-Only Action: Explicitly deletes a user from workspace storage.
+ * Rejects non-admin callers. Never allows deleting the workspace primary owner.
+ */
+export function adminDeleteUser(
+  adminIdentifier: string,
+  targetUserId: string
+): {
+  success: boolean;
+  error?: string;
+} {
+  if (!isUserAdminOrOwner(adminIdentifier, 'sivaji491@gmail.com')) {
+    return {
+      success: false,
+      error: 'Unauthorized: Only an administrator can delete users.',
+    };
+  }
+
+  const users = getStoredWorkspaceUsers();
+  const lower = (targetUserId || '').toLowerCase().trim();
+  const target = users.find(
+    (u) =>
+      u.id === targetUserId ||
+      (u.username && u.username.toLowerCase().trim() === lower) ||
+      (u.email && u.email.toLowerCase().trim() === lower)
+  );
+
+  if (!target) {
+    return { success: false, error: 'User not found.' };
+  }
+
+  if (target.id === 'usr-owner' || isUserAdminOrOwner(target, 'sivaji491@gmail.com')) {
+    return { success: false, error: 'Cannot remove workspace owner.' };
+  }
+
+  const updated = users.filter((u) => u.id !== target.id);
+  saveStoredWorkspaceUsers(updated);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+  }
+
+  return { success: true };
+}
+
+/**
+ * Admin-Only Action: Modifies user navigation permissions.
+ * Rejects non-admin callers.
+ */
+export function adminUpdateUserPermissions(
+  adminIdentifier: string,
+  targetUserId: string,
+  permissions: string[]
+): {
+  success: boolean;
+  error?: string;
+} {
+  if (!isUserAdminOrOwner(adminIdentifier, 'sivaji491@gmail.com')) {
+    return {
+      success: false,
+      error: 'Unauthorized: Only an administrator can modify user permissions.',
+    };
+  }
+
+  if (!Array.isArray(permissions) || permissions.length === 0) {
+    return { success: false, error: 'User must have access to at least one navigation field.' };
+  }
+
+  const users = getStoredWorkspaceUsers();
+  const lower = (targetUserId || '').toLowerCase().trim();
+  const index = users.findIndex(
+    (u) =>
+      u.id === targetUserId ||
+      (u.username && u.username.toLowerCase().trim() === lower) ||
+      (u.email && u.email.toLowerCase().trim() === lower)
+  );
+
+  if (index < 0) {
+    return { success: false, error: 'User not found.' };
+  }
+
+  users[index] = {
+    ...users[index],
+    permissions,
+  };
+  saveStoredWorkspaceUsers(users);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+  }
+
+  return { success: true };
 }

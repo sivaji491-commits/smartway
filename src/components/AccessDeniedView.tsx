@@ -1,4 +1,4 @@
-import { ShieldAlert, ArrowLeft, LogOut, Lock } from 'lucide-react';
+import { ShieldAlert, ArrowLeft, LogOut, Lock, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AccessDeniedViewProps {
@@ -6,7 +6,9 @@ interface AccessDeniedViewProps {
   userEmail?: string | null;
   onNavigateToAuthorized?: (() => void) | undefined;
   authorizedPageName?: string | null;
-  onSignOut?: (() => void) | undefined;
+  onSignOut?: (() => void | Promise<void>) | undefined;
+  isSigningOut?: boolean;
+  signOutError?: string | null;
 }
 
 export function AccessDeniedView({
@@ -15,6 +17,8 @@ export function AccessDeniedView({
   onNavigateToAuthorized,
   authorizedPageName,
   onSignOut,
+  isSigningOut = false,
+  signOutError = null,
 }: AccessDeniedViewProps) {
   return (
     <div className="flex flex-1 items-center justify-center p-6 min-h-[420px] animate-in fade-in duration-300">
@@ -57,11 +61,19 @@ export function AccessDeniedView({
           </div>
         )}
 
+        {/* Sign Out Error Alert */}
+        {signOutError && (
+          <div role="alert" className="text-xs text-red-400 bg-red-950/60 border border-red-500/30 rounded px-3 py-1.5 leading-snug mb-3 text-center">
+            {signOutError}
+          </div>
+        )}
+
         {/* Action Controls */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           {onNavigateToAuthorized && authorizedPageName && (
             <Button 
               onClick={onNavigateToAuthorized}
+              disabled={isSigningOut}
               className="w-full sm:w-auto h-9 text-xs font-semibold"
             >
               <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
@@ -72,9 +84,14 @@ export function AccessDeniedView({
             <Button 
               variant="outline" 
               onClick={onSignOut}
+              disabled={isSigningOut}
               className="w-full sm:w-auto h-9 text-xs font-semibold"
             >
-              <LogOut className="w-3.5 h-3.5 mr-1.5" />
+              {isSigningOut ? (
+                <LoaderCircle className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <LogOut className="w-3.5 h-3.5 mr-1.5" />
+              )}
               Sign Out
             </Button>
           )}

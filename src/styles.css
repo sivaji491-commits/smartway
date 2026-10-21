@@ -1063,13 +1063,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-top: var(--sidebar-item-py, 7px);
-  padding-bottom: var(--sidebar-item-py, 7px);
+  padding-top: var(--sidebar-item-py, 5px);
+  padding-bottom: var(--sidebar-item-py, 5px);
   padding-left: 11px;
   padding-right: 8px;
-  height: var(--sidebar-item-height, 36px);
-  min-height: var(--sidebar-item-min-height, 24px);
-  max-height: 36px;
+  height: var(--sidebar-item-height, 42px);
+  min-height: var(--sidebar-item-min-height, 28px);
+  max-height: 50px;
   border-radius: 7px;
   font-size: var(--sidebar-item-font-size, 13px);
   font-weight: 500;
@@ -1087,6 +1087,69 @@
   white-space: nowrap;
   position: relative;
   box-sizing: border-box;
+}
+
+.sidebar-nav-btn.has-submessage {
+  height: auto;
+  min-height: var(--sidebar-item-min-height, 38px);
+  max-height: 48px;
+}
+
+.sidebar-nav-label-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: left;
+  line-height: 1.25;
+}
+
+/* Sidebar Blinking Message Animation:
+   Continuous, subtle, attractive pulsing opacity with a soft amber/gold glow.
+   Does not scroll, shift, or translate horizontally. */
+@keyframes sidebar-blinking-pulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.55));
+  }
+  50% {
+    opacity: 0.38;
+    filter: drop-shadow(0 0 1px rgba(245, 158, 11, 0.15));
+  }
+}
+
+.sidebar-blinking-msg {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  color: #F59E0B;
+  line-height: 1.15;
+  margin-top: 1.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: sidebar-blinking-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.sidebar-nav-btn.active .sidebar-blinking-msg {
+  color: #FCD34D;
+}
+
+/* Hover & Focus: Highlights color to bright gold while preserving uniform continuous animation synchronization */
+.sidebar-nav-btn:hover .sidebar-blinking-msg,
+.sidebar-nav-btn:focus-visible .sidebar-blinking-msg,
+.sidebar-blinking-msg:hover {
+  color: #FBBF24;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-blinking-msg {
+    animation: none !important;
+    opacity: 0.9 !important;
+  }
 }
 
 .sidebar-nav-btn:active {
@@ -1315,12 +1378,12 @@
 }
 
 .app-topbar {
-  min-height: 46px;
-  height: 46px;
+  min-height: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 16px;
   background: color-mix(in oklch, var(--card) 90%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -1328,16 +1391,89 @@
   position: sticky;
   top: 0;
   z-index: 25;
-  gap: 16px;
+  gap: 10px;
   flex-shrink: 0;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Regular User Topbar - Minimalist Header displaying ONLY Access Valid For */
+.app-topbar.regular-user-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.app-topbar.regular-user-topbar .topbar-left {
+  flex: 0 0 auto;
+}
+
+.app-topbar.regular-user-topbar .topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.app-topbar.regular-user-topbar .session-timer-badge {
+  font-size: 12.5px;
+  padding: 6px 14px;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 900px) {
+  .app-topbar.regular-user-topbar {
+    padding: 0 12px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+  }
+
+  .app-topbar.regular-user-topbar .session-timer-badge {
+    font-size: 12px;
+    padding: 5px 11px;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-topbar.regular-user-topbar {
+    padding: 0 10px !important;
+  }
+
+  .app-topbar.regular-user-topbar .session-timer-badge {
+    font-size: 11.5px;
+    padding: 4px 9px;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-topbar.regular-user-topbar {
+    padding: 0 6px !important;
+    gap: 6px !important;
+  }
+
+  .app-topbar.regular-user-topbar .session-timer-badge {
+    font-size: 10.5px !important;
+    padding: 3px 6px !important;
+    gap: 4px !important;
+  }
+
+  .app-topbar.regular-user-topbar .session-timer-badge .timer-label {
+    font-size: 10px !important;
+  }
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  flex-wrap: nowrap;
 }
 
 .sidebar-mobile-toggle {
@@ -1366,6 +1502,16 @@
   padding: 3px 4px;
   border-radius: 9px;
   border: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-width: 100%;
+  flex-shrink: 1;
+  white-space: nowrap;
+}
+
+.topbar-nav-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .topbar-tab-item {
@@ -1402,8 +1548,10 @@
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin-left: auto;
+  flex-shrink: 0;
+  justify-content: flex-end;
 }
 
 /* Topbar Ranks Indicator Badge */
@@ -1420,6 +1568,7 @@
   box-shadow: 0 1px 2px rgba(16, 185, 129, 0.2);
   line-height: 1;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .topbar-ranks-count {
@@ -1436,8 +1585,8 @@
 .session-timer-badge {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 13px;
+  gap: 6px;
+  padding: 5px 12px;
   border-radius: 9999px;
   background: var(--secondary);
   border: 1px solid var(--border);
@@ -1445,6 +1594,8 @@
   font-weight: 500;
   color: var(--foreground);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .session-timer-badge.timer-warning {
@@ -1462,11 +1613,18 @@
 
 .timer-label {
   color: var(--muted-foreground);
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .timer-countdown {
   font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 /* Warning & Preview Banners */
@@ -3728,9 +3886,35 @@
   border-color: oklch(0.88 0.08 80);
 }
 
+@media (max-width: 960px) and (min-width: 721px) {
+  .nav-permissions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 @media (max-width: 720px) {
   .nav-permissions-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-backdrop {
+    padding: 10px 8px !important;
+  }
+  .invite-modal-card {
+    max-height: calc(100vh - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+    border-radius: 10px !important;
+  }
+  .modal-header {
+    padding: 14px 16px 12px !important;
+  }
+  .modal-form-body {
+    padding: 12px 14px !important;
+  }
+  .modal-footer {
+    padding: 12px 14px !important;
   }
 }
 
@@ -3934,19 +4118,27 @@
 
 @media (max-width: 520px) {
   .session-timer-badge {
-    padding: 4px 7px;
+    padding: 4px 8px;
     font-size: 11px;
     gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .session-timer-badge .timer-label {
     display: none;
   }
 
+  .app-topbar.regular-user-topbar .session-timer-badge .timer-label {
+    display: inline !important;
+  }
+
   .topbar-ranks-badge {
     padding: 3px 7px;
     font-size: 11px;
     gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 }
 
@@ -4118,7 +4310,7 @@
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: home-marquee-scroll 32s linear infinite;
+  animation: home-marquee-scroll 55s linear infinite;
 }
 
 @media (hover: hover) {
@@ -4134,7 +4326,7 @@
 
 @media (max-width: 768px) {
   .home-marquee-track {
-    animation-duration: 24s;
+    animation-duration: 42s;
   }
 }
 
@@ -4241,10 +4433,39 @@
     #f97316 360deg
   );
   animation: border-beam-travel 4s linear infinite;
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .time-in-hand-animated-border {
     animation: none !important;
+  }
+}
+
+/* Responsive Grid for In-Hand Summary Cards */
+.time-in-hand-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 360px) {
+  .time-in-hand-summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .time-in-hand-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .time-in-hand-summary-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
   }
 }

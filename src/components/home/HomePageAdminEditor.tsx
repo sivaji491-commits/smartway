@@ -424,12 +424,12 @@ export function HomePageAdminEditor({
                 Marquee Message Text
               </label>
               <Input
-                value={data.marqueeText || 'Understand the subject first, or face the loss. Stay updated!'}
+                value={data.marqueeText || "It's like ONE TIME SMART WORK FOR ASSET EARNING, FIRST UNDERSTAND THE BUSINESS PLAN"}
                 onChange={(e) => setData({
                   ...data,
                   marqueeText: e.target.value,
                 })}
-                placeholder="Understand the subject first, or face the loss. Stay updated!"
+                placeholder="It's like ONE TIME SMART WORK FOR ASSET EARNING, FIRST UNDERSTAND THE BUSINESS PLAN"
                 className="bg-[#071320] border-white/15 text-white text-xs font-medium"
               />
             </div>
