@@ -291,7 +291,7 @@ export function LoginPage() {
       <div className="visual-shade" />
       <div className="panel-content">
         <div className="brand-label"><Brand /><div className="brand-divider" /><span>YOUR CONNECTED WORKSPACE</span></div>
-        <div className="panel-message"><div className="eyebrow"><span className="tiny-line" /> BUILT FOR WHAT'S NEXT</div><h1>A smarter way<br /><span>here.</span></h1><p>One connected workspace. Clearer decisions.<br />More possibilities for your team.</p></div>
+        <div className="panel-message"><div className="eyebrow"><span className="tiny-line" /> BUILT FOR WHAT'S NEXT</div><h1>A smarter way<br /><span>here.</span></h1><p>Think Bigger. Grow Faster. Build Your Future.</p></div>
         <div className="panel-bottom"><div className="panel-values"><span><Layers /> Seamlessly connected</span><span><ShieldCheck /> Secure by design</span><span><Zap /> Built to move you forward</span></div><div className="panel-footer"><span>© {new Date().getUTCFullYear()} IG Infra. All rights reserved.</span><span><span className="status-dot" /> Your workspace, protected</span></div></div>
       </div>
     </section>

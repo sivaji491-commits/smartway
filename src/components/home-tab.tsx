@@ -364,7 +364,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           2. HERO SECTION — PREMIUM VISUAL DESIGN
           ========================================================================= */}
-      <section className="relative overflow-hidden min-h-[520px] lg:min-h-[580px] flex items-center justify-center border-b border-white/10">
+      <section className="relative overflow-hidden flex items-center justify-center border-b border-white/10">
         {/* Background Image with Dark Gradient Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
@@ -384,9 +384,9 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         <div className="pointer-events-none absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl" />
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 text-center">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 text-center">
           {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold tracking-wide mb-6 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold tracking-wide mb-3 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>TRANSPARENT REAL ESTATE BUSINESS ECOSYSTEM</span>
             <span className="text-emerald-500/50">·</span>
@@ -394,7 +394,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           </div>
 
           {/* Large Bold Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight sm:leading-tight mb-5">
+          <h1 className="text-3xl sm:5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight sm:leading-tight mb-3">
             {activeData.hero.headline}{' '}
             <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
               {activeData.hero.highlightHeadline}
@@ -402,7 +402,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           </h1>
 
           {/* Supporting Text */}
-          <p className="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed mb-8">
+          <p className="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed mb-4 sm:mb-5">
             {activeData.hero.subtitle}
           </p>
 
@@ -412,7 +412,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
               type="button"
               size="lg"
               onClick={() => handleExploreBusinessPlan(activeData.hero.primaryButtonLink)}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 py-3 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
             >
               <span>{activeData.hero.primaryButtonText}</span>
               <ArrowRight className="w-4 h-4" />
@@ -423,7 +423,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
               variant="outline"
               size="lg"
               onClick={() => scrollToSection(activeData.hero.secondaryButtonLink || 'plots-section')}
-              className="bg-white/10 hover:bg-white/15 text-slate-100 font-semibold text-sm sm:text-base px-6 sm:px-8 py-3 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+              className="bg-white/10 hover:bg-white/15 text-slate-100 font-semibold text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
             >
               <Building2 className="w-4 h-4 text-emerald-400" />
               <span>{activeData.hero.secondaryButtonText}</span>
@@ -431,7 +431,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           </div>
 
           {/* Transparent Trust Indicators */}
-          <div className="mt-12 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-400 max-w-4xl mx-auto">
+          <div className="mt-6 pt-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs text-slate-400 max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>100% Transparent Review</span>
@@ -455,60 +455,51 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           3. BUSINESS PHILOSOPHY SECTION
           ========================================================================= */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-3">
+      <section className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="text-center max-w-3xl mx-auto mb-4 sm:mb-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <Compass className="w-3.5 h-3.5" />
             <span>Core Philosophy</span>
           </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
             {activeData.philosophy.heading}
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-slate-400 leading-relaxed">
+          <p className="mt-2 text-sm sm:text-base text-slate-400 leading-relaxed">
             {activeData.philosophy.subtitle}
           </p>
         </div>
 
         {/* 3 Philosophy Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
           {activeData.philosophy.cards.map((card, idx) => (
             <div 
               key={card.id || idx}
-              className="relative group rounded-2xl bg-gradient-to-b from-[#0C1E30]/90 to-[#071524]/90 border border-white/10 p-6 sm:p-7 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-emerald-950/30"
+              className="relative group rounded-2xl bg-gradient-to-b from-[#0C1E30]/90 to-[#071524]/90 border border-white/10 p-4 sm:p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-emerald-950/30"
             >
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 mb-5 group-hover:scale-105 transition-transform">
-                {idx === 0 ? <ShieldCheck className="w-6 h-6 stroke-[2]" /> : idx === 1 ? <Layers className="w-6 h-6 stroke-[2]" /> : <Scale className="w-6 h-6 stroke-[2]" />}
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 mb-3.5 group-hover:scale-105 transition-transform">
+                {idx === 0 ? <ShieldCheck className="w-5 h-5 stroke-[2]" /> : idx === 1 ? <Layers className="w-5 h-5 stroke-[2]" /> : <Scale className="w-5 h-5 stroke-[2]" />}
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-white mb-1.5 tracking-tight">
                 {card.title}
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed">
                 {card.description}
               </p>
-              <div className="mt-4 pt-4 border-t border-white/10 text-xs text-slate-400 flex items-center gap-1.5">
+              <div className="mt-3.5 pt-3 border-t border-white/10 text-xs text-slate-400 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 <span>{card.highlight}</span>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Clear Non-Pressure & Risk Disclosure Notice */}
-        <div className="mt-8 p-4 sm:p-5 rounded-2xl bg-[#081522] border border-white/10 text-xs sm:text-sm text-slate-300 flex items-start gap-3">
-          <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-          <div className="leading-relaxed">
-            <strong className="text-white block font-semibold mb-0.5">Important Transparency Notice:</strong>
-            {activeData.philosophy.disclosureNote || 'We do not describe our business model as completely risk-free or guarantee profits or returns. Participation is strictly optional. All applicable costs, conditions, and business dynamics must be reviewed and understood before taking any step.'}
-          </div>
-        </div>
       </section>
 
       {/* =========================================================================
           4. PREMIUM PLOTS GALLERY
           ========================================================================= */}
-      <section id="plots-section" className="py-16 sm:py-20 bg-[#06101B]/80 border-y border-white/10">
+      <section id="plots-section" className="py-7 sm:py-9 bg-[#06101B]/80 border-y border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
                 <MapPin className="w-3.5 h-3.5" />
@@ -527,7 +518,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           </div>
 
           {/* Plot Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {activeData.plots.map((plot) => (
               <div 
                 key={plot.id}
@@ -535,7 +526,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
               >
                 <div>
                   {/* Image Container with Fallback */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
                     {!imageErrors[plot.id] ? (
                       <img 
                         src={plot.imageUrl} 
@@ -565,17 +556,17 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                   </div>
 
                   {/* Card Content */}
-                  <div className="p-5">
-                    <h3 className="text-base font-bold text-white mb-2 leading-snug group-hover:text-emerald-300 transition-colors">
+                  <div className="p-4 sm:p-4.5">
+                    <h3 className="text-base font-bold text-white mb-1.5 leading-snug group-hover:text-emerald-300 transition-colors">
                       {plot.title}
                     </h3>
-                    <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                    <p className="text-xs text-slate-300 leading-relaxed mb-3">
                       {plot.description}
                     </p>
 
                     {/* Features Badges */}
                     {Array.isArray(plot.features) && plot.features.length > 0 && (
-                      <div className="space-y-1.5 pt-3 border-t border-white/10">
+                      <div className="space-y-1 pt-2.5 border-t border-white/10">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                           Infrastructure Highlights
                         </span>
@@ -595,8 +586,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                   </div>
                 </div>
 
-                <div className="p-5 pt-0">
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                <div className="p-4 sm:p-4.5 pt-0">
+                  <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
                     <span className="flex items-center gap-1 text-emerald-400 font-medium">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       Planned Demarcation
@@ -613,8 +604,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           5. MODERN FLATS & APARTMENTS GALLERY
           ========================================================================= */}
-      <section id="flats-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4">
+      <section id="flats-section" className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-semibold uppercase tracking-wider mb-2">
               <Building2 className="w-3.5 h-3.5" />
@@ -633,7 +624,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         </div>
 
         {/* Apartment Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {activeData.apartments.map((apt) => (
             <div 
               key={apt.id}
@@ -641,7 +632,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
             >
               <div>
                 {/* Image Container with Fallback */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
                   {!imageErrors[apt.id] ? (
                     <img 
                       src={apt.imageUrl} 
@@ -671,17 +662,17 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                 </div>
 
                 {/* Card Content */}
-                <div className="p-5">
-                  <h3 className="text-base font-bold text-white mb-2 leading-snug group-hover:text-teal-300 transition-colors">
+                <div className="p-4 sm:p-4.5">
+                  <h3 className="text-base font-bold text-white mb-1.5 leading-snug group-hover:text-teal-300 transition-colors">
                     {apt.title}
                   </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
+                  <p className="text-xs text-slate-300 leading-relaxed mb-3">
                     {apt.description}
                   </p>
 
                   {/* Features Badges */}
                   {Array.isArray(apt.features) && apt.features.length > 0 && (
-                    <div className="space-y-1.5 pt-3 border-t border-white/10">
+                    <div className="space-y-1 pt-2.5 border-t border-white/10">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                         Key Community Features
                       </span>
@@ -701,8 +692,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                 </div>
               </div>
 
-              <div className="p-5 pt-0">
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+              <div className="p-4 sm:p-4.5 pt-0">
+                <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
                   <span className="flex items-center gap-1 text-teal-400 font-medium">
                     <Sparkles className="w-3.5 h-3.5" />
                     Modern Lifestyle
@@ -718,17 +709,17 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           6. HOW THE BUSINESS PLAN WORKS
           ========================================================================= */}
-      <section id="how-it-works-section" className="py-16 sm:py-20 bg-[#06101B]/80 border-y border-white/10">
+      <section id="how-it-works-section" className="py-7 sm:py-9 bg-[#06101B]/80 border-y border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="text-center max-w-3xl mx-auto mb-4 sm:mb-6">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
               <Layers className="w-3.5 h-3.5" />
               <span>Structured Roadmap</span>
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
               {activeData.howItWorks.heading}
             </h2>
-            <p className="mt-3 text-sm sm:text-base text-slate-400 leading-relaxed">
+            <p className="mt-2 text-sm sm:text-base text-slate-400 leading-relaxed">
               {activeData.howItWorks.subtitle}
             </p>
           </div>
@@ -737,16 +728,16 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           <div className="relative">
             <div className="hidden lg:block absolute top-12 left-12 right-12 h-0.5 bg-gradient-to-r from-emerald-500/40 via-teal-500/40 to-amber-500/40 z-0" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4 relative z-10">
               {activeData.howItWorks.steps.map((st, i) => (
                 <div 
                   key={st.id || i}
-                  className="flex flex-col items-start lg:items-center text-left lg:text-center p-5 rounded-2xl bg-[#091827] border border-white/10 shadow-lg group hover:border-emerald-500/40 transition-colors"
+                  className="flex flex-col items-start lg:items-center text-left lg:text-center p-3.5 sm:p-4 rounded-2xl bg-[#091827] border border-white/10 shadow-lg group hover:border-emerald-500/40 transition-colors"
                 >
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/15 border-2 border-emerald-400 text-emerald-300 flex items-center justify-center font-bold text-sm mb-4 shadow-sm group-hover:scale-110 transition-transform">
+                  <div className="w-11 h-11 rounded-full bg-emerald-500/15 border-2 border-emerald-400 text-emerald-300 flex items-center justify-center font-bold text-sm mb-3 shadow-sm group-hover:scale-110 transition-transform">
                     {String(st.stepNumber || i + 1).padStart(2, '0')}
                   </div>
-                  <h3 className="text-base font-bold text-white mb-1.5">{st.title}</h3>
+                  <h3 className="text-sm sm:text-base font-bold text-white mb-1">{st.title}</h3>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     {st.description}
                   </p>
@@ -756,7 +747,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           </div>
 
           {/* Timeline Disclosure Note */}
-          <div className="mt-8 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-400 text-center max-w-3xl mx-auto">
+          <div className="mt-5 p-3 sm:p-3.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-400 text-center max-w-3xl mx-auto">
             <span>{activeData.howItWorks.disclaimer || 'Note: Selecting or reviewing any rank does not imply guaranteed income, automated earnings, or property ownership. All outcomes require individual active effort and compliance with plan conditions.'}</span>
           </div>
         </div>
@@ -765,8 +756,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           7. RANK & PRICE PREVIEW
           ========================================================================= */}
-      <section id="ranks-preview-section" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4">
+      <section id="ranks-preview-section" className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
               <Award className="w-3.5 h-3.5" />
@@ -787,16 +778,16 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         </div>
 
         {/* Dynamic Ranks Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
           {computedRanks.map((rank, idx) => (
             <div 
               key={rank.id || idx}
-              className="group rounded-2xl bg-[#091827] border border-white/10 p-5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl flex flex-col justify-between"
+              className="group rounded-2xl bg-[#091827] border border-white/10 p-3.5 sm:p-4 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center text-xs font-bold font-mono">
+                    <div className="w-6.5 h-6.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center text-xs font-bold font-mono">
                       {String(rank.serialNumber || idx + 1).padStart(2, '0')}
                     </div>
                     <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -809,11 +800,11 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                   </span>
                 </div>
 
-                <h3 className="text-lg font-extrabold text-white mb-3 group-hover:text-amber-300 transition-colors">
+                <h3 className="text-base sm:text-lg font-extrabold text-white mb-2.5 group-hover:text-amber-300 transition-colors">
                   {rank.name}
                 </h3>
 
-                <div className="space-y-2 mb-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                <div className="space-y-1.5 mb-3 p-2.5 rounded-xl bg-white/5 border border-white/5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-400">Base Price:</span>
                     <strong className="text-white font-mono">${rank.basePrice.toLocaleString()}</strong>
@@ -835,13 +826,13 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-1">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setSelectedRankForModal(rank)}
-                  className="w-full h-8 text-xs font-semibold border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                  className="w-full h-7.5 text-xs font-semibold border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white cursor-pointer transition-all flex items-center justify-center gap-1.5"
                 >
                   <Eye className="w-3.5 h-3.5 text-amber-400" />
                   <span>View Details</span>
@@ -852,7 +843,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         </div>
 
         {/* Commitment-Free Notice */}
-        <div className="mt-8 p-4 rounded-xl bg-[#091522] border border-white/10 text-xs text-slate-300 flex items-center justify-between flex-wrap gap-3">
+        <div className="mt-4 p-3 sm:p-3.5 rounded-xl bg-[#091522] border border-white/10 text-xs text-slate-300 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>Reviewing rank costs does not commit you to purchasing or joining. All calculations are real-time and orderwise.</span>
@@ -874,7 +865,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           8. FINAL CALL-TO-ACTION SECTION
           ========================================================================= */}
-      <section className="relative overflow-hidden py-16 sm:py-24 border-t border-white/10 bg-gradient-to-b from-[#081524] to-[#040C16]">
+      <section className="relative overflow-hidden py-8 sm:py-10 lg:py-12 border-t border-white/10 bg-gradient-to-b from-[#081524] to-[#040C16]">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15 pointer-events-none"
           style={{
@@ -885,19 +876,19 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         <div className="absolute inset-0 bg-radial-at-c from-transparent via-[#06101B]/80 to-[#040C16]/95 pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2.5">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Informed Next Step</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-2.5">
             {activeData.finalCta.heading}{' '}
             <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
               {activeData.finalCta.highlightHeading}
             </span>
           </h2>
 
-          <p className="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-8">
+          <p className="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-4 sm:mb-5">
             {activeData.finalCta.subtitle}
           </p>
 
@@ -906,7 +897,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
               type="button"
               size="lg"
               onClick={() => handleExploreBusinessPlan(activeData.finalCta.primaryButtonLink)}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base px-7 sm:px-9 py-3 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
             >
               <span>{activeData.finalCta.primaryButtonText}</span>
               <ArrowRight className="w-4 h-4" />
@@ -917,14 +908,14 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
               variant="outline"
               size="lg"
               onClick={() => scrollToSection(activeData.finalCta.secondaryButtonLink || 'plots-section')}
-              className="bg-white/10 hover:bg-white/15 text-slate-100 font-semibold text-sm sm:text-base px-7 sm:px-9 py-3 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+              className="bg-white/10 hover:bg-white/15 text-slate-100 font-semibold text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
             >
               <Building2 className="w-4 h-4 text-emerald-400" />
               <span>{activeData.finalCta.secondaryButtonText}</span>
             </Button>
           </div>
 
-          <div className="mt-12 text-xs text-slate-400 flex flex-wrap items-center justify-center gap-6">
+          <div className="mt-5 text-xs text-slate-400 flex flex-wrap items-center justify-center gap-5 sm:gap-6">
             <span>✓ Transparent Information</span>
             <span>✓ No Mandatory Commitment</span>
             <span>✓ Authentic Project Ranks</span>

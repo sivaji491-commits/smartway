@@ -55,6 +55,12 @@ export const DEFAULT_NAVIGATION_FIELDS: NavigationFieldDef[] = [
     iconName: 'UserCheck',
   },
   {
+    id: 'potentiality',
+    label: 'Potentiality',
+    description: '12-week referral matrix, DCB earnings, and team business growth projection',
+    iconName: 'Target',
+  },
+  {
     id: 'currency',
     label: 'Currency Settings',
     description: 'USD to INR exchange rate and currency configuration',

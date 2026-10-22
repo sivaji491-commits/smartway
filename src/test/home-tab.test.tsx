@@ -45,8 +45,9 @@ describe('Real Estate Business Home Page Acceptance Tests', () => {
     expect(screen.getByText('Make an Informed Decision')).toBeDefined();
     expect(screen.getByText(/Review the relevant details, ask questions, understand the terms, and decide whether the opportunity suits your circumstances\./i)).toBeDefined();
 
-    // Non-pressure and risk disclosure
-    expect(screen.getByText(/We do not describe our business model as completely risk-free or guarantee profits/i)).toBeDefined();
+    // Verify Important Transparency Notice is completely removed from the Home page
+    expect(screen.queryByText(/Important Transparency Notice/i)).toBeNull();
+    expect(screen.queryByText(/We do not describe our business model as completely risk-free/i)).toBeNull();
   });
 
   it('3. Plots & Flats Galleries: Renders residential plots and modern apartment opportunities', () => {

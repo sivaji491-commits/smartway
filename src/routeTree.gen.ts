@@ -22,6 +22,7 @@ import { Route as AuthenticatedEarningOpportunitiesRouteImport } from './routes/
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedKeyPointsRouteImport } from './routes/_authenticated/key-points'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
+import { Route as AuthenticatedPotentialityRouteImport } from './routes/_authenticated/potentiality'
 import { Route as AuthenticatedRanksRouteImport } from './routes/_authenticated/ranks'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTimeInHandRouteImport } from './routes/_authenticated/time-in-hand'
@@ -97,6 +98,12 @@ const AuthenticatedMaintenanceRoute =
     path: '/maintenance',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPotentialityRoute =
+  AuthenticatedPotentialityRouteImport.update({
+    id: '/potentiality',
+    path: '/potentiality',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRanksRoute = AuthenticatedRanksRouteImport.update({
   id: '/ranks',
   path: '/ranks',
@@ -132,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/key-points': typeof AuthenticatedKeyPointsRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/potentiality': typeof AuthenticatedPotentialityRoute
   '/ranks': typeof AuthenticatedRanksRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/time-in-hand': typeof AuthenticatedTimeInHandRoute
@@ -150,6 +158,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/key-points': typeof AuthenticatedKeyPointsRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/potentiality': typeof AuthenticatedPotentialityRoute
   '/ranks': typeof AuthenticatedRanksRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/time-in-hand': typeof AuthenticatedTimeInHandRoute
@@ -170,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/key-points': typeof AuthenticatedKeyPointsRoute
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/_authenticated/potentiality': typeof AuthenticatedPotentialityRoute
   '/_authenticated/ranks': typeof AuthenticatedRanksRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/time-in-hand': typeof AuthenticatedTimeInHandRoute
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/key-points'
     | '/maintenance'
+    | '/potentiality'
     | '/ranks'
     | '/settings'
     | '/time-in-hand'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/key-points'
     | '/maintenance'
+    | '/potentiality'
     | '/ranks'
     | '/settings'
     | '/time-in-hand'
@@ -227,6 +239,7 @@ export interface FileRouteTypes {
     | '/_authenticated/home'
     | '/_authenticated/key-points'
     | '/_authenticated/maintenance'
+    | '/_authenticated/potentiality'
     | '/_authenticated/ranks'
     | '/_authenticated/settings'
     | '/_authenticated/time-in-hand'
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMaintenanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/potentiality': {
+      id: '/_authenticated/potentiality'
+      path: '/potentiality'
+      fullPath: '/potentiality'
+      preLoaderRoute: typeof AuthenticatedPotentialityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ranks': {
       id: '/_authenticated/ranks'
       path: '/ranks'
@@ -374,6 +394,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedKeyPointsRoute: typeof AuthenticatedKeyPointsRoute
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
+  AuthenticatedPotentialityRoute: typeof AuthenticatedPotentialityRoute
   AuthenticatedRanksRoute: typeof AuthenticatedRanksRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTimeInHandRoute: typeof AuthenticatedTimeInHandRoute
@@ -392,6 +413,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedKeyPointsRoute: AuthenticatedKeyPointsRoute,
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
+  AuthenticatedPotentialityRoute: AuthenticatedPotentialityRoute,
   AuthenticatedRanksRoute: AuthenticatedRanksRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTimeInHandRoute: AuthenticatedTimeInHandRoute,

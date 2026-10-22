@@ -33,6 +33,7 @@ import { RankCalculatorApp } from '@/components/rank-calculator/RankCalculatorAp
 import { TwelveLevelBonusView } from '@/components/twelve-level-bonus/TwelveLevelBonusView';
 import { DcbNinetyDaysView } from '@/components/dcb-bonus/DcbNinetyDaysView';
 import { CustomerView } from '@/components/customer-view/CustomerView';
+import { PotentialityView } from '@/components/potentiality/PotentialityView';
 import { AccessDeniedView } from '@/components/AccessDeniedView';
 import { supabase } from '@/integrations/supabase/client';
 import { pageMeta } from '@/lib/page-meta';
@@ -809,7 +810,7 @@ function Maintenance() {
         )}
 
         {/* Tab Content */}
-        <div className={`app-tab-body ${activeTab === 'earning-opportunities' ? 'earning-opportunities-body' : ''} ${activeTab === 'users' ? 'users-tab-body' : ''} ${activeTab === '12-level-bonus' ? 'twelve-bonus-tab-body' : ''}`}>
+        <div className={`app-tab-body ${activeTab === 'home' ? 'home-tab-body' : ''} ${activeTab === 'earning-opportunities' ? 'earning-opportunities-body' : ''} ${activeTab === 'users' ? 'users-tab-body' : ''} ${activeTab === '12-level-bonus' ? 'twelve-bonus-tab-body' : ''}`}>
           {activeTab === 'access-denied' || effectiveAllowed.length === 0 || !allowedTabs.includes(activeTab) ? (
             <AccessDeniedView
               pageName={activeTab !== 'access-denied' ? (navItems.find((i) => i.id === activeTab)?.label || activeTab) : undefined}
@@ -828,6 +829,11 @@ function Maintenance() {
               {activeTab === 'ranks' && allowedTabs.includes('ranks') && (
                 <main className="home-main-container ranks-container">
                   <RankCalculatorApp initialTab="ranks" embedded={true} isAdmin={isAdmin} allowedTabs={allowedTabs} />
+                </main>
+              )}
+              {activeTab === 'potentiality' && allowedTabs.includes('potentiality') && (
+                <main className="home-main-container ranks-container potentiality-container">
+                  <PotentialityView isAdmin={isAdmin} userEmail={effectiveEmail} />
                 </main>
               )}
               {activeTab === '12-level-bonus' && allowedTabs.includes('12-level-bonus') && (

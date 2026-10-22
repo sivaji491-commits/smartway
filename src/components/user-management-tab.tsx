@@ -35,7 +35,8 @@ import {
   Zap,
   KeyRound,
   Settings,
-  ShieldAlert
+  ShieldAlert,
+  Target
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -80,6 +81,8 @@ export const NAV_ICON_MAP: Record<string, any> = {
   trendingup: TrendingUp,
   wallet: Wallet,
   ranks: Layers,
+  potentiality: Target,
+  target: Target,
   '12-level-bonus': Award,
   '12_level_bonus': Award,
   'twelve-level-bonus': Award,
