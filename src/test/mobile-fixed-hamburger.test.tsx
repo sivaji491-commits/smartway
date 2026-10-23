@@ -96,4 +96,30 @@ describe('Mobile Fixed Hamburger Menu & Styling Verification', () => {
     const topbar = container.querySelector('.app-topbar.regular-user-topbar');
     expect(topbar).not.toBeNull();
   });
+
+  it('renders Access Valid For countdown timer badge with red bold countdown digits and clear label', () => {
+    window.localStorage.setItem('nexora-user-email', 'regular@example.com');
+    window.localStorage.setItem('user_permissions_regular@example.com', JSON.stringify(['home', 'ranks']));
+
+    const Component = MaintenanceRoute.options.component!;
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <Component />
+      </QueryClientProvider>
+    );
+
+    const timerBadge = container.querySelector('[data-testid="session-timer-badge"]');
+    expect(timerBadge).not.toBeNull();
+
+    // Verify label text
+    const label = timerBadge?.querySelector('.timer-label');
+    expect(label).not.toBeNull();
+    expect(label?.textContent).toContain('Access Valid For:');
+
+    // Verify countdown text and red bold styling
+    const countdown = timerBadge?.querySelector('.timer-countdown');
+    expect(countdown).not.toBeNull();
+    expect(countdown?.classList.contains('text-[#DC2626]')).toBe(true);
+    expect(countdown?.classList.contains('font-bold')).toBe(true);
+  });
 });

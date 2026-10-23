@@ -242,5 +242,31 @@ describe('Earning Opportunities & Source Structure Acceptance Tests', () => {
     fireEvent.touchEnd(wheelWrapper);
     expect(wheelSvg.style.animationPlayState).toBe('running');
   });
+
+  it('11. Card Heading Typography: All five cards render prominent headings with earning-card-title class and responsive sizing', () => {
+    const { container } = render(
+      <EarningOpportunitiesView isAdmin={false} userEmail="user@example.com" />
+    );
+
+    const cardHeadings = container.querySelectorAll('.earning-card-title');
+    expect(cardHeadings.length).toBe(5);
+
+    // Verify all 5 titles are present
+    const headingTexts = Array.from(cardHeadings).map((h) => h.textContent?.trim());
+    expect(headingTexts).toContain('12 Level Bonus');
+    expect(headingTexts).toContain('Double Connect Bonus (DCB)');
+    expect(headingTexts).toContain('Token Appreciation Bonus');
+    expect(headingTexts).toContain('Monthly Bonanza');
+    expect(headingTexts.some((t) => t?.includes('Global Pool'))).toBe(true);
+
+    // Verify 12 Level Bonus heading has updated responsive classes
+    const twelveLevelHeading = Array.from(cardHeadings).find((h) => h.textContent?.includes('12 Level Bonus'));
+    expect(twelveLevelHeading).toBeDefined();
+    expect(twelveLevelHeading?.className).toContain('earning-card-title');
+    expect(twelveLevelHeading?.className).toContain('font-bold');
+    expect(twelveLevelHeading?.className).toContain('text-[13.5px]');
+    expect(twelveLevelHeading?.className).toContain('lg:text-[12.5px]');
+    expect(twelveLevelHeading?.className).toContain('xl:text-[13.5px]');
+  });
 });
 

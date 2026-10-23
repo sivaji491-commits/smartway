@@ -31,7 +31,7 @@ describe('Potentiality Table Responsive Layout Verification', () => {
   it('3. Regular user colgroup uses proportional percentage widths totaling 100%', () => {
     const { container } = render(<PotentialityView isAdmin={false} />);
     const cols = container.querySelectorAll('colgroup col');
-    expect(cols.length).toBe(11);
+    expect(cols.length).toBe(9);
 
     // Sum up percentages
     let totalPercentage = 0;
@@ -48,7 +48,7 @@ describe('Potentiality Table Responsive Layout Verification', () => {
   it('4. Admin user colgroup uses proportional percentage widths totaling 100%', () => {
     const { container } = render(<PotentialityView isAdmin={true} />);
     const cols = container.querySelectorAll('colgroup col');
-    expect(cols.length).toBe(12);
+    expect(cols.length).toBe(10);
 
     let totalPercentage = 0;
     cols.forEach((col) => {
@@ -64,7 +64,7 @@ describe('Potentiality Table Responsive Layout Verification', () => {
   it('5. Allows multi-word column headers to wrap neatly with whitespace-normal', () => {
     const { container } = render(<PotentialityView isAdmin={false} />);
     const ths = container.querySelectorAll('thead th');
-    expect(ths.length).toBe(11);
+    expect(ths.length).toBe(9);
 
     // Find headers by text content
     const earnEachHeader = Array.from(ths).find((th) => th.textContent?.includes('Earn Each Referral'));
@@ -73,37 +73,41 @@ describe('Potentiality Table Responsive Layout Verification', () => {
     const refAmountHeader = Array.from(ths).find((th) => th.textContent?.includes('Ref. amount'));
     expect(refAmountHeader?.className).toContain('whitespace-normal');
 
-    const dcbHeader = Array.from(ths).find((th) => th.textContent?.includes('DCB 30%'));
-    expect(dcbHeader?.className).toContain('whitespace-normal');
-
     const justReferHeader = Array.from(ths).find((th) => th.textContent?.includes('Just refer'));
     expect(justReferHeader?.className).toContain('whitespace-normal');
 
     const timeHeader = Array.from(ths).find((th) => th.textContent?.includes('Time'));
     expect(timeHeader?.className).toContain('whitespace-nowrap');
+
+    // DCB 30% and Duration should NOT be table headers
+    const dcbHeader = Array.from(ths).find((th) => th.textContent?.includes('DCB 30%'));
+    expect(dcbHeader).toBeUndefined();
+
+    const durationHeader = Array.from(ths).find((th) => th.textContent?.includes('Duration'));
+    expect(durationHeader).toBeUndefined();
   });
 
-  it('6. Row 13 (Footer) spans matching columns correctly across all 11 columns', () => {
+  it('6. Row 13 (Footer) spans matching columns correctly across all 9 columns', () => {
     const { container } = render(<PotentialityView isAdmin={false} />);
     const rows = container.querySelectorAll('tbody tr');
     const footerRow = rows[rows.length - 1]; // Row 13
     expect(footerRow).not.toBeNull();
 
     const cells = footerRow.querySelectorAll('td');
-    // Cell 1: Time (1 col), Cell 2: Banner (colSpan=6), Cell 3: Total label (1 col), Cell 4: Total Profit (colSpan=2), Cell 5: Duration (1 col)
-    expect(cells.length).toBe(5);
-    expect(cells[1].getAttribute('colspan')).toBe('6');
+    // Cell 1: Time (1 col), Cell 2: Banner (colSpan=5), Cell 3: Total label (1 col), Cell 4: Total Profit (colSpan=2)
+    expect(cells.length).toBe(4);
+    expect(cells[1].getAttribute('colspan')).toBe('5');
     expect(cells[3].getAttribute('colspan')).toBe('2');
 
-    // Total spanning: 1 + 6 + 1 + 2 + 1 = 11 columns
-    const totalCols = 1 + 6 + 1 + 2 + 1;
-    expect(totalCols).toBe(11);
+    // Total spanning: 1 + 5 + 1 + 2 = 9 columns
+    const totalCols = 1 + 5 + 1 + 2;
+    expect(totalCols).toBe(9);
   });
 
   it('7. Compact responsive typography and padding are applied to table cells', () => {
     const { container } = render(<PotentialityView isAdmin={false} />);
     const firstRowCells = container.querySelectorAll('tbody tr:first-child td');
-    expect(firstRowCells.length).toBe(11);
+    expect(firstRowCells.length).toBe(9);
 
     // Check padding classes
     firstRowCells.forEach((td) => {

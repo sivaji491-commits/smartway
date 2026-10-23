@@ -784,9 +784,9 @@ function Maintenance() {
                 {isAdmin ? (
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 ) : (
-                  <Clock className={`w-3.5 h-3.5 shrink-0 ${sessionTimer.isUrgent ? 'text-rose-400' : sessionTimer.isWarning ? 'text-amber-400' : 'text-slate-300'}`} />
+                  <Clock className={`w-3.5 h-3.5 shrink-0 ${sessionTimer.isUrgent ? 'text-rose-500' : sessionTimer.isWarning ? 'text-amber-500' : 'text-slate-400'}`} />
                 )}
-                <span className="timer-label font-medium">
+                <span className="timer-label font-medium text-slate-700">
                   {isAdmin ? (
                     <>
                       <span className="hidden sm:inline">Access Valid For:</span>
@@ -796,7 +796,7 @@ function Maintenance() {
                     <span>Access Valid For:</span>
                   )}
                 </span>
-                <span className={`timer-countdown font-semibold text-xs tabular-nums ${isAdmin ? 'text-emerald-300' : 'text-foreground'}`}>
+                <span className={`timer-countdown font-bold text-xs tabular-nums ${isAdmin ? 'text-emerald-300' : 'text-[#DC2626]'}`}>
                   {isAdmin ? 'Unlimited' : sessionTimer.formattedTime}
                 </span>
                 {isAdmin && (

@@ -1020,7 +1020,7 @@ export const EarningOpportunitiesView: React.FC<EarningOpportunitiesViewProps> =
                       </div>
 
                       {/* Opportunity Title */}
-                      <h3 className="text-[11px] sm:text-[11.5px] font-bold text-white tracking-tight leading-snug mb-0.5 group-hover:text-white transition-colors line-clamp-2 min-h-[1.75rem] flex items-center">
+                      <h3 className="earning-card-title text-[13.5px] sm:text-[13px] md:text-[13.5px] lg:text-[12.5px] xl:text-[13.5px] 2xl:text-[14px] font-bold text-white tracking-tight leading-snug mb-1 group-hover:text-white transition-colors line-clamp-2 min-h-[2.4rem] sm:min-h-[2.5rem] lg:min-h-[2.25rem] xl:min-h-[2.5rem] flex items-center">
                         {item.title}
                       </h3>
 

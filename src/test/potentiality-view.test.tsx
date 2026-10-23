@@ -48,7 +48,7 @@ describe('Potentiality Page Integration & Acceptance Tests', () => {
     expect(screen.getAllByText('₹10,000.00').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Note: Including 3% Network fee.')).toBeDefined();
 
-    // Verify all 11 columns are present
+    // Verify all 9 table columns are present: Time | Rank | Level | Just refer | Ref. % | Earn Each Referral | Ref. amount | Total | Profit
     expect(screen.getByText('Time')).toBeDefined();
     expect(screen.getByText('Rank')).toBeDefined();
     expect(screen.getByText('Level')).toBeDefined();
@@ -56,10 +56,18 @@ describe('Potentiality Page Integration & Acceptance Tests', () => {
     expect(screen.getByText('Ref. %')).toBeDefined();
     expect(screen.getByText('Earn Each Referral')).toBeDefined();
     expect(screen.getByText('Ref. amount')).toBeDefined();
-    expect(screen.getByText('DCB 30%')).toBeDefined();
     expect(screen.getAllByText('Total').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Profit')).toBeDefined();
-    expect(screen.getByText('Duration')).toBeDefined();
+
+    // Verify DCB 30% is NOT a table column header and Duration is NOT a column header
+    expect(screen.queryByRole('columnheader', { name: /DCB 30%/i })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: /Duration/i })).toBeNull();
+
+    // Verify DCB 30% is displayed in summary strip beside Referrals
+    const dcbContainer = screen.getByTestId('summary-dcb-container');
+    expect(dcbContainer).toBeDefined();
+    expect(dcbContainer.textContent).toContain('DCB 30%:');
+    expect(dcbContainer.textContent).toContain('$30.00');
 
     // Verify Row 1 figures: $80.00 total, $72.00 profit
     expect(screen.getByText('$80.00')).toBeDefined();
@@ -77,18 +85,31 @@ describe('Potentiality Page Integration & Acceptance Tests', () => {
     expect(screen.getByText('5 Cr.')).toBeDefined();
   });
 
-  it('3. Regular User Security View: hides all admin actions, text edit controls, and row buttons', () => {
+  it('3. Regular User Security View: hides all admin actions, text edit controls, row buttons, and entire top control panel', () => {
     render(<PotentialityView isAdmin={false} />);
 
     // Actions column should NOT exist
     expect(screen.queryByText('Actions')).toBeNull();
 
-    // Admin buttons should NOT exist
+    // Top control panel and admin toolbar should NOT exist
+    expect(screen.queryByText('12-Week Matrix Projection')).toBeNull();
+    expect(screen.queryByTestId('top-rank-dropdown-btn')).toBeNull();
+    expect(screen.queryByTestId('top-referral-dropdown-btn')).toBeNull();
+    expect(screen.queryByRole('tablist', { name: 'Time Period Types' })).toBeNull();
+    expect(screen.queryByTitle('Configure Time Period Options and Summaries')).toBeNull();
+    expect(screen.queryByTitle('Configure Period Options and Summaries')).toBeNull();
     expect(screen.queryByTitle('Customize page banners and text')).toBeNull();
     expect(screen.queryByTitle('Add Level Row')).toBeNull();
     expect(screen.queryByTitle('Reset to default settings')).toBeNull();
     expect(screen.queryByTitle('Edit row')).toBeNull();
     expect(screen.queryByTitle('Delete row')).toBeNull();
+
+    // Essential user-facing elements remain present and functional
+    expect(screen.getByTestId('potentiality-selected-rank-summary')).toBeDefined();
+    expect(screen.getByTestId('summary-selected-rank-dropdown-btn')).toBeDefined();
+    expect(screen.getByTestId('summary-referral-dropdown-btn')).toBeDefined();
+    expect(screen.getByRole('table')).toBeDefined();
+    expect(screen.getByRole('button', { name: /Main Time Selection Dropdown/i })).toBeDefined();
   });
 
   it('4. Administrator Capabilities: displays Admin controls, allows editing messages and rows', () => {
@@ -175,7 +196,7 @@ describe('Potentiality Page Integration & Acceptance Tests', () => {
   });
 
   it('6. Time Period Selector: switches period types and updates options, summaries, and recommendation statuses', () => {
-    render(<PotentialityView isAdmin={false} />);
+    render(<PotentialityView isAdmin={true} />);
 
     // Default period type is Weekly: summary is "Just 3 Months", status is "Recommended"
     expect(screen.getAllByText('Just 3 Months').length).toBeGreaterThanOrEqual(1);
@@ -214,15 +235,12 @@ describe('Potentiality Page Integration & Acceptance Tests', () => {
     expect(screen.getAllByText('12th Month').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('7. Time Dropdown & Duration Synchronization: row Time column has interactive dropdown', () => {
+  it('7. Time Dropdown: row Time column has interactive dropdown', () => {
     render(<PotentialityView isAdmin={false} />);
 
     // Row 1 button has "1st Week"
     const row1TimeBtn = screen.getByRole('button', { name: /Time period for level 1, currently 1st Week/i });
     expect(row1TimeBtn).toBeDefined();
-
-    // Duration column initially matches
-    expect(screen.getAllByText('1st Week').length).toBeGreaterThanOrEqual(2);
   });
 
   it('8. Admin Period Configuration: allows configuring options in 2 columns and saving changes', () => {
@@ -428,20 +446,134 @@ describe('Potentiality Page Integration & Acceptance Tests', () => {
     expect(screen.getAllByText('1st Week').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('14. UI Cleanup: confirms NON WORKING INCOME is removed from the UI and DCB 30% / Total columns remain correctly aligned', () => {
+  it('14. UI Cleanup: confirms NON WORKING INCOME is removed, DCB 30% and Duration columns removed from table', () => {
     render(<PotentialityView isAdmin={false} />);
 
     // 1. Verify "NON WORKING INCOME" is completely removed from the document
     expect(screen.queryByText(/NON WORKING INCOME/i)).toBeNull();
 
-    // 2. Verify "DCB 30%" and "Total" column headers are rendered
-    const dcbHeader = screen.getByText('DCB 30%');
-    const totalHeaders = screen.getAllByText('Total');
-    expect(dcbHeader).toBeDefined();
-    expect(totalHeaders.length).toBeGreaterThanOrEqual(1);
+    // 2. Verify "DCB 30%" and "Duration" are NOT column headers in the table
+    expect(screen.queryByRole('columnheader', { name: /DCB 30%/i })).toBeNull();
+    expect(screen.queryByRole('columnheader', { name: /Duration/i })).toBeNull();
 
-    // 3. Verify Row 1 DCB ($30.00) and Total ($80.00) data cells are present and aligned
-    expect(screen.getByText('$30.00')).toBeDefined();
+    // 3. Verify DCB 30% is displayed to the LEFT of the Referrals selector
+    const dcbContainer = screen.getByTestId('summary-dcb-container');
+    const referralBtn = screen.getByTestId('summary-referral-dropdown-btn');
+    expect(dcbContainer).toBeDefined();
+    expect(referralBtn).toBeDefined();
+    expect(screen.getByTestId('summary-dcb-value').textContent).toBe('$30.00');
+
+    // 4. Verify Total column is present and Row 1 Total ($80.00) and Profit ($72.00) are aligned
     expect(screen.getByText('$80.00')).toBeDefined();
+    expect(screen.getByText('$72.00')).toBeDefined();
+  });
+
+  it('15. Dynamic DCB 30% Calculation and synchronization across all Referral options (2, 4, 6, 8, 10)', () => {
+    render(<PotentialityView isAdmin={false} />);
+
+    const summaryRefSelect = screen.getByTestId('potentiality-summary-referral-native-select') as HTMLSelectElement;
+    const dcbValueEl = screen.getByTestId('summary-dcb-value');
+
+    // Option 2 (Default PBA 1: $100 rank price, DCB 30% = $30.00)
+    expect(dcbValueEl.textContent).toBe('$30.00');
+    expect(screen.getByText('$50.00')).toBeDefined(); // Ref amount
+    expect(screen.getByText('$80.00')).toBeDefined(); // Total
+    expect(screen.getByText('$72.00')).toBeDefined(); // Profit
+
+    // Option 4
+    fireEvent.change(summaryRefSelect, { target: { value: '4' } });
+    expect(dcbValueEl.textContent).toBe('$30.00');
+    expect(screen.getAllByText('$100.00').length).toBeGreaterThanOrEqual(1); // 4 * $25 = $100
+    expect(screen.getAllByText('$130.00').length).toBeGreaterThanOrEqual(1); // $100 + $30 = $130
+    expect(screen.getAllByText('$117.00').length).toBeGreaterThanOrEqual(1); // $130 - 10% = $117
+
+    // Option 6
+    fireEvent.change(summaryRefSelect, { target: { value: '6' } });
+    expect(dcbValueEl.textContent).toBe('$30.00');
+    expect(screen.getAllByText('$150.00').length).toBeGreaterThanOrEqual(1); // 6 * $25 = $150
+    expect(screen.getAllByText('$180.00').length).toBeGreaterThanOrEqual(1); // $150 + $30 = $180
+    expect(screen.getAllByText('$162.00').length).toBeGreaterThanOrEqual(1); // $180 - 10% = $162
+
+    // Option 8
+    fireEvent.change(summaryRefSelect, { target: { value: '8' } });
+    expect(dcbValueEl.textContent).toBe('$30.00');
+    expect(screen.getAllByText('$200.00').length).toBeGreaterThanOrEqual(1); // 8 * $25 = $200
+    expect(screen.getAllByText('$230.00').length).toBeGreaterThanOrEqual(1); // $200 + $30 = $230
+    expect(screen.getAllByText('$207.00').length).toBeGreaterThanOrEqual(1); // $230 - 10% = $207
+
+    // Option 10
+    fireEvent.change(summaryRefSelect, { target: { value: '10' } });
+    expect(dcbValueEl.textContent).toBe('$30.00');
+    expect(screen.getAllByText('$250.00').length).toBeGreaterThanOrEqual(1); // 10 * $25 = $250
+    expect(screen.getAllByText('$280.00').length).toBeGreaterThanOrEqual(1); // $250 + $30 = $280
+    expect(screen.getAllByText('$252.00').length).toBeGreaterThanOrEqual(1); // $280 - 10% = $252
+
+    // Switch Rank to PBA 2 ($300 rank price): DCB 30% dynamically updates to $90.00
+    const summaryRankSelect = screen.getByTestId('potentiality-summary-rank-native-select') as HTMLSelectElement;
+    fireEvent.change(summaryRankSelect, { target: { value: 'pba-2' } });
+    expect(dcbValueEl.textContent).toBe('$90.00');
+  });
+
+  it('16. Presentation Cards: verifies premium gradients, zoom class, and floating pulse effect', () => {
+    const { container } = render(<PotentialityView isAdmin={false} />);
+
+    const zoomCards = container.querySelectorAll('.potentiality-zoom-card');
+    expect(zoomCards.length).toBe(3);
+
+    // Card 1: Navy/Royal blue gradient + rank/period text
+    expect(zoomCards[0].textContent).toContain('PBA 1');
+    expect(zoomCards[0].className).toContain('from-[#0c1e3d]');
+    expect(zoomCards[0].className).toContain('to-[#1e40af]');
+
+    // Card 2: Deep teal & emerald green gradient + ONE TIME SMART WORK
+    expect(zoomCards[1].textContent).toContain('ONE TIME SMART WORK');
+    expect(zoomCards[1].className).toContain('from-[#042f2e]');
+    expect(zoomCards[1].className).toContain('to-[#047857]');
+
+    // Card 3: Floating pulse effect class + Success ratio + Orange 5 Cr. value
+    expect(zoomCards[2].textContent).toMatch(/success ratio/i);
+    expect(zoomCards[2].classList.contains('potentiality-floating-card')).toBe(true);
+    const crValueEl = zoomCards[2].querySelector('span:nth-child(2)');
+    expect(crValueEl?.className).toContain('text-[#F97316]');
+  });
+
+  it('17. Premium Table Design: verifies navy header, selected row blue highlight, green profit column, navy total panel, and disclaimer', () => {
+    const { container } = render(<PotentialityView isAdmin={false} />);
+
+    // 1. Navy Table Header
+    const thead = container.querySelector('thead');
+    expect(thead?.className).toContain('bg-[#142D50]');
+    expect(thead?.className).toContain('text-white');
+
+    // 2. Selected Row Highlight (Row 1 is initially selected with blue accent and dropdown)
+    const rows = container.querySelectorAll('tbody tr');
+    const firstRow = rows[0];
+    expect(firstRow.className).toContain('bg-blue-50');
+    const firstCell = firstRow.querySelector('td');
+    expect(firstCell?.className).toContain('border-blue-600');
+
+    // Time Dropdown has professional blue style
+    const timeBtn = screen.getByRole('button', { name: /Main Time Selection Dropdown/i });
+    expect(timeBtn.className).toContain('bg-[#1d4ed8]');
+
+    // Clicking another row selects it
+    const secondRow = rows[1];
+    fireEvent.click(secondRow);
+    expect(secondRow.className).toContain('bg-blue-50');
+
+    // 3. Profit Column has subtle green highlight across rows
+    const profitCell = firstRow.querySelectorAll('td')[8];
+    expect(profitCell.className).toContain('text-[#15803d]');
+
+    // 4. Bottom Summary: Navy-blue Total Panel
+    const footerRow = rows[rows.length - 1];
+    const totalPanel = footerRow.querySelectorAll('td')[3];
+    expect(totalPanel.className).toContain('bg-[#142D50]');
+    expect(totalPanel.className).toContain('text-white');
+
+    // 5. Financial Projection Disclaimer is displayed
+    expect(screen.getByText(/Illustrative Projection — Actual Results May Vary/i)).toBeDefined();
   });
 });
+
+

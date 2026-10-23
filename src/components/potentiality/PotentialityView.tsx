@@ -176,6 +176,9 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
     savePotentialityState(updated);
   };
 
+  // Selected table row index for interactive highlighting
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number>(0);
+
   // Active period configuration
   const currentPeriodConfig: TimePeriodTypeConfig = useMemo(() => {
     const pType = potentialityState.activePeriodType || 'weekly';
@@ -200,6 +203,7 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
       rowsConfig: rows,
       availableTimePeriods: vlookupResult.periods,
     };
+    setSelectedRowIndex(0);
     setPotentialityState(updated);
     savePotentialityState(updated);
   };
@@ -403,8 +407,11 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
   const msgs = potentialityState.messages;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2 sm:p-3.5 md:p-4 space-y-2.5 sm:space-y-3 w-full max-w-[1020px] mx-auto animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif]">
-      {/* 1. Header Toolbar with Dynamic Rank Selection, Top Stat Summary & Admin Controls */}
+    <div className={`bg-white rounded-xl border border-slate-200/90 shadow-2xs ${isAdmin ? 'p-2 sm:p-3 md:p-3.5 space-y-2 sm:space-y-2.5' : 'p-2 sm:p-2.5 space-y-1.5 sm:space-y-2'} w-full max-w-[940px] mx-auto animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif]`}>
+      {/* Top Admin Control Panel: Header Toolbar with Title, Badges, Admin Selectors & Time Period Type Bar (Authorized Admins Only) */}
+      {isAdmin && (
+        <>
+          {/* 1. Header Toolbar with Dynamic Rank Selection, Top Stat Summary & Admin Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2.5 border-b border-slate-100">
         <div className="flex items-center gap-2.5 sm:gap-3">
           <div className="w-[36px] h-[36px] rounded-[8px] bg-[#142D50] text-white flex items-center justify-center shrink-0 shadow-2xs">
@@ -670,6 +677,8 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
           )}
         </div>
       </div>
+        </>
+      )}
 
       {/* 2. Selected Rank Top Summary Strip (Matching Exact Specification & Reference Image) */}
       <div 
@@ -803,7 +812,7 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
           </div>
         </div>
 
-        {/* Row 2: Note: Including 3% Network fee on left, Referral Dropdown on right */}
+        {/* Row 2: Note: Including 3% Network fee on left, DCB 30% & Referral Dropdown on right */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-200/70">
           <div className="flex items-center gap-2">
             <span className="text-[11px] sm:text-xs font-semibold text-red-600 bg-red-50/90 border border-red-200/70 px-2.5 py-0.5 rounded">
@@ -811,136 +820,140 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
             </span>
           </div>
 
-          {/* Referral Dropdown on the right side of the same line */}
-          <div className="flex items-center gap-1.5 ml-auto">
-            <span className="text-xs font-semibold text-slate-600">Referrals:</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  data-testid="summary-referral-dropdown-btn"
-                  className="h-7 sm:h-8 px-2 border-slate-200 bg-white font-bold text-slate-800 hover:bg-slate-50 rounded-md shadow-2xs flex items-center gap-1 cursor-pointer"
-                  aria-label="Select Referrals"
-                >
-                  <span className="w-4 h-4 rounded bg-orange-500 text-white flex items-center justify-center text-[10.5px] font-bold">
-                    {justReferGlobal}
-                  </span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-36 p-1 bg-white shadow-lg border border-slate-200 rounded-lg z-50">
-                <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Referrals / Person
-                </div>
-                {REFERRAL_OPTIONS.map((opt) => (
-                  <DropdownMenuItem
-                    key={opt}
-                    onClick={() => handleJustReferChange(opt)}
-                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer ${
-                      justReferGlobal === opt ? 'bg-orange-50 font-bold text-orange-900' : 'text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span>{opt} Referrals</span>
-                    {justReferGlobal === opt && <Check className="w-3.5 h-3.5 text-orange-600" />}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+          {/* Right section: DCB 30% immediately to the LEFT of the Referrals selector */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5 ml-auto flex-wrap sm:flex-nowrap">
+            {/* DCB 30% Label and Dynamically Calculated Value */}
+            <div className="flex items-center gap-1.5" data-testid="summary-dcb-container">
+              <span className="text-xs font-semibold text-slate-600">DCB 30%:</span>
+              <span 
+                data-testid="summary-dcb-value"
+                className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded shadow-2xs tabular-nums"
+              >
+                {formatUSD(summary.computedRows.find((r) => r.level === 1)?.dcbAmountUSD ?? summary.computedRows[0]?.dcbAmountUSD ?? round2(summary.rankPriceUSD * 0.30))}
+              </span>
+            </div>
 
-            {/* Hidden native select for accessibility and automated testing */}
-            <select
-              aria-label="Select Summary Referrals Native"
-              data-testid="potentiality-summary-referral-native-select"
-              value={justReferGlobal}
-              onChange={(e) => handleJustReferChange(Number(e.target.value))}
-              className="sr-only"
-              tabIndex={-1}
-            >
-              {REFERRAL_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt} Referrals
-                </option>
-              ))}
-            </select>
+            {/* Referral Dropdown */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-slate-600">Referrals:</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    data-testid="summary-referral-dropdown-btn"
+                    className="h-7 sm:h-8 px-2 border-slate-200 bg-white font-bold text-slate-800 hover:bg-slate-50 rounded-md shadow-2xs flex items-center gap-1 cursor-pointer"
+                    aria-label="Select Referrals"
+                  >
+                    <span className="w-4 h-4 rounded bg-orange-500 text-white flex items-center justify-center text-[10.5px] font-bold">
+                      {justReferGlobal}
+                    </span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-36 p-1 bg-white shadow-lg border border-slate-200 rounded-lg z-50">
+                  <div className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Referrals / Person
+                  </div>
+                  {REFERRAL_OPTIONS.map((opt) => (
+                    <DropdownMenuItem
+                      key={opt}
+                      onClick={() => handleJustReferChange(opt)}
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer ${
+                        justReferGlobal === opt ? 'bg-orange-50 font-bold text-orange-900' : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{opt} Referrals</span>
+                      {justReferGlobal === opt && <Check className="w-3.5 h-3.5 text-orange-600" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Hidden native select for accessibility and automated testing */}
+              <select
+                aria-label="Select Summary Referrals Native"
+                data-testid="potentiality-summary-referral-native-select"
+                value={justReferGlobal}
+                onChange={(e) => handleJustReferChange(Number(e.target.value))}
+                className="sr-only"
+                tabIndex={-1}
+              >
+                {REFERRAL_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt} Referrals
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 3. Potentiality Calculation Table */}
-      <div className="overflow-hidden rounded-[10px] border border-slate-200 shadow-2xs w-full bg-white">
+      <div className="overflow-hidden rounded-[8px] border border-slate-200 shadow-2xs w-full bg-white">
         <div className="overflow-x-auto relative w-full scrollbar-none sm:overflow-x-visible">
           <table className="w-full border-collapse text-left font-['Inter',system-ui,sans-serif]">
-            {/* Proportional Percentage Column Width Distribution */}
+            {/* Proportional Percentage Column Width Distribution (9 columns for users, 10 for admin) */}
             {isAdmin ? (
               <colgroup>
-                <col className="w-[10%]" />
-                <col className="w-[8%]" />
-                <col className="w-[6%]" />
+                <col className="w-[11%]" />
                 <col className="w-[7%]" />
+                <col className="w-[5%]" />
+                <col className="w-[6%]" />
                 <col className="w-[6%]" />
                 <col className="w-[12%]" />
-                <col className="w-[10%]" />
-                <col className="w-[8%]" />
-                <col className="w-[9%]" />
-                <col className="w-[10%]" />
-                <col className="w-[8%]" />
-                <col className="w-[6%]" />
+                <col className="w-[14%]" />
+                <col className="w-[15%]" />
+                <col className="w-[17%]" />
+                <col className="w-[7%]" />
               </colgroup>
             ) : (
               <colgroup>
                 <col className="w-[11%]" />
                 <col className="w-[8%]" />
                 <col className="w-[6%]" />
-                <col className="w-[8%]" />
+                <col className="w-[7%]" />
                 <col className="w-[7%]" />
                 <col className="w-[13%]" />
-                <col className="w-[11%]" />
-                <col className="w-[8%]" />
-                <col className="w-[9%]" />
-                <col className="w-[10%]" />
-                <col className="w-[9%]" />
+                <col className="w-[15%]" />
+                <col className="w-[16%]" />
+                <col className="w-[17%]" />
               </colgroup>
             )}
 
             {/* Dark Navy Blue Table Header */}
             <thead className="bg-[#142D50] text-white select-none">
-              <tr className="h-9 sm:h-10">
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-center font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-nowrap">
+              <tr className="h-8 sm:h-8.5">
+                <th className="py-1.5 px-1 sm:px-1.5 text-center font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-nowrap">
                   Time
                 </th>
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-center font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-nowrap">
+                <th className="py-1.5 px-1 sm:px-1.5 text-center font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-nowrap">
                   Rank
                 </th>
-                <th className="py-2 px-0.5 sm:px-1 md:px-1.5 text-center font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-nowrap">
+                <th className="py-1.5 px-0.5 sm:px-1 text-center font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-nowrap">
                   Level
                 </th>
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-center font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-normal leading-tight">
+                <th className="py-1.5 px-1 sm:px-1.5 text-center font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-normal leading-tight">
                   Just refer
                 </th>
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-center font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-normal leading-tight">
+                <th className="py-1.5 px-1 sm:px-1.5 text-center font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-normal leading-tight">
                   Ref. %
                 </th>
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-right font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-normal leading-tight">
+                <th className="py-1.5 pl-1 pr-1.5 sm:pr-2 text-right font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-normal leading-tight">
                   Earn Each Referral
                 </th>
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-right font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-normal leading-tight">
+                <th className="py-1.5 pl-1 pr-1.5 sm:pr-2 text-right font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-normal leading-tight">
                   Ref. amount
                 </th>
-                <th className="py-2 pl-1 sm:pl-1.5 pr-0.5 sm:pr-1 text-right font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-normal leading-tight">
-                  DCB 30%
-                </th>
-                <th className="py-2 pl-0.5 sm:pl-1 pr-1 sm:pr-2 text-right font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-nowrap">
+                <th className="py-1.5 pl-1 pr-1.5 sm:pr-2 text-right font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-nowrap">
                   Total
                 </th>
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-right font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-nowrap">
+                <th className="py-1.5 pl-1 pr-1.5 sm:pr-2 text-right font-bold text-[10px] sm:text-[10.5px] md:text-[11px] text-white whitespace-nowrap">
                   Profit
                 </th>
-                <th className="py-2 px-1 sm:px-1.5 md:px-2 text-center font-semibold text-[10px] sm:text-[11px] md:text-xs text-slate-100 whitespace-normal leading-tight">
-                  Duration
-                </th>
                 {isAdmin && (
-                  <th className="py-2 px-1 text-center font-semibold text-[10px] sm:text-[11px] text-slate-200 whitespace-nowrap">
+                  <th className="py-1.5 px-1 text-center font-bold text-[10px] sm:text-[11px] text-slate-200 whitespace-nowrap">
                     Actions
                   </th>
                 )}
@@ -951,28 +964,32 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
             <tbody className="divide-y divide-slate-100 relative">
               {summary.computedRows.map((row, index) => {
                 const isFirstRow = index === 0;
+                const isSelectedRow = index === selectedRowIndex;
 
                 return (
                   <tr 
                     key={row.id}
-                    className={`h-[34px] sm:h-[36px] md:h-[38px] transition-colors ${
-                      isFirstRow 
-                        ? 'bg-amber-50/40 hover:bg-amber-50/70 font-medium' 
-                        : 'even:bg-[#f8fafc] odd:bg-white hover:bg-blue-50/25'
+                    onClick={() => setSelectedRowIndex(index)}
+                    className={`h-[28px] sm:h-[30px] md:h-[31px] transition-colors cursor-pointer select-none ${
+                      isSelectedRow 
+                        ? 'bg-blue-50/70 hover:bg-blue-100/50 font-medium' 
+                        : 'even:bg-[#f8fafc] odd:bg-white hover:bg-slate-50/80'
                     }`}
                   >
-                    {/* Time Column: Only First Orange Cell has Interactive Dropdown; Rows Underneath are Plain Centered Text */}
-                    <td className="py-1 px-1 sm:px-1.5 md:px-2 text-center whitespace-nowrap">
+                    {/* Time Column: Row 1 has Interactive Dropdown in Professional Blue; Rows Underneath are Plain Centered Text with Left Blue Accent on Selected Row */}
+                    <td className={`py-0.5 px-1 sm:px-1.5 text-center whitespace-nowrap ${
+                      isSelectedRow ? 'border-l-[3.5px] border-blue-600 pl-0.5 sm:pl-1' : ''
+                    }`}>
                       {isFirstRow ? (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button
                               type="button"
                               aria-label={`Main Time Selection Dropdown (Time period for level ${row.level}, currently ${row.timeLabel})`}
-                              className="inline-flex items-center justify-center gap-0.5 sm:gap-1.5 px-1.5 sm:px-2.5 md:px-3 py-0.5 sm:py-1 rounded-[4px] sm:rounded-[5px] text-[10px] sm:text-[11px] md:text-xs font-bold cursor-pointer transition-colors shadow-2xs bg-[#ea580c] hover:bg-[#c2410c] text-white select-none"
+                              className="inline-flex items-center justify-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-[4px] text-[10px] sm:text-[10.5px] font-bold cursor-pointer transition-colors shadow-2xs bg-[#1d4ed8] hover:bg-[#1e40af] text-white select-none h-6 border border-blue-500/40"
                             >
                               <span>{row.timeLabel}</span>
-                              <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white/90 shrink-0" />
+                              <ChevronDown className="w-3 h-3 text-white/90 shrink-0" />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" className="w-56 p-1 bg-white shadow-xl border border-slate-200 rounded-lg z-50">
@@ -987,36 +1004,36 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
                                   key={opt}
                                   onClick={() => handleSelectMainTimeOption(opt)}
                                   className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer ${
-                                    isSelected ? 'bg-orange-50 font-bold text-orange-950' : 'text-slate-700 hover:bg-slate-50'
+                                    isSelected ? 'bg-blue-50 font-bold text-blue-900' : 'text-slate-700 hover:bg-slate-50'
                                   }`}
                                 >
                                   <div className="flex flex-col">
                                     <span className="font-bold">{opt}</span>
                                     <span className="text-[10px] text-slate-500">{lookup.summary} • {lookup.status}</span>
                                   </div>
-                                  {isSelected && <Check className="w-3.5 h-3.5 text-orange-600 ml-2" />}
+                                  {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 ml-2" />}
                                 </DropdownMenuItem>
                               );
                             })}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       ) : (
-                        <span className="font-semibold text-slate-700 text-[10px] sm:text-[11px] md:text-xs tracking-tight">
+                        <span className="font-semibold text-slate-700 text-[10px] sm:text-[10.5px] tracking-tight">
                           {row.timeLabel}
                         </span>
                       )}
                     </td>
 
                     {/* Rank Column (Dependent on Selected Rank) */}
-                    <td className="py-1 px-1 sm:px-1.5 text-center whitespace-nowrap">
-                      <span className={`inline-block px-1 sm:px-1.5 md:px-2 py-0.5 rounded-[4px] text-[9.5px] sm:text-[10.5px] md:text-[11px] font-semibold border ${pillStyle.bg} ${pillStyle.text} ${pillStyle.border}`}>
+                    <td className="py-0.5 px-1 sm:px-1.5 text-center whitespace-nowrap">
+                      <span className={`inline-block px-1.5 py-0.5 rounded-[4px] text-[9.5px] sm:text-[10px] font-semibold border ${pillStyle.bg} ${pillStyle.text} ${pillStyle.border}`}>
                         {row.rankName}
                       </span>
                     </td>
 
                     {/* Level Column */}
-                    <td className="py-1 px-0.5 sm:px-1 text-center whitespace-nowrap">
-                      <span className={`inline-block px-1 sm:px-1.5 py-0.5 rounded text-[9.5px] sm:text-[10.5px] md:text-[11px] font-bold ${
+                    <td className="py-0.5 px-0.5 sm:px-1 text-center whitespace-nowrap">
+                      <span className={`inline-block px-1.5 py-0.5 rounded text-[9.5px] sm:text-[10px] font-bold ${
                         isFirstRow ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-700'
                       }`}>
                         {row.levelLabel}
@@ -1024,62 +1041,48 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
                     </td>
 
                     {/* Just Refer Column */}
-                    <td className="py-1 px-1 sm:px-1.5 text-center whitespace-nowrap">
+                    <td className="py-0.5 px-1 sm:px-1.5 text-center whitespace-nowrap">
                       {isFirstRow ? (
-                        <span className="inline-flex items-center justify-center w-5 sm:w-6 h-4 sm:h-5 rounded bg-orange-500 text-white font-bold text-[10px] sm:text-[11px] md:text-[11.5px] shadow-2xs">
+                        <span className="inline-flex items-center justify-center w-5 h-4 sm:w-5.5 sm:h-4.5 rounded bg-orange-500 text-white font-bold text-[10px] sm:text-[10.5px] shadow-2xs">
                           {row.justRefer}
                         </span>
                       ) : (
-                        <span className="font-semibold text-slate-700 tabular-nums text-[10px] sm:text-[11px] md:text-[12px]">
+                        <span className="font-semibold text-slate-700 tabular-nums text-[10px] sm:text-[10.5px]">
                           {row.justRefer}
                         </span>
                       )}
                     </td>
 
                     {/* Ref. % Column */}
-                    <td className="py-1 px-1 sm:px-1.5 text-center font-semibold text-slate-800 tabular-nums text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap">
+                    <td className="py-0.5 px-1 sm:px-1.5 text-center font-semibold text-slate-800 tabular-nums text-[10px] sm:text-[10.5px] whitespace-nowrap">
                       {row.referralPercentage}%
                     </td>
 
                     {/* Earn Each Referral */}
-                    <td className="py-1 px-1 sm:px-1.5 md:px-2 text-right font-medium text-slate-700 tabular-nums text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap">
+                    <td className="py-0.5 pl-1 pr-1.5 sm:pr-2 text-right font-medium text-slate-700 tabular-nums text-[10px] sm:text-[10.5px] whitespace-nowrap">
                       {formatUSD(row.earnEachReferralUSD)}
                     </td>
 
                     {/* Ref. amount */}
-                    <td className="py-1 px-1 sm:px-1.5 md:px-2 text-right font-semibold text-slate-900 tabular-nums text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap">
+                    <td className="py-0.5 pl-1 pr-1.5 sm:pr-2 text-right font-semibold text-slate-900 tabular-nums text-[10px] sm:text-[10.5px] whitespace-nowrap">
                       {formatUSD(row.refAmountUSD)}
                     </td>
 
-                    {/* DCB 30% Column */}
-                    <td className="py-1 pl-1 sm:pl-1.5 pr-0.5 sm:pr-1 text-right tabular-nums text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap">
-                      {row.dcbAmountUSD > 0 ? (
-                        <span className="font-bold text-emerald-700">
-                          {formatUSD(row.dcbAmountUSD)}
-                        </span>
-                      ) : (
-                        <span className="text-slate-300">-</span>
-                      )}
-                    </td>
-
                     {/* Total Column */}
-                    <td className="py-1 pl-0.5 sm:pl-1 pr-1 sm:pr-2 text-right font-bold text-slate-900 tabular-nums text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap">
+                    <td className="py-0.5 pl-1 pr-1.5 sm:pr-2 text-right font-bold text-slate-900 tabular-nums text-[10px] sm:text-[10.5px] whitespace-nowrap">
                       {formatUSD(row.totalUSD)}
                     </td>
 
-                    {/* Profit Column (Net with 10% fee deduction) */}
-                    <td className="py-1 px-1 sm:px-1.5 md:px-2 text-right font-bold text-emerald-700 tabular-nums text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap">
+                    {/* Profit Column (Net with 10% fee deduction) - Special Subtle Green Highlight */}
+                    <td className={`py-0.5 pl-1 pr-1.5 sm:pr-2 text-right font-bold text-[#15803d] tabular-nums text-[10px] sm:text-[10.5px] whitespace-nowrap ${
+                      isSelectedRow ? 'bg-emerald-100/50' : 'bg-[#f0fdf4]/80'
+                    }`}>
                       {formatUSD(row.profitUSD)}
-                    </td>
-
-                    {/* Duration Column */}
-                    <td className="py-1 px-1 sm:px-1.5 text-center font-medium text-slate-600 text-[9.5px] sm:text-[10.5px] md:text-[11.5px] whitespace-nowrap">
-                      {row.durationLabel}
                     </td>
 
                     {/* Admin Actions */}
                     {isAdmin && (
-                      <td className="py-1 px-1 text-center whitespace-nowrap">
+                      <td className="py-0.5 px-1 text-center whitespace-nowrap">
                         <div className="inline-flex items-center gap-0.5">
                           <button
                             type="button"
@@ -1115,86 +1118,86 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
                 );
               })}
 
-              {/* Row 13: Recommended / Not Recommended Row Aligned with Columns (Matching Excel Reference Screenshot) */}
-              <tr className="h-[36px] sm:h-[38px] bg-slate-50/70 border-t-2 border-slate-200">
-                {/* Cell 1: Under Time Column */}
-                <td className="py-1.5 px-1 sm:px-1.5 text-center whitespace-nowrap">
-                  <span className={`text-[9.5px] sm:text-[11px] md:text-[12px] font-bold tracking-tight uppercase ${
-                    currentPeriodConfig.status === 'Not Recommended' ? 'text-rose-600' : 'text-red-600'
+              {/* Row 13: Recommended / Not Recommended Row Aligned with Columns (Compact & Professional) */}
+              <tr className="h-[29px] sm:h-[31px] md:h-[32px] bg-slate-50/80 border-t border-slate-200">
+                {/* Cell 1: Under Time Column - Clean, distinct recommendation status section */}
+                <td className="py-1 px-1 text-center whitespace-nowrap bg-white border-r border-slate-200">
+                  <span className={`inline-block px-1.5 py-0.5 rounded text-[9.5px] sm:text-[10px] font-bold tracking-tight uppercase ${
+                    currentPeriodConfig.status === 'Not Recommended' ? 'text-rose-600 bg-rose-50/80 border border-rose-200/60' : 'text-emerald-700 bg-emerald-50/80 border border-emerald-200/60'
                   }`}>
                     {currentPeriodConfig.status || msgs.recommendedBadge}
                   </span>
                 </td>
 
-                {/* Cell 2-7: Spanning Motivation Banner */}
-                <td colSpan={6} className="py-1 px-1 sm:px-2 text-center bg-[#a3e635]/25 border-x border-slate-200">
-                  <span className="text-[9.5px] sm:text-[11px] md:text-[12.5px] font-extrabold text-[#365314] tracking-tight uppercase leading-tight line-clamp-2">
+                {/* Cell 2-6: Spanning Motivation Banner across Rank, Level, Just refer, Ref. %, Earn Each Referral */}
+                <td colSpan={5} className="py-0.5 px-1 sm:px-1.5 text-center bg-[#ecfccb]/70 border-r border-slate-200">
+                  <span className="text-[9.5px] sm:text-[10.5px] font-extrabold text-[#365314] tracking-tight uppercase leading-tight line-clamp-1 block">
                     {msgs.bannerHeader}
                   </span>
                 </td>
 
-                {/* Cell 8: Total Label */}
-                <td className="py-1 pl-1 sm:pl-1.5 pr-0.5 sm:pr-1 text-right font-bold text-slate-700 text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap">
+                {/* Cell 7: Total Label inside Deep Navy-Blue Summary Panel */}
+                <td className="py-1 pl-1 pr-1.5 sm:pr-2 text-right font-bold text-slate-200 text-[10px] sm:text-[10.5px] whitespace-nowrap bg-[#142D50] border-l border-slate-700/50">
                   Total
                 </td>
 
-                {/* Cell 9: Total Profit Amount */}
-                <td colSpan={2} className="py-1 pl-0.5 sm:pl-1 pr-1 sm:pr-2 text-right font-black text-slate-900 text-[10px] sm:text-[11.5px] md:text-[13px] tabular-nums whitespace-nowrap">
+                {/* Cell 8-9: Total Profit Amount inside Deep Navy-Blue Summary Panel */}
+                <td colSpan={2} className="py-1 pl-1 pr-1.5 sm:pr-2 text-right font-black text-white text-[10.5px] sm:text-[11.5px] tabular-nums whitespace-nowrap bg-[#142D50] shadow-xs">
                   <span>{formatUSD(summary.totalProfitUSD)}</span>
-                  <span className="block sm:inline text-[9px] sm:text-[10px] md:text-[11px] font-bold text-slate-500 tabular-nums sm:ml-1.5">
+                  <span className="inline text-[9px] sm:text-[10px] font-medium text-slate-300 tabular-nums ml-1 sm:ml-1.5">
                     ({formatINR(summary.totalProfitINR)})
                   </span>
                 </td>
 
-                {/* Cell 10: Under Duration Column */}
-                <td className="py-1.5 px-1 sm:px-1.5 text-center whitespace-nowrap">
-                  <span className={`text-[9.5px] sm:text-[11px] md:text-[12px] font-bold tracking-tight uppercase ${
-                    currentPeriodConfig.status === 'Not Recommended' ? 'text-rose-600' : 'text-red-600'
-                  }`}>
-                    {currentPeriodConfig.status || msgs.recommendedBadge}
-                  </span>
-                </td>
-
-                {isAdmin && <td className="py-1 px-1 text-center" />}
+                {isAdmin && <td className="py-1 px-1 text-center bg-[#142D50]" />}
               </tr>
             </tbody>
           </table>
+        </div>
+
+        {/* Unobtrusive Financial Projection Disclaimer */}
+        <div className="bg-slate-50/80 border-t border-slate-200/80 px-2.5 py-0.5 flex items-center justify-end">
+          <span className="text-[9.5px] sm:text-[10px] text-slate-400 italic font-medium">
+            * Illustrative Projection — Actual Results May Vary.
+          </span>
         </div>
       </div>
 
       {/* 4. Bottom Presentation Cards & Motivational Banners (Matching Exact Reference Screenshot) */}
       <div className="space-y-2 pt-1 font-['Inter',system-ui,sans-serif]">
-        {/* Banner Layer: Orange Dynamic Period Summary Card + Center Orange Smart Work Banner + Success Ratio */}
+        {/* Banner Layer: Navy/Royal Blue Period Summary + Teal/Emerald Smart Work Banner + Floating Success Ratio */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-stretch">
-          {/* Left Orange Card: Dynamic Period Summary / Selected Rank */}
-          <div className="md:col-span-3 bg-[#ea580c] text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-2xs">
-            <span className="text-[12px] sm:text-[13px] font-extrabold tracking-wide uppercase">
+          {/* Card 1: Left Deep Navy into Royal Blue Gradient Card with Subtle Highlights */}
+          <div className="potentiality-zoom-card md:col-span-3 bg-gradient-to-br from-[#0c1e3d] via-[#112d58] to-[#1e40af] border border-blue-400/25 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-sm relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300/15 via-transparent to-transparent pointer-events-none rounded-[8px]" />
+            <span className="relative z-1 text-[12px] sm:text-[13px] font-extrabold tracking-wide uppercase text-blue-100">
               {currentPeriodConfig.summary || msgs.monthsBadge}
             </span>
-            <span className="text-[16px] sm:text-[18px] font-black tracking-tight mt-0.5">
+            <span className="relative z-1 text-[16px] sm:text-[18px] font-black tracking-tight mt-0.5 text-white drop-shadow-xs">
               {summary.selectedRankName}
             </span>
           </div>
 
-          {/* Center Banner: "ONE TIME SMART WORK" */}
-          <div className="md:col-span-6 bg-[#ea580c] text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-2xs">
-            <span className="text-[13px] sm:text-[15px] font-black tracking-wider uppercase">
+          {/* Card 2: Center Deep Teal & Emerald Green Gradient Card */}
+          <div className="potentiality-zoom-card md:col-span-6 bg-gradient-to-br from-[#042f2e] via-[#064e3b] to-[#047857] border border-emerald-400/30 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-md relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-300/15 via-transparent to-transparent pointer-events-none rounded-[8px]" />
+            <span className="relative z-1 text-[13px] sm:text-[15px] font-black tracking-wider uppercase text-emerald-50 drop-shadow-xs">
               {msgs.bannerTitle}
             </span>
-            <span className="text-[11px] sm:text-[12px] font-medium text-orange-50 tracking-normal mt-0.5">
+            <span className="relative z-1 text-[11px] sm:text-[12px] font-medium text-emerald-100/90 tracking-normal mt-0.5">
               {msgs.bannerSubtitle}
             </span>
-            <div className="inline-flex items-center gap-1.5 mt-1 bg-white/15 px-2.5 py-0.5 rounded text-[11px] sm:text-[11.5px] font-bold text-white">
+            <div className="relative z-1 inline-flex items-center gap-1.5 mt-1 bg-emerald-950/40 border border-emerald-300/30 px-2.5 py-0.5 rounded text-[11px] sm:text-[11.5px] font-bold text-white shadow-xs">
               <span>{msgs.bannerTarget}</span>
             </div>
           </div>
 
-          {/* Right Success Ratio Card */}
-          <div className="md:col-span-3 bg-slate-50 border border-slate-200/90 rounded-[8px] p-2 sm:p-2.5 flex flex-col justify-center items-center text-center shadow-2xs">
+          {/* Card 3: Right Success Ratio Card with Special Floating Pulse Effect & Soft Border Glow */}
+          <div className="potentiality-zoom-card potentiality-floating-card md:col-span-3 bg-gradient-to-b from-white via-slate-50 to-slate-100/90 border border-slate-200/90 rounded-[8px] p-2 sm:p-2.5 flex flex-col justify-center items-center text-center shadow-xs">
             <span className="text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">
               {msgs.successRatioTitle}
             </span>
-            <span className="text-[17px] sm:text-[19px] font-black text-slate-900 tracking-tight mt-0.5">
+            <span className="text-[17px] sm:text-[19px] font-black text-[#F97316] tracking-tight mt-0.5">
               {msgs.successRatioValue}
             </span>
           </div>
