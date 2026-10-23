@@ -4014,22 +4014,46 @@
   }
 
   .sidebar-mobile-toggle {
+    position: fixed !important;
+    top: calc(5px + env(safe-area-inset-top, 0px)) !important;
+    left: calc(10px + env(safe-area-inset-left, 0px)) !important;
+    z-index: 40 !important;
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--foreground);
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border) !important;
+    background: #ffffff !important;
+    color: var(--foreground) !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease !important;
   }
 
   .sidebar-mobile-toggle:hover {
-    background: var(--secondary);
+    background: var(--secondary) !important;
+    border-color: color-mix(in oklch, var(--border) 80%, black) !important;
+  }
+
+  .sidebar-mobile-toggle:active {
+    background: var(--muted) !important;
+    transform: scale(0.97);
+  }
+
+  .earning-opportunities-active .sidebar-mobile-toggle {
+    background: #0d1d30 !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .earning-opportunities-active .sidebar-mobile-toggle:hover {
+    background: #132742 !important;
+    border-color: rgba(255, 255, 255, 0.22) !important;
   }
 
   .sidebar-close-mobile {
@@ -4106,6 +4130,7 @@
     gap: 8px;
     flex-wrap: nowrap;
     overflow: hidden;
+    padding-left: 42px;
   }
 
   .topbar-nav-tabs {
@@ -4113,7 +4138,7 @@
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
-    max-width: calc(100% - 42px);
+    max-width: 100% !important;
     flex-shrink: 1;
     padding: 2px 3px;
   }
@@ -4538,5 +4563,75 @@
   .time-in-hand-summary-grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 12px;
+  }
+}
+
+/* ==========================================================================
+   Home Page Hero Headline — Subtle Golden Glow & Occasional Light Sweep
+   ========================================================================== */
+
+.hero-golden-headline {
+  position: relative;
+  display: inline-block;
+  color: #ffffff;
+  /* Premium golden gradient with occasional shine band */
+  background-image: linear-gradient(
+    115deg,
+    #ffffff 0%,
+    #ffffff 36%,
+    #fef08a 44%,
+    #fbbf24 50%,
+    #fef08a 56%,
+    #ffffff 64%,
+    #ffffff 100%
+  );
+  background-size: 280% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Dual animations: gentle breathing glow (3.5s) + occasional shine sweep (7s) */
+  animation:
+    heroGoldenGlow 3.5s ease-in-out infinite alternate,
+    heroGoldenShine 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: filter, background-position;
+}
+
+/* 1. Soft golden glow fading gently in and out over ~3.5 seconds */
+@keyframes heroGoldenGlow {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.22))
+            drop-shadow(0 0 16px rgba(251, 191, 36, 0.12));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.55))
+            drop-shadow(0 0 28px rgba(245, 158, 11, 0.32))
+            drop-shadow(0 0 40px rgba(217, 119, 6, 0.18));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.22))
+            drop-shadow(0 0 16px rgba(251, 191, 36, 0.12));
+  }
+}
+
+/* 2. Subtle golden light sweep across text occasionally (~every 7 seconds) */
+@keyframes heroGoldenShine {
+  0%, 68% {
+    background-position: 0% 50%;
+  }
+  84% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Respect user's reduced-motion accessibility preference */
+@media (prefers-reduced-motion: reduce) {
+  .hero-golden-headline {
+    animation: none !important;
+    background-position: 0% 50% !important;
+    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.3)) !important;
   }
 }

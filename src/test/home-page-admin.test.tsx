@@ -70,7 +70,7 @@ describe('Home Page Admin Editing System Acceptance Tests', () => {
       expect(screen.getByText(/Manage Real Estate Home Page/i)).toBeDefined();
 
       // Find headline input
-      const headlineInput = screen.getByDisplayValue(/Your Future\. Your Opportunity\./i);
+      const headlineInput = screen.getByDisplayValue(/Earn Plot or Flat Within 1 Year\./i);
       fireEvent.change(headlineInput, { target: { value: 'Welcome to Elite Horizons' } });
 
       // Save Draft
@@ -113,7 +113,7 @@ describe('Home Page Admin Editing System Acceptance Tests', () => {
       fireEvent.click(screen.getByRole('button', { name: /Edit Home Page/i }));
 
       // Change headline
-      const headlineInput = screen.getByDisplayValue(/Your Future\. Your Opportunity\./i);
+      const headlineInput = screen.getByDisplayValue(/Earn Plot or Flat Within 1 Year\./i);
       fireEvent.change(headlineInput, { target: { value: 'Published Luxury Living' } });
 
       // Click Publish Changes

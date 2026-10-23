@@ -9,7 +9,7 @@ describe('Real Estate Business Home Page Acceptance Tests', () => {
     render(<HomeTab userEmail="sivaji491@gmail.com" onNavigateToTab={onNavigateMock} />);
 
     // Headline
-    expect(screen.getByText(/Your Future\. Your Opportunity\./i)).toBeDefined();
+    expect(screen.getByText(/Earn Plot or Flat Within 1 Year\./i)).toBeDefined();
     expect(screen.getByText(/Understand the Possibilities\./i)).toBeDefined();
 
     // Supporting text

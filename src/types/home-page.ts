@@ -89,7 +89,7 @@ export interface HomePageData {
 export const DEFAULT_HOME_PAGE_DATA: HomePageData = {
   marqueeText: "It's like ONE TIME SMART WORK FOR ASSET EARNING, FIRST UNDERSTAND THE BUSINESS PLAN",
   hero: {
-    headline: 'Your Future. Your Opportunity.',
+    headline: 'Earn Plot or Flat Within 1 Year.',
     highlightHeadline: 'Understand the Possibilities.',
     subtitle: 'Already working in a job, managing a business, or pursuing another profession? Explore our real estate business plan, understand how it works, and evaluate the available opportunities at your own pace.',
     heroBgImage: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80',

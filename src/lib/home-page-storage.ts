@@ -91,6 +91,11 @@ export function loadPublishedHomePage(): HomePageData {
       savePublishedHomePageLocal({ ...DEFAULT_HOME_PAGE_DATA, ...parsed });
     }
 
+    if (parsed.hero?.headline === 'Your Future. Your Opportunity.') {
+      parsed.hero.headline = DEFAULT_HOME_PAGE_DATA.hero.headline;
+      savePublishedHomePageLocal({ ...DEFAULT_HOME_PAGE_DATA, ...parsed });
+    }
+
     return {
       ...DEFAULT_HOME_PAGE_DATA,
       ...parsed,
@@ -121,6 +126,9 @@ export function loadDraftHomePage(): HomePageData {
           parsed.marqueeText === "It's like ONE TIME SMART WORK FOR ASSET EARNING"
         ) {
           parsed.marqueeText = DEFAULT_HOME_PAGE_DATA.marqueeText;
+        }
+        if (parsed.hero?.headline === 'Your Future. Your Opportunity.') {
+          parsed.hero.headline = DEFAULT_HOME_PAGE_DATA.hero.headline;
         }
         return {
           ...DEFAULT_HOME_PAGE_DATA,

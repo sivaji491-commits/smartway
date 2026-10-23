@@ -649,7 +649,25 @@ function Maintenance() {
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {mobileMenuOpen ? (
+                <X className="w-4 h-4" />
+              ) : (
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="3.5" y1="4.5" x2="20.5" y2="4.5" />
+                  <line x1="3.5" y1="9.5" x2="20.5" y2="9.5" />
+                  <line x1="3.5" y1="14.5" x2="20.5" y2="14.5" />
+                  <line x1="3.5" y1="19.5" x2="20.5" y2="19.5" />
+                </svg>
+              )}
             </button>
             {isAdmin && (
               <nav className="topbar-nav-tabs" aria-label="Top Tabs Navigation">

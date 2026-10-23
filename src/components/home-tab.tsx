@@ -394,8 +394,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           </div>
 
           {/* Large Bold Headline */}
-          <h1 className="text-3xl sm:5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight sm:leading-tight mb-3">
-            {activeData.hero.headline}{' '}
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight sm:leading-tight mb-3 max-w-5xl mx-auto">
+            <span className="hero-golden-headline">{activeData.hero.headline}</span>{' '}
             <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
               {activeData.hero.highlightHeadline}
             </span>
