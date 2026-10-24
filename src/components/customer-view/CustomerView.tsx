@@ -15,7 +15,11 @@ import {
   Users,
   Info,
   ArrowUpRight,
-  Infinity as InfinityIcon
+  Infinity as InfinityIcon,
+  Landmark,
+  Handshake,
+  MapPin,
+  Home
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -23,6 +27,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { loadRankCalculatorState } from '@/lib/rank-storage';
 import { formatUSD } from '@/lib/rank-calculator-engine';
@@ -60,6 +72,7 @@ export function CustomerView({
   const [selectedRankId, setSelectedRankId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [infoModalOption, setInfoModalOption] = useState<'savings' | 'loan' | null>(null);
 
   // Sync listener: auto-update when admin edits ranks, prices, gas fees, or exchange rate
   const syncLatestData = useCallback(() => {
@@ -168,9 +181,278 @@ export function CustomerView({
   }
 
   return (
-    <div className="customer-view-container bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3 lg:p-3.5 space-y-2.5 w-full animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif] select-none">
-      {/* 1. Header Toolbar with Page Title, Downward Dynamic Rank Dropdown, and Rate Indicator */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+    <div className="customer-view-container bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3.5 lg:p-4 space-y-3.5 sm:space-y-4 w-full animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif] select-none">
+      {/* 1. Real Estate Hero Section (Matching Reference Image) */}
+      <section 
+        className="customer-hero-card w-full"
+        aria-label="Property Purchase Options Hero"
+        data-testid="customer-hero-section"
+      >
+        <div className="flex flex-col lg:flex-row items-stretch justify-between">
+          {/* Left Text Content */}
+          <div className="flex-1 p-4 sm:p-6 lg:p-7 flex flex-col justify-center">
+            <div className="inline-flex items-center gap-2 mb-2 sm:mb-2.5">
+              <span className="w-1.5 h-4 bg-emerald-500 rounded-full shrink-0"></span>
+              <span className="text-xs sm:text-sm font-bold text-slate-800 tracking-tight">
+                Your Dream Land Awaits!
+              </span>
+            </div>
+            
+            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-[#0B2545] tracking-tight leading-[1.2]">
+              Choose the Best Way
+            </h1>
+            
+            <p className="text-xs sm:text-sm lg:text-base text-slate-600 mt-2 sm:mt-2.5 max-w-xl leading-relaxed font-normal">
+              Buy your desired plot or flat using our special option, not your savings, and not a bank loan.
+            </p>
+            
+            <div className="mt-3.5 sm:mt-4 inline-flex items-center gap-2 border-b-2 border-amber-400/90 pb-1 self-start">
+              <span className="font-serif italic text-xs sm:text-sm lg:text-[15px] font-bold text-[#1E3A8A] tracking-wide">
+                Your Land &bull; Your Future &bull; Our Support
+              </span>
+            </div>
+          </div>
+
+          {/* Right Real Estate Image Banner */}
+          <div className="relative w-full lg:w-[48%] h-48 sm:h-56 lg:h-auto min-h-[200px] sm:min-h-[220px] overflow-hidden bg-slate-100">
+            <img 
+              src="/images/customer-view/hero-real-estate.jpg" 
+              alt="Developed residential plots and luxury apartments" 
+              className="w-full h-full object-cover object-center"
+              loading="eager"
+            />
+            <div 
+              className="absolute top-2.5 sm:top-3 right-2.5 sm:right-3 max-w-[calc(100%-20px)] bg-white/95 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-md border border-slate-200/80 flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-blue-900 pointer-events-none whitespace-nowrap z-10"
+              data-testid="customer-hero-badge"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <span>Earn as soon as possible</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Three Image-Based Purchase Option Cards */}
+      <section 
+        className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 w-full"
+        aria-label="Property Purchase Methods"
+        data-testid="customer-purchase-cards-grid"
+      >
+        {/* Card 1 — Use Your Savings */}
+        <div 
+          className="customer-purchase-card theme-blue"
+          data-testid="customer-purchase-card-savings"
+        >
+          <div>
+            <div className="flex items-start gap-2.5">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-2xs">
+                1
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+                  Use Your Savings
+                </h2>
+                <p className="text-[11.5px] sm:text-xs text-slate-600 mt-0.5 leading-relaxed">
+                  Pay directly using your available savings.
+                </p>
+              </div>
+            </div>
+
+            <div className="my-3 rounded-xl overflow-hidden bg-white/90 border border-blue-100 aspect-[4/3] flex items-center justify-center shadow-2xs">
+              <img 
+                src="/images/customer-view/savings-option.jpg" 
+                alt="Use Your Savings - Piggy bank with coins and residential land plot" 
+                className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2.5 mt-auto">
+            <button
+              type="button"
+              onClick={() => setInfoModalOption('savings')}
+              className="w-full py-2.5 px-4 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow transition flex items-center justify-center gap-1.5 cursor-pointer"
+              aria-label="Buy with Savings option details"
+            >
+              <span>Buy with Savings</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <div className="p-2 sm:p-2.5 rounded-xl bg-blue-100/60 border border-blue-200/80 flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-[11px] leading-tight">
+                <div className="font-bold text-blue-950">No extra interest</div>
+                <div className="text-blue-700 text-[10.5px]">Simple & secure</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 2 — Take a Bank Loan */}
+        <div 
+          className="customer-purchase-card theme-green"
+          data-testid="customer-purchase-card-loan"
+        >
+          <div>
+            <div className="flex items-start gap-2.5">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-2xs">
+                2
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+                  Take a Bank Loan
+                </h2>
+                <p className="text-[11.5px] sm:text-xs text-slate-600 mt-0.5 leading-relaxed">
+                  Explore bank financing options to purchase your desired property.
+                </p>
+              </div>
+            </div>
+
+            <div className="my-3 rounded-xl overflow-hidden bg-white/90 border border-emerald-100 aspect-[4/3] flex items-center justify-center shadow-2xs">
+              <img 
+                src="/images/customer-view/bank-loan-option.jpg" 
+                alt="Take a Bank Loan - Bank building and approved mortgage agreement" 
+                className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2.5 mt-auto">
+            <button
+              type="button"
+              onClick={() => setInfoModalOption('loan')}
+              className="w-full py-2.5 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow transition flex items-center justify-center gap-1.5 cursor-pointer"
+              aria-label="Get Bank Loan financing details"
+            >
+              <span>Get Bank Loan</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-100/60 border border-emerald-200/80 flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                <Landmark className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-[11px] leading-tight">
+                <div className="font-bold text-emerald-950">Attractive interest rates</div>
+                <div className="text-emerald-700 text-[10.5px]">Flexible repayment options</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3 — Use Our Option */}
+        <div 
+          className="customer-purchase-card theme-orange"
+          data-testid="customer-purchase-card-our-option"
+        >
+          <div>
+            <div className="flex items-start gap-2.5">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-orange-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-2xs">
+                3
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+                  Use Our Option
+                </h2>
+                <p className="text-[11.5px] sm:text-xs text-slate-600 mt-0.5 leading-relaxed">
+                  Explore our alternative option for purchasing your desired plot or flat.
+                </p>
+              </div>
+            </div>
+
+            <div className="my-3 rounded-xl overflow-hidden bg-white/90 border border-orange-100 aspect-[4/3] flex items-center justify-center shadow-2xs">
+              <img 
+                src="/images/customer-view/our-special-option.jpg" 
+                alt="Use Our Option - Handshake partnership with residential home and location pin" 
+                className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2.5 mt-auto">
+            <button
+              type="button"
+              onClick={() => {
+                const target = document.getElementById('rank-benefits-calculator');
+                if (target) {
+                  target.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="w-full py-2.5 px-4 rounded-full bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow transition flex items-center justify-center gap-1.5 cursor-pointer"
+              aria-label="Know More about our special purchase option"
+            >
+              <span>Know More</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <div className="p-2 sm:p-2.5 rounded-xl bg-orange-100/60 border border-orange-200/80 flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-orange-600 text-white flex items-center justify-center shrink-0">
+                <Handshake className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-[11px] leading-tight">
+                <div className="font-bold text-orange-950">More flexibility</div>
+                <div className="text-orange-700 text-[10.5px]">Better support</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Trust & Key Benefits Strip (Matching Reference Image) */}
+      <section 
+        className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs w-full"
+        aria-label="Platform Trust Features"
+        data-testid="customer-trust-strip"
+      >
+        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50/80 transition">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+            <ShieldCheck className="w-4 h-4 text-blue-600" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-xs font-bold text-slate-900 leading-tight truncate">Secure Investment</h3>
+            <p className="text-[10px] sm:text-[10.5px] text-slate-500 leading-tight truncate">Your money is safe with us</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50/80 transition">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+            <MapPin className="w-4 h-4 text-blue-600" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-xs font-bold text-slate-900 leading-tight truncate">Prime Locations</h3>
+            <p className="text-[10px] sm:text-[10.5px] text-slate-500 leading-tight truncate">Best plots & flats</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50/80 transition">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0">
+            <TrendingUp className="w-4 h-4 text-teal-600" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-xs font-bold text-slate-900 leading-tight truncate">Growing Value</h3>
+            <p className="text-[10px] sm:text-[10.5px] text-slate-500 leading-tight truncate">Build long-term wealth</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50/80 transition">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0">
+            <Users className="w-4 h-4 text-indigo-600" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-xs font-bold text-slate-900 leading-tight truncate">Trusted Platform</h3>
+            <p className="text-[10px] sm:text-[10.5px] text-slate-500 leading-tight truncate">Thousands of happy customers</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Rank Selection & Benefits Calculator Section (All Existing Calculations & Cards Preserved) */}
+      <div id="rank-benefits-calculator" className="pt-3 border-t border-slate-200/80 space-y-2.5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold shrink-0">
             <UserCheck className="w-4 h-4 text-blue-600" />
@@ -502,6 +784,102 @@ export function CustomerView({
           </div>
         </div>
       </div>
+      </div>
+
+      {/* Informational Dialog for Savings / Loan Options */}
+      <Dialog open={!!infoModalOption} onOpenChange={(open) => !open && setInfoModalOption(null)}>
+        <DialogContent className="max-w-md p-6 bg-white rounded-2xl border border-slate-200 shadow-xl">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center text-white",
+                infoModalOption === 'savings' ? "bg-blue-600" : "bg-emerald-600"
+              )}>
+                {infoModalOption === 'savings' ? <Coins className="w-5 h-5" /> : <Landmark className="w-5 h-5" />}
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-slate-900">
+                  {infoModalOption === 'savings' ? 'Buy with Savings' : 'Bank Loan Option'}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500">
+                  {infoModalOption === 'savings' 
+                    ? 'Direct payment using your accumulated savings' 
+                    : 'Explore bank financing options to purchase your property'}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2 text-xs sm:text-sm text-slate-600">
+            {infoModalOption === 'savings' ? (
+              <>
+                <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-100 flex items-start gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-blue-950 block">No Extra Interest</span>
+                    <span className="text-xs text-slate-600">Pay directly with 100% ownership from day one without any bank interest or recurring loan charges.</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 block">Instant Settlement</span>
+                    <span className="text-xs text-slate-600">Immediate allotment and direct registration paperwork with no waiting for bank loan approvals.</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-100 flex items-start gap-2.5">
+                  <Landmark className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-emerald-950 block">Partner Banking Support</span>
+                    <span className="text-xs text-slate-600">Access pre-approved mortgage options and attractive interest rates through our approved banking partners.</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-start gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-slate-800 block">Flexible Repayment Terms</span>
+                    <span className="text-xs text-slate-600">Choose tenures tailored to your monthly budget with transparent loan terms and dedicated guidance.</span>
+                  </div>
+                </div>
+              </>
+            )}
+            <p className="text-[11px] text-slate-400 italic">
+              Want to see our special incentive option? Check out the Rank-Based Benefits below to explore how you can fund your property with community referral returns.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setInfoModalOption(null)}
+              className="text-xs font-semibold"
+            >
+              Close
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setInfoModalOption(null);
+                const target = document.getElementById('rank-benefits-calculator');
+                if (target) {
+                  target.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className={cn(
+                "text-xs font-semibold text-white",
+                infoModalOption === 'savings' ? "bg-blue-600 hover:bg-blue-700" : "bg-emerald-600 hover:bg-emerald-700"
+              )}
+            >
+              <span>View Rank Benefits</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -27,9 +27,15 @@ import {
   Save,
   Send,
   Star,
-  ArrowLeft
+  ArrowLeft,
+  ChevronLeft,
+  User,
+  UserPlus,
+  Menu,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { loadRankCalculatorState } from '@/lib/rank-storage';
 import { computeRankTotals } from '@/lib/rank-calculator-engine';
 import { ComputedRankItem, RankCalculatorState, RankItem } from '@/types/rank-calculator';
@@ -70,6 +76,59 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
   // Modal inspection for rank cards
   const [selectedRankForModal, setSelectedRankForModal] = useState<ComputedRankItem | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  // Hero Carousel State (Slide 1: Business Intro, Slide 2: Plot Opportunity, Slide 3: Flat Opportunity)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  // Top Navigation Bar State (Matches Reference Design)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [activeNav, setActiveNav] = useState('home');
+
+  // Auto-advance slides smoothly every 5.5s (unless paused on hover/touch or user prefers reduced motion)
+  useEffect(() => {
+    if (isCarouselPaused) return;
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % 3);
+    }, 5500);
+
+    return () => clearInterval(timer);
+  }, [isCarouselPaused]);
+
+  const nextSlide = useCallback(() => setCurrentSlide((prev) => (prev + 1) % 3), []);
+  const prevSlide = useCallback(() => setCurrentSlide((prev) => (prev - 1 + 3) % 3), []);
+  const goToSlide = useCallback((index: number) => setCurrentSlide(index), []);
+
+  // Touch handlers for mobile swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchEndX(null);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX !== null && touchEndX !== null) {
+      const distance = touchStartX - touchEndX;
+      const minSwipeDistance = 45;
+      if (distance > minSwipeDistance) {
+        nextSlide();
+      } else if (distance < -minSwipeDistance) {
+        prevSlide();
+      }
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
 
   // Reload published home page & rank data on storage events
   const reloadData = useCallback(() => {
@@ -357,96 +416,713 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       )}
 
       {/* =========================================================================
+          1. PROFESSIONAL TOP NAVIGATION BAR (Matches Reference Design)
+          ========================================================================= */}
+      <nav className="relative z-30 w-full bg-[#071526] border-b border-white/10 select-none">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-17 flex items-center justify-between">
+          {/* Brand Logo with IG INFRAS stylized mark */}
+          <div 
+            className="flex items-center gap-2.5 cursor-pointer group"
+            onClick={() => {
+              setActiveNav('home');
+              scrollToSection('home-hero-carousel');
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="IG INFRAS - Home"
+          >
+            {/* Stylized Roof / House Icon matching screenshot */}
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 group-hover:border-emerald-400 transition-colors">
+              <svg 
+                className="w-5 h-5 text-emerald-400" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.4" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M3 10.5L12 3l9 7.5" />
+                <path d="M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9" />
+                <path d="M9 21V12h6v9" />
+              </svg>
+            </div>
+            <div className="flex items-baseline tracking-tight">
+              <span className="font-extrabold text-xl text-emerald-400">iG</span>
+              <span className="font-extrabold text-xl text-white ml-1 tracking-wider">INFRAS</span>
+            </div>
+          </div>
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8 text-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav('home');
+                scrollToSection('home-hero-carousel');
+              }}
+              className={cn(
+                "relative py-1.5 font-medium transition-colors cursor-pointer",
+                activeNav === 'home' 
+                  ? "text-emerald-400 font-semibold" 
+                  : "text-slate-300 hover:text-white"
+              )}
+            >
+              <span>Home</span>
+              {activeNav === 'home' && (
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-emerald-400 rounded-full shadow-xs shadow-emerald-400/50" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav('about');
+                scrollToSection('philosophy-section');
+              }}
+              className={cn(
+                "relative py-1.5 font-medium transition-colors cursor-pointer",
+                activeNav === 'about' ? "text-emerald-400 font-semibold" : "text-slate-300 hover:text-white"
+              )}
+            >
+              <span>About Us</span>
+              {activeNav === 'about' && (
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-emerald-400 rounded-full" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav('business-plan');
+                handleExploreBusinessPlan('earning-opportunities');
+              }}
+              className={cn(
+                "relative py-1.5 font-medium transition-colors cursor-pointer",
+                activeNav === 'business-plan' ? "text-emerald-400 font-semibold" : "text-slate-300 hover:text-white"
+              )}
+            >
+              <span>Business Plan</span>
+              {activeNav === 'business-plan' && (
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-emerald-400 rounded-full" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav('plots-flats');
+                scrollToSection('plots-section');
+              }}
+              className={cn(
+                "relative py-1.5 font-medium transition-colors cursor-pointer",
+                activeNav === 'plots-flats' ? "text-emerald-400 font-semibold" : "text-slate-300 hover:text-white"
+              )}
+            >
+              <span>Plots &amp; Flats</span>
+              {activeNav === 'plots-flats' && (
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-emerald-400 rounded-full" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav('ecosystem');
+                scrollToSection('how-it-works-section');
+              }}
+              className={cn(
+                "relative py-1.5 font-medium transition-colors cursor-pointer",
+                activeNav === 'ecosystem' ? "text-emerald-400 font-semibold" : "text-slate-300 hover:text-white"
+              )}
+            >
+              <span>Our Ecosystem</span>
+              {activeNav === 'ecosystem' && (
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-emerald-400 rounded-full" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveNav('contact');
+                scrollToSection('final-cta-section');
+              }}
+              className={cn(
+                "relative py-1.5 font-medium transition-colors cursor-pointer",
+                activeNav === 'contact' ? "text-emerald-400 font-semibold" : "text-slate-300 hover:text-white"
+              )}
+            >
+              <span>Contact</span>
+              {activeNav === 'contact' && (
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-emerald-400 rounded-full" />
+              )}
+            </button>
+          </div>
+
+          {/* Desktop Action Buttons: Login & Register */}
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') window.location.href = '/auth';
+              }}
+              className="rounded-full border border-slate-600/70 hover:border-slate-400 bg-white/5 hover:bg-white/10 text-slate-200 px-4 py-1.5 text-xs sm:text-sm font-medium flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-xs"
+              aria-label="User Login"
+            >
+              <User className="w-3.5 h-3.5 text-slate-300" />
+              <span>Login</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') window.location.href = '/auth?mode=register';
+              }}
+              className="rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold px-4 py-1.5 text-xs sm:text-sm flex items-center gap-1.5 shadow-md shadow-emerald-950/40 transition-all cursor-pointer hover:shadow-emerald-500/25"
+              aria-label="Register New Account"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-white" />
+              <span>Register</span>
+            </button>
+          </div>
+
+          {/* Mobile Hamburger Toggle Button */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileNavOpen}
+            >
+              {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileNavOpen && (
+          <div className="md:hidden border-t border-white/10 bg-[#061221] px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-col space-y-2 text-sm font-medium">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveNav('home');
+                  setMobileNavOpen(false);
+                  scrollToSection('home-hero-carousel');
+                }}
+                className={cn(
+                  "text-left py-2 px-3 rounded-lg transition-colors cursor-pointer",
+                  activeNav === 'home' ? "bg-emerald-500/15 text-emerald-400 font-semibold" : "text-slate-300 hover:bg-white/5"
+                )}
+              >
+                Home
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveNav('about');
+                  setMobileNavOpen(false);
+                  scrollToSection('philosophy-section');
+                }}
+                className={cn(
+                  "text-left py-2 px-3 rounded-lg transition-colors cursor-pointer",
+                  activeNav === 'about' ? "bg-emerald-500/15 text-emerald-400 font-semibold" : "text-slate-300 hover:bg-white/5"
+                )}
+              >
+                About Us
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveNav('business-plan');
+                  setMobileNavOpen(false);
+                  handleExploreBusinessPlan('earning-opportunities');
+                }}
+                className={cn(
+                  "text-left py-2 px-3 rounded-lg transition-colors cursor-pointer",
+                  activeNav === 'business-plan' ? "bg-emerald-500/15 text-emerald-400 font-semibold" : "text-slate-300 hover:bg-white/5"
+                )}
+              >
+                Business Plan
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveNav('plots-flats');
+                  setMobileNavOpen(false);
+                  scrollToSection('plots-section');
+                }}
+                className={cn(
+                  "text-left py-2 px-3 rounded-lg transition-colors cursor-pointer",
+                  activeNav === 'plots-flats' ? "bg-emerald-500/15 text-emerald-400 font-semibold" : "text-slate-300 hover:bg-white/5"
+                )}
+              >
+                Plots &amp; Flats
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveNav('ecosystem');
+                  setMobileNavOpen(false);
+                  scrollToSection('how-it-works-section');
+                }}
+                className={cn(
+                  "text-left py-2 px-3 rounded-lg transition-colors cursor-pointer",
+                  activeNav === 'ecosystem' ? "bg-emerald-500/15 text-emerald-400 font-semibold" : "text-slate-300 hover:bg-white/5"
+                )}
+              >
+                Our Ecosystem
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveNav('contact');
+                  setMobileNavOpen(false);
+                  scrollToSection('final-cta-section');
+                }}
+                className={cn(
+                  "text-left py-2 px-3 rounded-lg transition-colors cursor-pointer",
+                  activeNav === 'contact' ? "bg-emerald-500/15 text-emerald-400 font-semibold" : "text-slate-300 hover:bg-white/5"
+                )}
+              >
+                Contact
+              </button>
+            </div>
+
+            <div className="pt-3 border-t border-white/10 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') window.location.href = '/auth';
+                }}
+                className="flex-1 rounded-full border border-slate-600/70 bg-white/5 text-slate-200 py-2 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <User className="w-3.5 h-3.5 text-slate-300" />
+                <span>Login</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') window.location.href = '/auth?mode=register';
+                }}
+                className="flex-1 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-2 text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/40 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5 text-white" />
+                <span>Register</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* =========================================================================
           CONTINUOUS SCROLLING MARQUEE ANNOUNCEMENT
           ========================================================================= */}
       <HomeScrollingMarquee text={activeData.marqueeText || DEFAULT_MARQUEE_TEXT} />
 
       {/* =========================================================================
-          2. HERO SECTION — PREMIUM VISUAL DESIGN
+          2. HERO SECTION — THREE-SLIDE REAL ESTATE HERO CAROUSEL (Matches Reference Screenshot)
           ========================================================================= */}
-      <section className="relative overflow-hidden flex items-center justify-center border-b border-white/10">
-        {/* Background Image with Dark Gradient Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-105"
-          style={{
-            backgroundImage: `url(${activeData.hero.heroBgImage || DEFAULT_HOME_PAGE_DATA.hero.heroBgImage})`,
-          }}
-          role="img"
-          aria-label="Panoramic view of luxury residential plots and modern apartment developments"
-        />
-        
-        {/* Subtle Dark Overlays for Optimal Text Contrast */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#06101B]/95 via-[#071524]/85 to-[#050D18]/90" />
-        <div className="absolute inset-0 bg-radial-at-c from-transparent via-[#071320]/60 to-[#050D18]/95" />
+      <section 
+        id="home-hero-carousel"
+        className="relative overflow-hidden border-b border-white/10 select-none bg-[#071526]"
+        aria-label="Real Estate Opportunities Carousel"
+        role="region"
+        aria-roledescription="carousel"
+        onMouseEnter={() => setIsCarouselPaused(true)}
+        onMouseLeave={() => setIsCarouselPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        data-testid="home-hero-carousel"
+      >
+        {/* Desktop/Tablet Left & Right Chevron Arrows */}
+        <button
+          type="button"
+          onClick={prevSlide}
+          aria-label="Previous slide"
+          className="hidden md:flex absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/45 hover:bg-black/70 border border-white/20 text-white items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer shadow-lg hover:scale-105"
+        >
+          <ChevronLeft className="w-5 h-5 text-white/90" />
+        </button>
 
-        {/* Ambient Glow Orbs */}
-        <div className="pointer-events-none absolute -top-32 -left-32 w-96 h-96 rounded-full bg-emerald-500/15 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl" />
+        <button
+          type="button"
+          onClick={nextSlide}
+          aria-label="Next slide"
+          className="hidden md:flex absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/45 hover:bg-black/70 border border-white/20 text-white items-center justify-center backdrop-blur-md transition-all duration-200 cursor-pointer shadow-lg hover:scale-105"
+        >
+          <ChevronRight className="w-5 h-5 text-white/90" />
+        </button>
 
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 text-center">
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold tracking-wide mb-3 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>TRANSPARENT REAL ESTATE BUSINESS ECOSYSTEM</span>
-            <span className="text-emerald-500/50">·</span>
-            <span className="text-slate-300 font-normal">INFORMED DECISIONS FIRST</span>
+        {/* Carousel Slide Container */}
+        <div className="relative z-10 w-full min-h-[490px] sm:min-h-[520px] lg:min-h-[550px] flex items-center">
+          
+          {/* ===================================================================
+              SLIDE 1 — BUSINESS INTRODUCTION (Exact Reference Screenshot Match)
+              =================================================================== */}
+          <div 
+            className={cn(
+              "w-full transition-all duration-700 ease-in-out relative",
+              currentSlide === 0
+                ? "opacity-100 z-10 translate-y-0"
+                : "opacity-0 z-0 pointer-events-none absolute translate-y-2"
+            )}
+            role="group"
+            aria-roledescription="slide"
+            aria-label="Slide 1 of 3: Business Introduction"
+            aria-hidden={currentSlide !== 0}
+            data-testid="hero-slide-0"
+          >
+            {/* Desktop Wide Plot Property Image (Right 58%) with Left-Edge Soft Blend */}
+            <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-[58%] pointer-events-none select-none overflow-hidden">
+              <img
+                src="/images/home-hero/slide-plot.png"
+                alt="Master-planned residential plots and avenue layouts"
+                className="w-full h-full object-cover object-center"
+                loading="eager"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/images/customer-view/hero-real-estate.jpg';
+                }}
+              />
+              {/* Soft directional gradient to seamlessly blend into navy text column on left */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#071526] via-[#071526]/40 to-transparent w-40 pointer-events-none" />
+            </div>
+
+            {/* Slide 1 Floating Top-Right Badge: Single instance on Desktop */}
+            <div className="hidden lg:inline-flex absolute top-6 right-8 lg:right-10 z-20 items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 text-[#0F2942] text-xs sm:text-sm font-bold tracking-tight shadow-xl">
+              <TrendingUp className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
+              <span>Earn as soon as possible</span>
+            </div>
+
+            {/* Slide 1 Content Container */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 lg:py-12">
+              <div className="relative z-10 w-full lg:w-[58%] text-left">
+                {/* Eyebrow Pill */}
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#071F2C]/80 border border-teal-500/40 text-teal-300 text-xs font-semibold tracking-wide mb-3 sm:mb-4 shadow-sm backdrop-blur-xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>TRANSPARENT REAL ESTATE BUSINESS ECOSYSTEM</span>
+                  <span className="text-teal-500/50">|</span>
+                  <span className="text-slate-300 font-normal">INFORMED DECISIONS FIRST</span>
+                </div>
+
+                {/* Large Bold Headline */}
+                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-2 max-w-5xl">
+                  <span className="hero-golden-headline">{activeData.hero.headline}</span>
+                </h1>
+
+                {/* Supporting Headline with green teal gradient accent */}
+                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight mb-3">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300">
+                    {activeData.hero.highlightHeadline}
+                  </span>
+                </p>
+
+                {/* Supporting Paragraph */}
+                <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed mb-4 sm:mb-6 max-w-xl">
+                  {activeData.hero.subtitle}
+                </p>
+
+                {/* Mobile & Tablet Visible Plot Image Card */}
+                <div className="lg:hidden w-full max-w-xl mx-auto my-4 sm:my-5">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900 aspect-[16/10] group">
+                    <img 
+                      src="/images/home-hero/slide-plot.png" 
+                      alt="Master-planned residential plots and avenue layouts"
+                      className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      loading="eager"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/images/customer-view/hero-real-estate.jpg';
+                      }}
+                    />
+                    <div className="absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[#0F2942] text-[11px] font-bold shadow-md">
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+                      <span>Earn as soon as possible</span>
+                    </div>
+                    <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <Button
+                    type="button"
+                    size="lg"
+                    onClick={() => handleExploreBusinessPlan(activeData.hero.primaryButtonLink)}
+                    className="bg-[#059669] hover:bg-[#10B981] text-white font-semibold text-sm sm:text-base px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-emerald-950/60 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                  >
+                    <span>{activeData.hero.primaryButtonText}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    onClick={() => scrollToSection(activeData.hero.secondaryButtonLink || 'plots-section')}
+                    className="bg-[#081C30]/80 hover:bg-[#0E2844] text-slate-100 font-semibold text-sm sm:text-base px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                  >
+                    <Building2 className="w-4 h-4 text-emerald-400" />
+                    <span>{activeData.hero.secondaryButtonText}</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Large Bold Headline */}
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight sm:leading-tight mb-3 max-w-5xl mx-auto">
-            <span className="hero-golden-headline">{activeData.hero.headline}</span>{' '}
-            <span className="block mt-1 sm:mt-2 bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
-              {activeData.hero.highlightHeadline}
-            </span>
-          </h1>
+          {/* ===================================================================
+              SLIDE 2 — PLOT OPPORTUNITY
+              =================================================================== */}
+          <div 
+            className={cn(
+              "w-full transition-all duration-700 ease-in-out",
+              currentSlide === 1
+                ? "opacity-100 z-10 translate-y-0"
+                : "opacity-0 z-0 pointer-events-none absolute translate-y-2"
+            )}
+            role="group"
+            aria-roledescription="slide"
+            aria-label="Slide 2 of 3: Plot Opportunity"
+            aria-hidden={currentSlide !== 1}
+            data-testid="hero-slide-1"
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 lg:py-12">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 max-w-6xl mx-auto">
+                {/* Text & Action Column */}
+                <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+                  {/* Real Estate Opportunity Badge */}
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 text-[#0F2942] text-xs font-bold tracking-tight mb-2.5 shadow-md">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+                    <span>Earn as soon as possible</span>
+                  </div>
 
-          {/* Supporting Text */}
-          <p className="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed mb-4 sm:mb-5">
-            {activeData.hero.subtitle}
-          </p>
+                  {/* Headline */}
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-2">
+                    <span>Explore Your</span>{' '}
+                    <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300 bg-clip-text text-transparent">
+                      Plot Opportunity
+                    </span>
+                  </h2>
 
-          {/* Primary & Secondary Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3.5 sm:gap-4">
-            <Button
-              type="button"
-              size="lg"
-              onClick={() => handleExploreBusinessPlan(activeData.hero.primaryButtonLink)}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <span>{activeData.hero.primaryButtonText}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+                  {/* Supporting Text */}
+                  <p className="text-xs sm:text-sm lg:text-base text-slate-300 leading-relaxed mb-3.5 max-w-lg">
+                    Discover master-planned residential plots with clear demarcations, wide paved avenues, and transparent pathways to own land through our business plan.
+                  </p>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              onClick={() => scrollToSection(activeData.hero.secondaryButtonLink || 'plots-section')}
-              className="bg-white/10 hover:bg-white/15 text-slate-100 font-semibold text-sm sm:text-base px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
-            >
-              <Building2 className="w-4 h-4 text-emerald-400" />
-              <span>{activeData.hero.secondaryButtonText}</span>
-            </Button>
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3 mb-3.5">
+                    <Button
+                      type="button"
+                      size="lg"
+                      onClick={() => handleExploreBusinessPlan(activeData.hero.primaryButtonLink)}
+                      className="bg-[#059669] hover:bg-[#10B981] text-white font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                    >
+                      <span>Explore the Business Plan</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      onClick={() => scrollToSection('plots-section')}
+                      className="bg-[#081C30]/80 hover:bg-[#0E2844] text-slate-100 font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                    >
+                      <TreePine className="w-4 h-4 text-emerald-400" />
+                      <span>View Plots &amp; Flats</span>
+                    </Button>
+                  </div>
+
+                  {/* Plot Opportunity Highlights */}
+                  <div className="pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3.5 text-xs text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span>Planned Demarcations</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                      <span>Clear Documentation</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>Prime Location Access</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Prominent Visible Plot Image Element */}
+                <div className="w-full sm:w-[90%] lg:w-[48%] shrink-0">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900 aspect-[16/10] group">
+                    <img 
+                      src="/images/home-hero/slide-plot.png" 
+                      alt="Master-planned residential plots and avenue layouts"
+                      className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      loading="eager"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/images/customer-view/hero-real-estate.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Transparent Trust Indicators */}
-          <div className="mt-6 pt-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs text-slate-400 max-w-4xl mx-auto">
-            <div className="flex items-center justify-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>100% Transparent Review</span>
+          {/* ===================================================================
+              SLIDE 3 — FLAT OPPORTUNITY
+              =================================================================== */}
+          <div 
+            className={cn(
+              "w-full transition-all duration-700 ease-in-out",
+              currentSlide === 2
+                ? "opacity-100 z-10 translate-y-0"
+                : "opacity-0 z-0 pointer-events-none absolute translate-y-2"
+            )}
+            role="group"
+            aria-roledescription="slide"
+            aria-label="Slide 3 of 3: Flat Opportunity"
+            aria-hidden={currentSlide !== 2}
+            data-testid="hero-slide-2"
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 lg:py-12">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 max-w-6xl mx-auto">
+                {/* Text & Action Column */}
+                <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+                  {/* Eyebrow Pill */}
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-semibold tracking-wide mb-2.5 shadow-sm">
+                    <Building2 className="w-3.5 h-3.5 text-teal-400" />
+                    <span>CONTEMPORARY RESIDENTIAL LIVING</span>
+                    <span className="text-teal-500/50">·</span>
+                    <span className="text-slate-300 font-normal">LUXURY INTERIORS</span>
+                  </div>
+
+                  {/* Headline */}
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-2">
+                    <span>Discover Your</span>{' '}
+                    <span className="bg-gradient-to-r from-amber-300 via-orange-300 to-amber-400 bg-clip-text text-transparent">
+                      Dream Flat
+                    </span>
+                  </h2>
+
+                  {/* Supporting Text */}
+                  <p className="text-xs sm:text-sm lg:text-base text-slate-300 leading-relaxed mb-3.5 max-w-lg">
+                    Step into modern, thoughtfully designed luxury flats with world-class amenities, premium finishes, and transparent paths to ownership through our business plan.
+                  </p>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3 mb-3.5">
+                    <Button
+                      type="button"
+                      size="lg"
+                      onClick={() => handleExploreBusinessPlan(activeData.hero.primaryButtonLink)}
+                      className="bg-[#059669] hover:bg-[#10B981] text-white font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                    >
+                      <span>Explore the Business Plan</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      onClick={() => scrollToSection('flats-section')}
+                      className="bg-[#081C30]/80 hover:bg-[#0E2844] text-slate-100 font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                    >
+                      <Building2 className="w-4 h-4 text-amber-400" />
+                      <span>View Plots &amp; Flats</span>
+                    </Button>
+                  </div>
+
+                  {/* Flat Opportunity Highlights */}
+                  <div className="pt-2.5 border-t border-white/10 flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3.5 text-xs text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>Modern Architecture</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                      <span>Gated Community Security</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span>Verified Construction Quality</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Prominent Visible Flat Interior Image Element */}
+                <div className="w-full sm:w-[90%] lg:w-[48%] shrink-0">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900 aspect-[16/10] group">
+                    <img 
+                      src="/images/home-hero/slide-flat.jpg" 
+                      alt="Contemporary luxury flat interior with modern living and dining spaces"
+                      className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      loading="eager"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80';
+                      }}
+                    />
+                    <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl pointer-events-none" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-teal-400 shrink-0" />
-              <span>No Pressure Evaluation</span>
+          </div>
+
+        </div>
+
+        {/* Bottom Trust & Information Strip (Horizontal Strip matching reference design) */}
+        <div className="relative z-20 border-t border-white/10 bg-[#061220]/85 backdrop-blur-md py-3 sm:py-3.5 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
+            {/* 4 Trust Feature Items */}
+            <div className="w-full md:w-auto grid grid-cols-2 md:flex md:items-center gap-3 md:gap-7 text-xs text-slate-300">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-teal-400 shrink-0" />
+                <span className="font-medium whitespace-nowrap">100% Transparent Review</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="font-medium whitespace-nowrap">No Pressure Evaluation</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Coins className="w-4 h-4 text-amber-400 shrink-0" />
+                <span className="font-medium whitespace-nowrap">Dynamic Rank Pricing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Scale className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span className="font-medium whitespace-nowrap">Independent Decision Making</span>
+              </div>
             </div>
-            <div className="flex items-center justify-center gap-2">
-              <Coins className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Dynamic Rank Pricing</span>
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <Scale className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span>Independent Decision Making</span>
+
+            {/* Carousel Indicators (Pills & Dots) */}
+            <div 
+              className="flex items-center gap-2 p-1 rounded-full bg-black/40 backdrop-blur-md border border-white/15 shrink-0"
+              role="tablist"
+              aria-label="Slide Selection"
+            >
+              {[0, 1, 2].map((idx) => {
+                const labels = ['Business Plan', 'Plot Opportunity', 'Flat Opportunity'];
+                const isActive = currentSlide === idx;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => goToSlide(idx)}
+                    className={cn(
+                      "h-2 rounded-full transition-all duration-300 cursor-pointer flex items-center justify-center",
+                      isActive
+                        ? "w-7 sm:w-8 bg-emerald-400 shadow-xs shadow-emerald-400/50"
+                        : "w-2 bg-white/40 hover:bg-white/70"
+                    )}
+                    aria-label={`Go to slide ${idx + 1}: ${labels[idx]}`}
+                    aria-current={isActive ? 'true' : 'false'}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
@@ -455,7 +1131,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           3. BUSINESS PHILOSOPHY SECTION
           ========================================================================= */}
-      <section className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <section id="philosophy-section" className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-4 sm:mb-6">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <Compass className="w-3.5 h-3.5" />
@@ -865,7 +1541,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           8. FINAL CALL-TO-ACTION SECTION
           ========================================================================= */}
-      <section className="relative overflow-hidden py-8 sm:py-10 lg:py-12 border-t border-white/10 bg-gradient-to-b from-[#081524] to-[#040C16]">
+      <section id="final-cta-section" className="relative overflow-hidden py-8 sm:py-10 lg:py-12 border-t border-white/10 bg-gradient-to-b from-[#081524] to-[#040C16]">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15 pointer-events-none"
           style={{

@@ -573,34 +573,52 @@ export function DcbNinetyDaysView({
                   </div>
 
                   {/* Milestone Cards Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto flex-1 max-w-xl">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full md:w-auto flex-1 max-w-xl">
                     {/* 2 Referrals Milestone */}
-                    <div className="bg-[#fcd34d] p-2 rounded border border-amber-400 text-center shadow-2xs">
-                      <div className="text-xs font-bold text-slate-950 tabular-nums">
-                        {formatINR(dcbResult.milestones[0].totalINR)}
-                      </div>
-                      <div className="text-[10.5px] font-medium text-slate-800 mt-0.5 flex items-center justify-center gap-0.5">
-                        Earnings ($) <span className="font-bold">2 ↑</span>
+                    <div 
+                      className="dcb-earnings-card"
+                      data-testid="dcb-earnings-card-2"
+                      title="Milestone Earnings for 2 Direct Qualifying Referrals"
+                    >
+                      <div className="dcb-earnings-card-inner">
+                        <div className="dcb-earnings-amount">
+                          {formatINR(dcbResult.milestones[0].totalINR)}
+                        </div>
+                        <div className="dcb-earnings-label">
+                          <span>Earnings ($)</span> <span className="dcb-earnings-highlight">2 ↑</span>
+                        </div>
                       </div>
                     </div>
 
                     {/* 4 Referrals Milestone */}
-                    <div className="bg-[#fcd34d] p-2 rounded border border-amber-400 text-center shadow-2xs">
-                      <div className="text-xs font-bold text-slate-950 tabular-nums">
-                        {formatINR(dcbResult.milestones[1].totalINR)}
-                      </div>
-                      <div className="text-[10.5px] font-medium text-slate-800 mt-0.5 flex items-center justify-center gap-0.5">
-                        Earnings ($) <span className="font-bold">4 ↑</span>
+                    <div 
+                      className="dcb-earnings-card"
+                      data-testid="dcb-earnings-card-4"
+                      title="Milestone Earnings for 4 Direct Qualifying Referrals"
+                    >
+                      <div className="dcb-earnings-card-inner">
+                        <div className="dcb-earnings-amount">
+                          {formatINR(dcbResult.milestones[1].totalINR)}
+                        </div>
+                        <div className="dcb-earnings-label">
+                          <span>Earnings ($)</span> <span className="dcb-earnings-highlight">4 ↑</span>
+                        </div>
                       </div>
                     </div>
 
                     {/* 6 Referrals Milestone */}
-                    <div className="bg-[#fcd34d] p-2 rounded border border-amber-400 text-center shadow-2xs">
-                      <div className="text-xs font-bold text-slate-950 tabular-nums">
-                        {formatINR(dcbResult.milestones[2].totalINR)}
-                      </div>
-                      <div className="text-[10.5px] font-medium text-slate-800 mt-0.5 flex items-center justify-center gap-0.5">
-                        Earnings ($) <span className="font-bold">6 ↑</span>
+                    <div 
+                      className="dcb-earnings-card"
+                      data-testid="dcb-earnings-card-6"
+                      title="Milestone Earnings for 6 Direct Qualifying Referrals"
+                    >
+                      <div className="dcb-earnings-card-inner">
+                        <div className="dcb-earnings-amount">
+                          {formatINR(dcbResult.milestones[2].totalINR)}
+                        </div>
+                        <div className="dcb-earnings-label">
+                          <span>Earnings ($)</span> <span className="dcb-earnings-highlight">6 ↑</span>
+                        </div>
                       </div>
                     </div>
                   </div>

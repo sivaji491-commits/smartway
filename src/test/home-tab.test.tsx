@@ -180,5 +180,98 @@ describe('Real Estate Business Home Page Acceptance Tests', () => {
       expect(marqueeTrack.style.animationPlayState).toBe('running');
     });
   });
+
+  describe('8. Three-Slide Real Estate Hero Carousel Tests', () => {
+    it('initializes with Slide 1 (Business Introduction) active by default', () => {
+      render(<HomeTab userEmail="user@example.com" />);
+
+      const carousel = screen.getByTestId('home-hero-carousel');
+      expect(carousel).toBeInTheDocument();
+
+      const slide0 = screen.getByTestId('hero-slide-0');
+      expect(slide0).toHaveAttribute('aria-hidden', 'false');
+      expect(slide0).toHaveTextContent(/Earn Plot or Flat Within 1 Year\./i);
+      expect(slide0).toHaveTextContent(/Understand the Possibilities\./i);
+
+      // Slide 2 and 3 should be hidden on initial view
+      const slide1 = screen.getByTestId('hero-slide-1');
+      const slide2 = screen.getByTestId('hero-slide-2');
+      expect(slide1).toHaveAttribute('aria-hidden', 'true');
+      expect(slide2).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('navigates to Slide 2 (Plot Opportunity) using indicator or next button and displays plot image', () => {
+      render(<HomeTab userEmail="user@example.com" />);
+
+      const indicator2 = screen.getByRole('button', { name: /Go to slide 2: Plot Opportunity/i });
+      fireEvent.click(indicator2);
+
+      const slide1 = screen.getByTestId('hero-slide-1');
+      expect(slide1).toHaveAttribute('aria-hidden', 'false');
+      expect(slide1).toHaveTextContent(/Explore Your Plot Opportunity/i);
+      expect(slide1).toHaveTextContent(/Earn as soon as possible/i);
+      expect(slide1).toHaveTextContent(/Planned Demarcations/i);
+
+      // Verify actual plot image is rendered as a visible img element
+      const plotImg = slide1.querySelector('img');
+      expect(plotImg).toBeDefined();
+      expect(plotImg).toHaveAttribute('src', '/images/home-hero/slide-plot.png');
+      expect(plotImg).toHaveAttribute('alt', 'Master-planned residential plots and avenue layouts');
+    });
+
+    it('navigates to Slide 3 (Flat Opportunity) using indicator and displays flat interior image', () => {
+      render(<HomeTab userEmail="user@example.com" />);
+
+      const indicator3 = screen.getByRole('button', { name: /Go to slide 3: Flat Opportunity/i });
+      fireEvent.click(indicator3);
+
+      const slide2 = screen.getByTestId('hero-slide-2');
+      expect(slide2).toHaveAttribute('aria-hidden', 'false');
+      expect(slide2).toHaveTextContent(/Discover Your Dream Flat/i);
+      expect(slide2).toHaveTextContent(/Modern Architecture/i);
+
+      // Verify actual flat interior image is rendered as a visible img element
+      const flatImg = slide2.querySelector('img');
+      expect(flatImg).toBeDefined();
+      expect(flatImg).toHaveAttribute('src', '/images/home-hero/slide-flat.jpg');
+      expect(flatImg).toHaveAttribute('alt', 'Contemporary luxury flat interior with modern living and dining spaces');
+    });
+
+    it('supports next/previous navigation using chevron buttons', () => {
+      render(<HomeTab userEmail="user@example.com" />);
+
+      const nextBtn = screen.getByRole('button', { name: /Next slide/i });
+      const prevBtn = screen.getByRole('button', { name: /Previous slide/i });
+
+      // Click Next -> Slide 2 (index 1)
+      fireEvent.click(nextBtn);
+      expect(screen.getByTestId('hero-slide-1')).toHaveAttribute('aria-hidden', 'false');
+
+      // Click Next -> Slide 3 (index 2)
+      fireEvent.click(nextBtn);
+      expect(screen.getByTestId('hero-slide-2')).toHaveAttribute('aria-hidden', 'false');
+
+      // Click Next again -> Loops back to Slide 1 (index 0)
+      fireEvent.click(nextBtn);
+      expect(screen.getByTestId('hero-slide-0')).toHaveAttribute('aria-hidden', 'false');
+
+      // Click Previous -> Goes to Slide 3 (index 2)
+      fireEvent.click(prevBtn);
+      expect(screen.getByTestId('hero-slide-2')).toHaveAttribute('aria-hidden', 'false');
+    });
+
+    it('supports touch swipe gestures on mobile', () => {
+      render(<HomeTab userEmail="user@example.com" />);
+
+      const carousel = screen.getByTestId('home-hero-carousel');
+
+      // Swipe left (finger moves from x=200 to x=80 -> diff > 45) advances to Slide 2
+      fireEvent.touchStart(carousel, { touches: [{ clientX: 200 }] });
+      fireEvent.touchMove(carousel, { touches: [{ clientX: 80 }] });
+      fireEvent.touchEnd(carousel);
+
+      expect(screen.getByTestId('hero-slide-1')).toHaveAttribute('aria-hidden', 'false');
+    });
+  });
 });
 

@@ -211,5 +211,104 @@ describe('Customer View Page – Rank-Based Benefits Display', () => {
       });
     });
   });
+
+  describe('7. Premium Real Estate Hero Section & Visual Purchase Options', () => {
+    it('renders the real estate hero section with correct heading, subtitle, tagline, and image', () => {
+      render(<CustomerView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const hero = screen.getByTestId('customer-hero-section');
+      expect(hero).toBeInTheDocument();
+
+      expect(screen.getByText(/Your Dream Land Awaits!/i)).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: /^Choose the Best Way$/i })).toBeInTheDocument();
+      expect(screen.getByText(/Buy your desired plot or flat using our special option, not your savings, and not a bank loan\./i)).toBeInTheDocument();
+      expect(screen.getByText(/Your Land • Your Future • Our Support/i)).toBeInTheDocument();
+      expect(screen.getByText(/Earn as soon as possible/i)).toBeInTheDocument();
+      expect(screen.getByTestId('customer-hero-badge')).toHaveTextContent(/Earn as soon as possible/i);
+
+      const heroImg = screen.getByAltText(/Developed residential plots and luxury apartments/i);
+      expect(heroImg).toHaveAttribute('src', '/images/customer-view/hero-real-estate.jpg');
+    });
+
+    it('renders the three image-based purchase option cards with respective imagery, badges, and copy', () => {
+      render(<CustomerView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      // Grid container
+      expect(screen.getByTestId('customer-purchase-cards-grid')).toBeInTheDocument();
+
+      // Card 1: Savings
+      const cardSavings = screen.getByTestId('customer-purchase-card-savings');
+      expect(cardSavings).toBeInTheDocument();
+      expect(cardSavings).toHaveTextContent(/Use Your Savings/i);
+      expect(cardSavings).toHaveTextContent(/Pay directly using your available savings\./i);
+      expect(cardSavings).toHaveTextContent(/No extra interest/i);
+      expect(cardSavings).toHaveTextContent(/Simple & secure/i);
+      const savingsImg = screen.getByAltText(/Use Your Savings - Piggy bank with coins and residential land plot/i);
+      expect(savingsImg).toHaveAttribute('src', '/images/customer-view/savings-option.jpg');
+
+      // Card 2: Bank Loan
+      const cardLoan = screen.getByTestId('customer-purchase-card-loan');
+      expect(cardLoan).toBeInTheDocument();
+      expect(cardLoan).toHaveTextContent(/Take a Bank Loan/i);
+      expect(cardLoan).toHaveTextContent(/Explore bank financing options to purchase your desired property\./i);
+      expect(cardLoan).toHaveTextContent(/Attractive interest rates/i);
+      expect(cardLoan).toHaveTextContent(/Flexible repayment options/i);
+      const loanImg = screen.getByAltText(/Take a Bank Loan - Bank building and approved mortgage agreement/i);
+      expect(loanImg).toHaveAttribute('src', '/images/customer-view/bank-loan-option.jpg');
+
+      // Card 3: Our Option
+      const cardOurOption = screen.getByTestId('customer-purchase-card-our-option');
+      expect(cardOurOption).toBeInTheDocument();
+      expect(cardOurOption).toHaveTextContent(/Use Our Option/i);
+      expect(cardOurOption).toHaveTextContent(/Explore our alternative option for purchasing your desired plot or flat\./i);
+      expect(cardOurOption).toHaveTextContent(/More flexibility/i);
+      expect(cardOurOption).toHaveTextContent(/Better support/i);
+      const ourOptionImg = screen.getByAltText(/Use Our Option - Handshake partnership with residential home and location pin/i);
+      expect(ourOptionImg).toHaveAttribute('src', '/images/customer-view/our-special-option.jpg');
+    });
+
+    it('renders the trust and key benefits strip with 4 value propositions', () => {
+      render(<CustomerView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const trustStrip = screen.getByTestId('customer-trust-strip');
+      expect(trustStrip).toBeInTheDocument();
+
+      expect(screen.getByText('Secure Investment')).toBeInTheDocument();
+      expect(screen.getByText('Your money is safe with us')).toBeInTheDocument();
+
+      expect(screen.getByText('Prime Locations')).toBeInTheDocument();
+      expect(screen.getByText('Best plots & flats')).toBeInTheDocument();
+
+      expect(screen.getByText('Growing Value')).toBeInTheDocument();
+      expect(screen.getByText('Build long-term wealth')).toBeInTheDocument();
+
+      expect(screen.getByText('Trusted Platform')).toBeInTheDocument();
+      expect(screen.getByText('Thousands of happy customers')).toBeInTheDocument();
+    });
+
+    it('opens informational dialog on clicking "Buy with Savings"', async () => {
+      render(<CustomerView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const savingsBtn = screen.getByRole('button', { name: /Buy with Savings option details/i });
+      fireEvent.click(savingsBtn);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+      expect(screen.getByText(/Instant Settlement/i)).toBeInTheDocument();
+    });
+
+    it('opens informational dialog on clicking "Get Bank Loan"', async () => {
+      render(<CustomerView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const loanBtn = screen.getByRole('button', { name: /Get Bank Loan financing details/i });
+      fireEvent.click(loanBtn);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+      expect(screen.getByText(/Partner Banking Support/i)).toBeInTheDocument();
+    });
+  });
 });
 

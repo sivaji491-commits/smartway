@@ -160,5 +160,53 @@ describe('DCB (90 days) Navigation & Business Calculations', () => {
         expect(screen.getAllByText('$25.00').length).toBeGreaterThanOrEqual(1);
       });
     });
+
+    it('renders the 3 premium animated earnings cards with correct amounts, labels, and hierarchy', async () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      // Verify all 3 cards exist
+      const card2 = screen.getByTestId('dcb-earnings-card-2');
+      const card4 = screen.getByTestId('dcb-earnings-card-4');
+      const card6 = screen.getByTestId('dcb-earnings-card-6');
+
+      expect(card2).toBeDefined();
+      expect(card4).toBeDefined();
+      expect(card6).toBeDefined();
+
+      expect(card2.classList.contains('dcb-earnings-card')).toBe(true);
+      expect(card4.classList.contains('dcb-earnings-card')).toBe(true);
+      expect(card6.classList.contains('dcb-earnings-card')).toBe(true);
+
+      // Verify inner card elements
+      expect(card2.querySelector('.dcb-earnings-card-inner')).not.toBeNull();
+      expect(card4.querySelector('.dcb-earnings-card-inner')).not.toBeNull();
+      expect(card6.querySelector('.dcb-earnings-card-inner')).not.toBeNull();
+
+      // Verify default PBA 7 amounts (₹3,60,000.00, ₹7,20,000.00, ₹10,80,000.00)
+      expect(card2.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹3,60,000.00');
+      expect(card4.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹7,20,000.00');
+      expect(card6.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹10,80,000.00');
+
+      // Verify high-contrast labels and highlights
+      expect(card2.querySelector('.dcb-earnings-label')?.textContent).toContain('Earnings ($)');
+      expect(card2.querySelector('.dcb-earnings-highlight')?.textContent).toContain('2 ↑');
+
+      expect(card4.querySelector('.dcb-earnings-label')?.textContent).toContain('Earnings ($)');
+      expect(card4.querySelector('.dcb-earnings-highlight')?.textContent).toContain('4 ↑');
+
+      expect(card6.querySelector('.dcb-earnings-label')?.textContent).toContain('Earnings ($)');
+      expect(card6.querySelector('.dcb-earnings-highlight')?.textContent).toContain('6 ↑');
+
+      // Dynamic update test: switch rank to PBA 1
+      const select = screen.getByLabelText('Select Rank:');
+      const pba1Option = screen.getByRole('option', { name: /PBA 1/i });
+      fireEvent.change(select, { target: { value: (pba1Option as HTMLOptionElement).value } });
+
+      await waitFor(() => {
+        expect(card2.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹7,200.00');
+        expect(card4.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹14,400.00');
+        expect(card6.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹21,600.00');
+      });
+    });
   });
 });
