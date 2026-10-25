@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { validateSignIn } from '@/lib/auth-validation';
 import { startUserLoginSession, EXPIRED_ACCOUNT_MESSAGE } from '@/lib/session-manager';
 import { isUserAdminOrOwner } from '@/lib/permissions';
+import { authenticateWorkspaceUser, syncWorkspaceUsers } from '@/lib/workspace-user-sync';
 import sculpture from '@/assets/workspace-sculpture.jpg';
 
 export function LoginPage() {
@@ -80,6 +81,9 @@ export function LoginPage() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     window.addEventListener('appinstalled', handleAppInstalled);
 
+    // Eagerly sync workspace users in background so mobile devices immediately receive latest users
+    syncWorkspaceUsers().catch(() => {});
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
       window.removeEventListener('appinstalled', handleAppInstalled);
@@ -132,140 +136,29 @@ export function LoginPage() {
       }
 
       const trimmedId = identifier.trim();
-      const lowerId = trimmedId.toLowerCase();
-      const isAdminCredentials = 
-        (lowerId === 'sivaji491@gmail.com' || lowerId === 'sivaji') && password === 'Vijashya@2828';
-      const isThisAdmin = isAdminCredentials || isUserAdminOrOwner(trimmedId, 'sivaji491@gmail.com');
+      const authResult = await authenticateWorkspaceUser(trimmedId, password);
 
-      // Check if user is DISABLED in workspace store (applies ONLY to regular users, NEVER to Admin)
-      if (typeof window !== 'undefined') {
-        const storedUsersRaw = window.localStorage.getItem('nexora_workspace_users');
-        if (storedUsersRaw) {
-          try {
-            const storedUsers = JSON.parse(storedUsersRaw);
-            const matched = Array.isArray(storedUsers) && storedUsers.find(
-              (u: any) => {
-                if (!u) return false;
-                const matchUser = (u.username && u.username.toLowerCase() === lowerId) ||
-                                  (u.name && u.name.toLowerCase() === lowerId);
-                const matchEmail = u.email && u.email.toLowerCase() === lowerId;
-                return matchUser || matchEmail;
-              }
-            );
-
-            // Auto-heal admin if previously marked disabled
-            if (matched && isUserAdminOrOwner(matched, 'sivaji491@gmail.com')) {
-              matched.status = 'ACTIVE';
-              matched.disableReason = null;
-              matched.disabledAt = null;
-              matched.loginDuration = 'Unlimited';
-              matched.sessionExpireTime = null;
-              window.localStorage.setItem('nexora_workspace_users', JSON.stringify(storedUsers));
-            } else if (!isThisAdmin && matched && matched.status === 'DISABLED') {
-              setError(
-                matched.disableReason === 'SESSIONTIMEEXPIRED'
-                  ? EXPIRED_ACCOUNT_MESSAGE
-                  : 'Your account has been disabled. Please contact your administrator to restore access.'
-              );
-              setBusy(false);
-              return;
-            }
-          } catch {
-            // Ignore parse errors
-          }
-        }
-      }
-
-      let authError: any = null;
-      let userRole = 'Member';
-      let resolvedIdentifier = trimmedId;
-
-      if (isAdminCredentials) {
-        // Admin user (sivaji491@gmail.com / sivaji with Vijashya@2828):
-        // Has permanent access anytime, no timer, and never disabled.
-        userRole = 'Owner';
-        resolvedIdentifier = 'sivaji491@gmail.com';
-        const adminAuth = await supabase.auth.signInWithPassword({ 
-          email: 'preview@nexora.example', 
-          password: 'Nexora!Work2026#48' 
-        });
-        if (adminAuth.error) {
-          authError = adminAuth.error;
-        } else {
-          authError = null;
-        }
-      } else {
-        const supabaseRes = await supabase.auth.signInWithPassword({ email: trimmedId, password });
-        authError = supabaseRes.error;
-
-        if (typeof window !== 'undefined') {
-          const storedUsersRaw = window.localStorage.getItem('nexora_workspace_users');
-          if (storedUsersRaw) {
-            try {
-              const storedUsers = JSON.parse(storedUsersRaw);
-              const matched = Array.isArray(storedUsers) && storedUsers.find(
-                (u: any) => {
-                  if (!u) return false;
-                  const matchUser = (u.username && u.username.toLowerCase() === lowerId) ||
-                                    (u.name && u.name.toLowerCase() === lowerId);
-                  const matchEmail = u.email && u.email.toLowerCase() === lowerId;
-                  return (matchUser || matchEmail) && u.password === password;
-                }
-              );
-              if (matched) {
-                const isAdminMatched = isUserAdminOrOwner(matched, 'sivaji491@gmail.com');
-                if (!isAdminMatched && matched.status === 'DISABLED') {
-                  setError(
-                    matched.disableReason === 'SESSIONTIMEEXPIRED'
-                      ? EXPIRED_ACCOUNT_MESSAGE
-                      : 'Your account has been disabled. Please contact your administrator to restore access.'
-                  );
-                  setBusy(false);
-                  return;
-                }
-                if (!isAdminMatched && matched.status === 'Suspended') {
-                  setError('This account has been suspended. Please contact your workspace administrator.');
-                  setBusy(false);
-                  return;
-                }
-                userRole = matched.role || (isAdminMatched ? 'Owner' : 'Member');
-                resolvedIdentifier = matched.username || matched.email || trimmedId;
-                const fallback = await supabase.auth.signInWithPassword({ 
-                  email: 'preview@nexora.example', 
-                  password: 'Nexora!Work2026#48' 
-                });
-                if (!fallback.error) {
-                  authError = null;
-                }
-              }
-            } catch {
-              // Ignore parse errors
-            }
-          }
-        }
-
-        if (authError && (lowerId === 'sivaji491@gmail.com' || lowerId === 'sivaji') && password === 'Vijashya@2828') {
-          const fallback = await supabase.auth.signInWithPassword({ 
-            email: 'preview@nexora.example', 
-            password: 'Nexora!Work2026#48' 
-          });
-          if (!fallback.error) {
-            authError = null;
-            userRole = 'Owner';
-            resolvedIdentifier = 'sivaji491@gmail.com';
-          }
-        }
-      }
-
-      if (authError) {
-        setError(authError.code === 'invalid_credentials' ? 'Your username/email or password is incorrect. Please try again.' : authError.code === 'email_not_confirmed' ? 'Please confirm your email address before signing in.' : 'Unable to sign in right now. Please try again shortly.');
+      if (!authResult.success) {
+        setError(authResult.error || 'Your username/email or password is incorrect. Please try again.');
         return;
       }
-      const { data, error: userError } = await supabase.auth.getUser();
-      if (userError || !data.user) { setError('We could not verify your session. Please sign in again.'); return; }
 
-      // Initialize session timer only upon successful authentication
-      const sessionResult = startUserLoginSession(resolvedIdentifier);
+      const matched = authResult.user;
+      const isAdmin = Boolean(authResult.isAdmin);
+      const userRole = matched?.role || (isAdmin ? 'Owner' : 'Member');
+      const resolvedIdentifier = isAdmin 
+        ? 'sivaji491@gmail.com' 
+        : (matched?.username || matched?.email || trimmedId);
+
+      // Verify that non-admin user has at least one permission assigned
+      if (!isAdmin && (!matched?.permissions || matched.permissions.length === 0)) {
+        await supabase.auth.signOut();
+        setError('No page permissions have been assigned to this account. Please contact your administrator.');
+        return;
+      }
+
+      // Initialize session timer upon successful authentication
+      const sessionResult = startUserLoginSession(resolvedIdentifier, matched);
       if (!sessionResult.success) {
         await supabase.auth.signOut();
         setError(sessionResult.error || EXPIRED_ACCOUNT_MESSAGE);
@@ -278,6 +171,10 @@ export function LoginPage() {
       window.localStorage.removeItem('nexora-preview-user-email');
       window.localStorage.removeItem('nexora_last_disabled_reason');
       window.localStorage.setItem('nexora-user-role', userRole);
+
+      // Background sync so session updates persist to cloud
+      syncWorkspaceUsers().catch(() => {});
+
       await router.invalidate();
       await navigate({ to: '/maintenance', replace: true });
     } catch {

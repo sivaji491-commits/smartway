@@ -36,7 +36,8 @@ import {
   KeyRound,
   Settings,
   ShieldAlert,
-  Target
+  Target,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,6 +63,12 @@ import {
   getAllNavigationFieldIds,
   type NavigationField as CoreNavigationField
 } from '@/lib/permissions';
+import { 
+  saveCloudWorkspaceUsers, 
+  syncWorkspaceUsers,
+  fetchCloudWorkspaceUsers,
+  type CloudWorkspaceUser
+} from '@/lib/workspace-user-sync';
 
 export type NavigationField = CoreNavigationField;
 
@@ -348,6 +355,7 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
   const [createMfa, setCreateMfa] = useState(true);
   const [createError, setCreateError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Synchronize state with storage events and dynamic navigation field events
   useEffect(() => {
@@ -367,7 +375,62 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
     };
   }, [primaryOwnerEmail]);
 
-  // Persist users to localStorage whenever state updates and dispatch update event
+  // Pulls freshest user accounts directly from central database without passive overwrites
+  const refreshFromCloud = async (showNotification = false) => {
+    setIsRefreshing(true);
+    try {
+      const cloudUsers = await fetchCloudWorkspaceUsers();
+      if (cloudUsers && cloudUsers.length > 0) {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudUsers));
+          window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
+        }
+        setUsers(loadDynamicUsers(primaryOwnerEmail));
+        if (showNotification) {
+          showToast('User directory refreshed from central database.');
+        }
+      } else {
+        const local = loadDynamicUsers(primaryOwnerEmail);
+        if (local.length > 0) {
+          await saveCloudWorkspaceUsers(local as CloudWorkspaceUser[]);
+        }
+      }
+    } catch (err) {
+      console.warn('[UserManagement] Refresh failed:', err);
+      if (showNotification) {
+        showToast('Could not reach database. Showing cached users.');
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Initial synchronization with central database on mount
+  useEffect(() => {
+    refreshFromCloud(false);
+  }, [primaryOwnerEmail]);
+
+  // Auto-refresh when tab/window gains focus or becomes visible
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshFromCloud(false);
+      }
+    };
+    const handleFocus = () => {
+      refreshFromCloud(false);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [primaryOwnerEmail]);
+
+  // Persist users to localStorage and dispatch update event for reactive components (sidebar, etc.)
+  // NOTE: Central cloud saves are executed only in explicit administrator mutation handlers, NEVER passively on mount!
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
@@ -519,6 +582,7 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
         window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
       }
       setUsers(nextUsers);
+      await saveCloudWorkspaceUsers(nextUsers as CloudWorkspaceUser[]).catch(() => {});
       setIsCreateOpen(false);
       setCreateUsername('');
       setCreateEmail('');
@@ -572,6 +636,7 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
       window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
     }
     setUsers(updated);
+    saveCloudWorkspaceUsers(updated as CloudWorkspaceUser[]).catch(() => {});
     showToast(`Navigation permissions updated for ${editingPermissionsUser.name}`);
     setEditingPermissionsUser(null);
   };
@@ -716,6 +781,7 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
       window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
     }
     setUsers(nextUsers);
+    saveCloudWorkspaceUsers(nextUsers as CloudWorkspaceUser[]).catch(() => {});
     showToast(`${name} has been removed from workspace`);
   };
 
@@ -752,6 +818,7 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
         window.localStorage.removeItem('nexora-preview-user-email');
         window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
       }
+      saveCloudWorkspaceUsers(reset as CloudWorkspaceUser[]).catch(() => {});
       showToast('Directory reset to dynamic authenticated state');
     }
   };
@@ -830,6 +897,17 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
           >
             <UserPlus className="w-4 h-4 mr-2" />
             Create User
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => refreshFromCloud(true)}
+            disabled={isRefreshing}
+            title="Refresh user list from central database"
+            className="refresh-btn flex items-center gap-1.5"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-primary' : 'text-muted-foreground'}`} />
+            <span className="hidden sm:inline">{isRefreshing ? 'Syncing…' : 'Refresh'}</span>
           </Button>
           <Button 
             variant="outline" 

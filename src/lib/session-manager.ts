@@ -173,6 +173,11 @@ export function saveStoredWorkspaceUsers(users: any[]): void {
   window.localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
   window.dispatchEvent(new CustomEvent('nexora_permissions_updated'));
   window.dispatchEvent(new CustomEvent('nexora_session_updated'));
+  import('./workspace-user-sync')
+    .then(({ saveCloudWorkspaceUsers }) => {
+      saveCloudWorkspaceUsers(users).catch(() => {});
+    })
+    .catch(() => {});
 }
 
 /**
@@ -180,7 +185,7 @@ export function saveStoredWorkspaceUsers(users: any[]): void {
  * Never resets on logout/login, refresh, or reconnect — maintains the authoritative expiration timestamp.
  * Only an authorized Admin reset creates a new timer.
  */
-export function startUserLoginSession(identifier: string): {
+export function startUserLoginSession(identifier: string, fallbackUser?: any): {
   success: boolean;
   error?: string;
   sessionStartTime: number;
@@ -207,6 +212,10 @@ export function startUserLoginSession(identifier: string): {
 
   if (targetUserIndex >= 0) {
     targetUser = users[targetUserIndex];
+  } else if (fallbackUser) {
+    users.push(fallbackUser);
+    targetUserIndex = users.length - 1;
+    targetUser = fallbackUser;
   }
 
   // Admin and owner accounts have permanent unlimited sessions and can never be disabled
