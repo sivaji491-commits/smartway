@@ -19,7 +19,8 @@ import {
   UserCheck,
   GripVertical,
   KeyRound,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Route as RouteIcon
 } from 'lucide-react';
 import { Brand } from '@/components/brand';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,7 @@ import { TwelveLevelBonusView } from '@/components/twelve-level-bonus/TwelveLeve
 import { DcbNinetyDaysView } from '@/components/dcb-bonus/DcbNinetyDaysView';
 import { CustomerView } from '@/components/customer-view/CustomerView';
 import { PotentialityView } from '@/components/potentiality/PotentialityView';
+import { RouteMapView } from '@/components/route-map/RouteMapView';
 import { AccessDeniedView } from '@/components/AccessDeniedView';
 import { supabase } from '@/integrations/supabase/client';
 import { pageMeta } from '@/lib/page-meta';
@@ -769,6 +771,17 @@ function Maintenance() {
               </div>
             )}
 
+            {/* Route Map Indicator */}
+            {isAdmin && activeTab === 'route-map' && (
+              <div 
+                className="topbar-ranks-badge bg-amber-600 border-amber-500"
+                title="Route Map · Business Growth & Strategic Roadmap"
+              >
+                <RouteIcon className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">Route Map</span>
+              </div>
+            )}
+
             {/* Live Access Time Countdown Widget */}
             {effectiveEmail && (
               <div 
@@ -828,7 +841,7 @@ function Maintenance() {
         )}
 
         {/* Tab Content */}
-        <div className={`app-tab-body ${activeTab === 'home' ? 'home-tab-body' : ''} ${activeTab === 'earning-opportunities' ? 'earning-opportunities-body' : ''} ${activeTab === 'users' ? 'users-tab-body' : ''} ${activeTab === '12-level-bonus' ? 'twelve-bonus-tab-body' : ''}`}>
+        <div className={`app-tab-body ${activeTab === 'home' ? 'home-tab-body' : ''} ${activeTab === 'route-map' ? 'route-map-tab-body' : ''} ${activeTab === 'earning-opportunities' ? 'earning-opportunities-body' : ''} ${activeTab === 'users' ? 'users-tab-body' : ''} ${activeTab === '12-level-bonus' ? 'twelve-bonus-tab-body' : ''}`}>
           {activeTab === 'access-denied' || effectiveAllowed.length === 0 || !allowedTabs.includes(activeTab) ? (
             <AccessDeniedView
               pageName={activeTab !== 'access-denied' ? (navItems.find((i) => i.id === activeTab)?.label || activeTab) : undefined}
@@ -852,6 +865,15 @@ function Maintenance() {
               {activeTab === 'potentiality' && allowedTabs.includes('potentiality') && (
                 <main className="home-main-container ranks-container potentiality-container">
                   <PotentialityView isAdmin={isAdmin} userEmail={effectiveEmail} />
+                </main>
+              )}
+              {activeTab === 'route-map' && allowedTabs.includes('route-map') && (
+                <main className="home-main-container route-map-container p-0">
+                  <RouteMapView 
+                    isAdmin={isAdmin} 
+                    userEmail={effectiveEmail} 
+                    onNavigateToTab={handleSelectTab} 
+                  />
                 </main>
               )}
               {activeTab === '12-level-bonus' && allowedTabs.includes('12-level-bonus') && (

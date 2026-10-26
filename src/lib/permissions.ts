@@ -61,6 +61,12 @@ export const DEFAULT_NAVIGATION_FIELDS: NavigationFieldDef[] = [
     iconName: 'Target',
   },
   {
+    id: 'route-map',
+    label: 'Route Map',
+    description: 'Lifetime roadmap, real estate vision, and 2-referrals milestone route',
+    iconName: 'Route',
+  },
+  {
     id: 'currency',
     label: 'Currency Settings',
     description: 'USD to INR exchange rate and currency configuration',
@@ -161,6 +167,23 @@ export function getOrderedNavigationFields(): NavigationFieldDef[] {
             fieldMap.delete(id);
           }
         });
+
+        // If route-map is not in the custom saved order, place it right after potentiality (or customer-view)
+        if (fieldMap.has('route-map')) {
+          const routeMapDef = fieldMap.get('route-map')!;
+          fieldMap.delete('route-map');
+          const potentialityIdx = ordered.findIndex((f) => f.id === 'potentiality');
+          if (potentialityIdx >= 0) {
+            ordered.splice(potentialityIdx + 1, 0, routeMapDef);
+          } else {
+            const customerViewIdx = ordered.findIndex((f) => f.id === 'customer-view');
+            if (customerViewIdx >= 0) {
+              ordered.splice(customerViewIdx + 1, 0, routeMapDef);
+            } else {
+              ordered.push(routeMapDef);
+            }
+          }
+        }
 
         // If time-in-hand is not in the custom saved order, place it right above settings
         if (fieldMap.has('time-in-hand')) {

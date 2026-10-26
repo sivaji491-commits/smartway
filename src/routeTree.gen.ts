@@ -24,6 +24,7 @@ import { Route as AuthenticatedKeyPointsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
 import { Route as AuthenticatedPotentialityRouteImport } from './routes/_authenticated/potentiality'
 import { Route as AuthenticatedRanksRouteImport } from './routes/_authenticated/ranks'
+import { Route as AuthenticatedRouteMapRouteImport } from './routes/_authenticated/route-map'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTimeInHandRouteImport } from './routes/_authenticated/time-in-hand'
 import { Route as AuthenticatedUserManagementRouteImport } from './routes/_authenticated/user-management'
@@ -109,6 +110,11 @@ const AuthenticatedRanksRoute = AuthenticatedRanksRouteImport.update({
   path: '/ranks',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRouteMapRoute = AuthenticatedRouteMapRouteImport.update({
+  id: '/route-map',
+  path: '/route-map',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/potentiality': typeof AuthenticatedPotentialityRoute
   '/ranks': typeof AuthenticatedRanksRoute
+  '/route-map': typeof AuthenticatedRouteMapRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/maintenance': typeof AuthenticatedMaintenanceRoute
   '/potentiality': typeof AuthenticatedPotentialityRoute
   '/ranks': typeof AuthenticatedRanksRoute
+  '/route-map': typeof AuthenticatedRouteMapRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
   '/_authenticated/potentiality': typeof AuthenticatedPotentialityRoute
   '/_authenticated/ranks': typeof AuthenticatedRanksRoute
+  '/_authenticated/route-map': typeof AuthenticatedRouteMapRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/_authenticated/user-management': typeof AuthenticatedUserManagementRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/potentiality'
     | '/ranks'
+    | '/route-map'
     | '/settings'
     | '/time-in-hand'
     | '/user-management'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/maintenance'
     | '/potentiality'
     | '/ranks'
+    | '/route-map'
     | '/settings'
     | '/time-in-hand'
     | '/user-management'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/_authenticated/maintenance'
     | '/_authenticated/potentiality'
     | '/_authenticated/ranks'
+    | '/_authenticated/route-map'
     | '/_authenticated/settings'
     | '/_authenticated/time-in-hand'
     | '/_authenticated/user-management'
@@ -360,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRanksRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/route-map': {
+      id: '/_authenticated/route-map'
+      path: '/route-map'
+      fullPath: '/route-map'
+      preLoaderRoute: typeof AuthenticatedRouteMapRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -396,6 +415,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
   AuthenticatedPotentialityRoute: typeof AuthenticatedPotentialityRoute
   AuthenticatedRanksRoute: typeof AuthenticatedRanksRoute
+  AuthenticatedRouteMapRoute: typeof AuthenticatedRouteMapRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTimeInHandRoute: typeof AuthenticatedTimeInHandRoute
   AuthenticatedUserManagementRoute: typeof AuthenticatedUserManagementRoute
@@ -415,6 +435,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
   AuthenticatedPotentialityRoute: AuthenticatedPotentialityRoute,
   AuthenticatedRanksRoute: AuthenticatedRanksRoute,
+  AuthenticatedRouteMapRoute: AuthenticatedRouteMapRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTimeInHandRoute: AuthenticatedTimeInHandRoute,
   AuthenticatedUserManagementRoute: AuthenticatedUserManagementRoute,

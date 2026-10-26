@@ -1872,6 +1872,29 @@
   background: rgba(148, 163, 184, 0.55) !important;
 }
 
+/* Route Map Tab - Full-width responsive container without horizontal scrollbar */
+.app-tab-body.route-map-tab-body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.home-main-container.route-map-container {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+}
+
 /* Compact layout for User Management tab to fit cleanly within viewport without scrollbars */
 .home-main-container.users-container {
   max-width: 100%;

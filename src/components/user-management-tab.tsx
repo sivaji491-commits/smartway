@@ -37,7 +37,9 @@ import {
   Settings,
   ShieldAlert,
   Target,
-  RefreshCw
+  RefreshCw,
+  Route as RouteIcon,
+  Map as MapIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,6 +103,11 @@ export const NAV_ICON_MAP: Record<string, any> = {
   'customer-view': UserCheck,
   'customer_view': UserCheck,
   usercheck: UserCheck,
+  'route-map': RouteIcon,
+  'route_map': RouteIcon,
+  routemap: RouteIcon,
+  route: RouteIcon,
+  map: MapIcon,
   currency: Coins,
   configuration: Sliders,
   sliders: Sliders,
