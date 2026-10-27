@@ -82,6 +82,11 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
   const [rowAge, setRowAge] = useState<number>(30);
   const [rowUpTo60, setRowUpTo60] = useState<string>('30 Y');
   const [rowYearsInHand, setRowYearsInHand] = useState<number>(10);
+  const [rowHoursPerDay, setRowHoursPerDay] = useState<number>(config.hoursPerDay || 8);
+
+  // Table inline editing state for first 4 columns (Admin only)
+  const [isEditingTable, setIsEditingTable] = useState<boolean>(false);
+  const [tableDraftRows, setTableDraftRows] = useState<TimeInHandRow[]>([]);
 
   // Feedback notifications
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -102,10 +107,18 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
     };
   }, [syncFromStorage]);
 
-  // Calculated rows
+  // Active configuration: reflects live draft values while admin edits first 4 columns
+  const activeConfig = useMemo(() => {
+    if (isAdmin && isEditingTable && tableDraftRows.length > 0) {
+      return { ...config, rows: tableDraftRows };
+    }
+    return config;
+  }, [config, isAdmin, isEditingTable, tableDraftRows]);
+
+  // Calculated rows (live recalculation for remaining columns when editing first 4 columns)
   const calculatedRows = useMemo(() => {
-    return calculateAllTimeInHandRows(config);
-  }, [config]);
+    return calculateAllTimeInHandRows(activeConfig);
+  }, [activeConfig]);
 
   // Selected row state for interactive Annual Days calculation
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -208,12 +221,110 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
     }
   };
 
+  // --- Table Inline Editing Handlers (Admin Only - Columns 1 to 4) ---
+  const handleStartEditingTable = () => {
+    if (!isAdmin) return;
+    setTableDraftRows(
+      config.rows.map((r) => ({
+        ...r,
+        hoursPerDay: r.hoursPerDay !== undefined && !isNaN(Number(r.hoursPerDay)) 
+          ? Number(r.hoursPerDay) 
+          : (Number(config.hoursPerDay) || 8),
+      }))
+    );
+    setIsEditingTable(true);
+    setFeedback(null);
+  };
+
+  const handleCancelEditingTable = () => {
+    setIsEditingTable(false);
+    setTableDraftRows([]);
+  };
+
+  const handleDraftCellChange = (
+    rowId: string, 
+    field: 'age' | 'upTo60' | 'yearsInHand' | 'hoursPerDay', 
+    val: string | number
+  ) => {
+    setTableDraftRows((prev) =>
+      prev.map((r) => {
+        if (r.id !== rowId) return r;
+        return {
+          ...r,
+          [field]: val,
+        };
+      })
+    );
+  };
+
+  const handleSaveTableDraft = async () => {
+    if (!isAdmin) return;
+    setIsSaving(true);
+    setFeedback(null);
+
+    // Validate inputs for the first 4 columns across all draft rows
+    for (let i = 0; i < tableDraftRows.length; i++) {
+      const r = tableDraftRows[i];
+      const ageNum = Number(r.age);
+      if (isNaN(ageNum) || ageNum <= 0 || ageNum > 120) {
+        setFeedback({ type: 'error', message: `Row #${i + 1}: Age must be a valid number between 1 and 120.` });
+        setIsSaving(false);
+        return;
+      }
+      if (!r.upTo60 || typeof r.upTo60 !== 'string' || !r.upTo60.trim()) {
+        setFeedback({ type: 'error', message: `Row #${i + 1}: 'Up to 60 Years In-hand' cannot be empty.` });
+        setIsSaving(false);
+        return;
+      }
+      const yihNum = Number(r.yearsInHand);
+      if (isNaN(yihNum) || yihNum < 0) {
+        setFeedback({ type: 'error', message: `Row #${i + 1}: Years In-hand must be a non-negative number.` });
+        setIsSaving(false);
+        return;
+      }
+      const hpdNum = Number(r.hoursPerDay);
+      if (isNaN(hpdNum) || hpdNum <= 0 || hpdNum > 24) {
+        setFeedback({ type: 'error', message: `Row #${i + 1}: Hours per Day must be a number between 1 and 24.` });
+        setIsSaving(false);
+        return;
+      }
+    }
+
+    const cleanedRows: TimeInHandRow[] = tableDraftRows.map((r) => ({
+      ...r,
+      age: Number(r.age),
+      upTo60: String(r.upTo60).trim(),
+      yearsInHand: Number(r.yearsInHand),
+      hoursPerDay: Number(r.hoursPerDay),
+    }));
+
+    const updatedConfig: TimeInHandConfig = {
+      ...config,
+      rows: cleanedRows,
+    };
+
+    const res = await saveTimeInHandAdmin(updatedConfig, userEmail || 'sivaji491@gmail.com');
+    setIsSaving(false);
+    if (res.success && res.data) {
+      setConfig(res.data);
+      setIsEditingTable(false);
+      setTableDraftRows([]);
+      setFeedback({ 
+        type: 'success', 
+        message: 'Updated values for the first 4 columns (Age, Up to 60, Years In-hand, Hours/Day) saved successfully.' 
+      });
+    } else {
+      setFeedback({ type: 'error', message: res.error || 'Failed to save table changes.' });
+    }
+  };
+
   // Open Add/Edit Row Modal
   const openAddRowModal = () => {
     setEditingRow(null);
     setRowAge(30);
     setRowUpTo60('30 Y');
     setRowYearsInHand(10);
+    setRowHoursPerDay(config.hoursPerDay || 8);
     setFeedback(null);
     setIsAddRowModalOpen(true);
   };
@@ -223,6 +334,7 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
     setRowAge(row.age);
     setRowUpTo60(row.upTo60);
     setRowYearsInHand(row.yearsInHand);
+    setRowHoursPerDay(row.hoursPerDay !== undefined && !isNaN(Number(row.hoursPerDay)) ? Number(row.hoursPerDay) : (config.hoursPerDay || 8));
     setFeedback(null);
     setIsAddRowModalOpen(true);
   };
@@ -234,8 +346,16 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
       setFeedback({ type: 'error', message: 'Age must be between 1 and 120.' });
       return;
     }
+    if (!rowUpTo60 || !rowUpTo60.trim()) {
+      setFeedback({ type: 'error', message: 'Up to 60 Years In-hand cannot be empty.' });
+      return;
+    }
     if (rowYearsInHand < 0) {
       setFeedback({ type: 'error', message: 'Years in-hand cannot be negative.' });
+      return;
+    }
+    if (rowHoursPerDay <= 0 || rowHoursPerDay > 24) {
+      setFeedback({ type: 'error', message: 'Hours per day must be between 1 and 24.' });
       return;
     }
 
@@ -243,7 +363,13 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
     if (editingRow) {
       updatedRows = config.rows.map((r) => 
         r.id === editingRow.id 
-          ? { ...r, age: Number(rowAge), upTo60: rowUpTo60.trim() || `${Math.max(0, 60 - rowAge)} Y`, yearsInHand: Number(rowYearsInHand) }
+          ? { 
+              ...r, 
+              age: Number(rowAge), 
+              upTo60: rowUpTo60.trim() || `${Math.max(0, 60 - rowAge)} Y`, 
+              yearsInHand: Number(rowYearsInHand),
+              hoursPerDay: Number(rowHoursPerDay),
+            }
           : r
       );
     } else {
@@ -252,6 +378,7 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
         age: Number(rowAge),
         upTo60: rowUpTo60.trim() || `${Math.max(0, 60 - rowAge)} Y`,
         yearsInHand: Number(rowYearsInHand),
+        hoursPerDay: Number(rowHoursPerDay),
       };
       updatedRows = [...config.rows, newRow];
     }
@@ -389,6 +516,44 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
                 26 Days (Image)
               </button>
             </div>
+
+            {!isEditingTable ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleStartEditingTable}
+                className="h-8 px-2.5 text-xs text-indigo-700 border-indigo-300 bg-indigo-50/50 hover:bg-indigo-50 font-semibold"
+                title="Edit the first 4 columns directly in the table (Age, Up to 60, Years In-hand, Hours/Day)"
+              >
+                <Edit2 className="w-3.5 h-3.5 mr-1 text-indigo-600" />
+                Edit First 4 Columns
+              </Button>
+            ) : (
+              <div className="flex items-center gap-1.5 bg-indigo-50 p-1 rounded-lg border border-indigo-200">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleSaveTableDraft}
+                  disabled={isSaving}
+                  className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs"
+                >
+                  <Save className="w-3.5 h-3.5 mr-1" />
+                  {isSaving ? 'Saving...' : 'Save Values'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCancelEditingTable}
+                  disabled={isSaving}
+                  className="h-7 px-2 text-xs text-slate-600 hover:text-slate-900 border-slate-300 bg-white"
+                >
+                  <X className="w-3.5 h-3.5 mr-1" />
+                  Cancel
+                </Button>
+              </div>
+            )}
 
             <Button
               type="button"
@@ -572,6 +737,42 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
         </div>
       </div>
 
+      {/* Admin Inline Editing Status Banner */}
+      {isAdmin && isEditingTable && (
+        <div className="bg-indigo-50/90 border border-indigo-200 rounded-lg p-2.5 text-xs text-indigo-950 flex flex-wrap items-center justify-between gap-2 shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+            <span className="font-semibold text-indigo-900">Admin Editing Mode:</span>
+            <span className="text-indigo-800">
+              Columns 1–4 are editable below. Dependent columns (5–10) calculate live. Click <strong>Save Values</strong> to persist.
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleSaveTableDraft}
+              disabled={isSaving}
+              className="h-7 px-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-xs"
+            >
+              <Save className="w-3.5 h-3.5 mr-1" />
+              {isSaving ? 'Saving...' : 'Save Values'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancelEditingTable}
+              disabled={isSaving}
+              className="h-7 px-2.5 text-xs text-slate-700 bg-white hover:bg-slate-50 border-slate-300"
+            >
+              <X className="w-3.5 h-3.5 mr-1" />
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* 3. The 10-Column Responsive Table Container */}
       <div className="relative rounded-lg border border-slate-300 overflow-hidden bg-white shadow-xs">
         {/* Horizontal scroll hints on mobile */}
@@ -585,17 +786,45 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
             {/* Table Header matching the uploaded reference image */}
             <thead>
               <tr className="bg-white text-slate-900 font-semibold border-b border-slate-400 divide-x divide-slate-300">
-                <th className="py-2.5 px-3 whitespace-nowrap text-center font-bold">
-                  {config.colAge || 'Age'}
+                <th className={`py-2.5 px-3 whitespace-nowrap text-center font-bold ${isAdmin && isEditingTable ? 'bg-indigo-50/70 text-indigo-950 border-indigo-200' : ''}`}>
+                  <div className="flex items-center justify-center gap-1">
+                    <span>{config.colAge || 'Age'}</span>
+                    {isAdmin && isEditingTable && (
+                      <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-indigo-100 text-indigo-700 border border-indigo-200">
+                        Edit
+                      </span>
+                    )}
+                  </div>
                 </th>
-                <th className="py-2.5 px-3 whitespace-nowrap text-center font-bold">
-                  {config.colUpTo60 || 'Up to 60 Years In-hand'}
+                <th className={`py-2.5 px-3 whitespace-nowrap text-center font-bold ${isAdmin && isEditingTable ? 'bg-indigo-50/70 text-indigo-950 border-indigo-200' : ''}`}>
+                  <div className="flex items-center justify-center gap-1">
+                    <span>{config.colUpTo60 || 'Up to 60 Years In-hand'}</span>
+                    {isAdmin && isEditingTable && (
+                      <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-indigo-100 text-indigo-700 border border-indigo-200">
+                        Edit
+                      </span>
+                    )}
+                  </div>
                 </th>
-                <th className="py-2.5 px-3 whitespace-nowrap text-center font-bold">
-                  {config.colYearsInHand || 'Years In-hand'}
+                <th className={`py-2.5 px-3 whitespace-nowrap text-center font-bold ${isAdmin && isEditingTable ? 'bg-indigo-50/70 text-indigo-950 border-indigo-200' : ''}`}>
+                  <div className="flex items-center justify-center gap-1">
+                    <span>{config.colYearsInHand || 'Years In-hand'}</span>
+                    {isAdmin && isEditingTable && (
+                      <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-indigo-100 text-indigo-700 border border-indigo-200">
+                        Edit
+                      </span>
+                    )}
+                  </div>
                 </th>
-                <th className="py-2.5 px-3 whitespace-nowrap text-center font-bold">
-                  {config.colHoursPerDay || 'Hours per Day'}
+                <th className={`py-2.5 px-3 whitespace-nowrap text-center font-bold ${isAdmin && isEditingTable ? 'bg-indigo-50/70 text-indigo-950 border-indigo-200' : ''}`}>
+                  <div className="flex items-center justify-center gap-1">
+                    <span>{config.colHoursPerDay || 'Hours per Day'}</span>
+                    {isAdmin && isEditingTable && (
+                      <span className="text-[9px] font-semibold px-1 py-0.2 rounded bg-indigo-100 text-indigo-700 border border-indigo-200">
+                        Edit
+                      </span>
+                    )}
+                  </div>
                 </th>
                 <th className="py-2.5 px-3 whitespace-nowrap text-center font-bold">
                   {config.colDaysPerMonth || 'Days per Month'}
@@ -630,56 +859,120 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
 
             {/* Table Body */}
             <tbody className="divide-y divide-slate-200">
-              {calculatedRows.map((row) => {
+              {calculatedRows.map((row, idx) => {
                 const isSelected = activeRow?.id === row.id;
+                const draftRow = isAdmin && isEditingTable 
+                  ? tableDraftRows.find((d) => d.id === row.id) || row
+                  : null;
+
                 return (
                   <tr 
                     key={row.id} 
-                    onClick={() => setSelectedRowId(row.id)}
-                    className={`transition-colors divide-x divide-slate-200 cursor-pointer ${
+                    onClick={() => {
+                      if (!isEditingTable) {
+                        setSelectedRowId(row.id);
+                      }
+                    }}
+                    className={`transition-colors divide-x divide-slate-200 ${
+                      !isEditingTable ? 'cursor-pointer' : ''
+                    } ${
                       isSelected 
                         ? 'bg-amber-50/50 text-slate-900 font-medium' 
                         : 'hover:bg-slate-50/70 text-slate-800'
                     }`}
                   >
-                    {/* 1. Age */}
-                    <td className="py-2.5 px-3 font-semibold text-slate-900 bg-slate-50/40">
-                      {row.age}
+                    {/* 1. Age (Admin Editable) */}
+                    <td className={`py-2 px-2 font-semibold text-slate-900 ${isAdmin && isEditingTable ? 'bg-indigo-50/30' : 'bg-slate-50/40'}`}>
+                      {isAdmin && isEditingTable && draftRow ? (
+                        <Input
+                          type="number"
+                          min="1"
+                          max="120"
+                          value={draftRow.age}
+                          onChange={(e) => handleDraftCellChange(row.id, 'age', e.target.value)}
+                          className="h-7 w-16 sm:w-20 mx-auto text-center font-bold text-slate-900 bg-white border-indigo-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-1 py-0.5 text-xs shadow-xs"
+                          aria-label={`Age for row ${idx + 1}`}
+                        />
+                      ) : (
+                        row.age
+                      )}
                     </td>
 
-                    {/* 2. Up to 60 Years In-hand */}
-                    <td className="py-2.5 px-3 font-medium text-slate-700">
-                      {row.upTo60}
+                    {/* 2. Up to 60 Years In-hand (Admin Editable) */}
+                    <td className={`py-2 px-2 font-medium text-slate-700 ${isAdmin && isEditingTable ? 'bg-indigo-50/30' : ''}`}>
+                      {isAdmin && isEditingTable && draftRow ? (
+                        <Input
+                          type="text"
+                          value={draftRow.upTo60}
+                          onChange={(e) => handleDraftCellChange(row.id, 'upTo60', e.target.value)}
+                          className="h-7 w-20 sm:w-24 mx-auto text-center font-medium text-slate-900 bg-white border-indigo-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-1 py-0.5 text-xs shadow-xs"
+                          aria-label={`Up to 60 for row ${idx + 1}`}
+                        />
+                      ) : (
+                        row.upTo60
+                      )}
                     </td>
 
-                    {/* 3. Years In-hand */}
+                    {/* 3. Years In-hand (Admin Editable) */}
                     <td 
-                      className={`py-2.5 px-3 font-semibold transition-colors ${
-                        isSelected 
-                          ? 'bg-teal-50 text-teal-900 font-bold' 
-                          : 'text-slate-900'
+                      className={`py-2 px-2 font-semibold transition-colors ${
+                        isAdmin && isEditingTable 
+                          ? 'bg-indigo-50/30' 
+                          : isSelected 
+                            ? 'bg-teal-50 text-teal-900 font-bold' 
+                            : 'text-slate-900'
                       }`}
                       onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedRowId(row.id);
+                        if (!isEditingTable) {
+                          e.stopPropagation();
+                          setSelectedRowId(row.id);
+                        }
                       }}
-                      role="button"
-                      tabIndex={0}
-                      aria-pressed={isSelected}
-                      aria-label={`Select row with ${row.yearsInHand} years in-hand`}
+                      role={isEditingTable ? undefined : 'button'}
+                      tabIndex={isEditingTable ? undefined : 0}
+                      aria-pressed={isEditingTable ? undefined : isSelected}
+                      aria-label={isEditingTable ? undefined : `Select row with ${row.yearsInHand} years in-hand`}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (!isEditingTable && (e.key === 'Enter' || e.key === ' ')) {
                           e.preventDefault();
                           setSelectedRowId(row.id);
                         }
                       }}
                     >
-                      {row.yearsInHand}
+                      {isAdmin && isEditingTable && draftRow ? (
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.5"
+                          value={draftRow.yearsInHand}
+                          onChange={(e) => handleDraftCellChange(row.id, 'yearsInHand', e.target.value)}
+                          className="h-7 w-16 sm:w-20 mx-auto text-center font-bold text-teal-950 bg-white border-indigo-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-1 py-0.5 text-xs shadow-xs"
+                          aria-label={`Years in hand for row ${idx + 1}`}
+                        />
+                      ) : (
+                        row.yearsInHand
+                      )}
                     </td>
 
-                    {/* 4. Hours per Day */}
-                    <td className="py-2.5 px-3 text-slate-700">
-                      {row.hoursPerDay} hours
+                    {/* 4. Hours per Day (Admin Editable) */}
+                    <td className={`py-2 px-2 text-slate-700 ${isAdmin && isEditingTable ? 'bg-indigo-50/30' : ''}`}>
+                      {isAdmin && isEditingTable && draftRow ? (
+                        <div className="flex items-center justify-center gap-1">
+                          <Input
+                            type="number"
+                            min="1"
+                            max="24"
+                            step="0.5"
+                            value={draftRow.hoursPerDay}
+                            onChange={(e) => handleDraftCellChange(row.id, 'hoursPerDay', e.target.value)}
+                            className="h-7 w-14 sm:w-16 text-center font-medium text-slate-900 bg-white border-indigo-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-1 py-0.5 text-xs shadow-xs"
+                            aria-label={`Hours per day for row ${idx + 1}`}
+                          />
+                          <span className="text-[11px] text-slate-500 font-medium select-none">hrs</span>
+                        </div>
+                      ) : (
+                        `${row.hoursPerDay} hours`
+                      )}
                     </td>
 
                     {/* 5. Days per Month */}
@@ -1059,7 +1352,7 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
 
               <div>
                 <label className="block font-medium text-slate-700 mb-1">
-                  Years In-hand
+                  Years In-hand (Col 3)
                 </label>
                 <Input
                   type="number"
@@ -1071,6 +1364,24 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
                 />
                 <span className="text-[10px] text-slate-500">
                   Number of working years to compute accumulation
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-medium text-slate-700 mb-1">
+                  Hours per Day (Col 4)
+                </label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="24"
+                  step="0.5"
+                  value={rowHoursPerDay}
+                  onChange={(e) => setRowHoursPerDay(Number(e.target.value))}
+                  className="h-8 text-xs"
+                />
+                <span className="text-[10px] text-slate-500">
+                  Daily working hours for this age group (1–24 hours)
                 </span>
               </div>
             </div>

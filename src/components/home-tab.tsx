@@ -167,7 +167,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
   };
 
   const scrollToSection = (sectionId: string) => {
-    const el = document.getElementById(sectionId);
+    const target = sectionId === 'flats-section' ? 'plots-section' : sectionId;
+    const el = document.getElementById(target);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -275,7 +276,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
   }
 
   return (
-    <div className="min-h-full w-full bg-[#071320] text-slate-100 font-['Inter',system-ui,sans-serif] selection:bg-emerald-500/30 selection:text-white">
+    <div className="min-h-full w-full bg-slate-50 text-slate-800 font-['Inter',system-ui,sans-serif] selection:bg-emerald-500/30 selection:text-slate-900">
       {/* Toast Notification */}
       {notification && (
         <div 
@@ -419,7 +420,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           1. PROFESSIONAL TOP NAVIGATION BAR (Matches Reference Design)
           ========================================================================= */}
       <nav className="relative z-30 w-full bg-[#071526] border-b border-white/10 select-none">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-17 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-15 flex items-center justify-between">
           {/* Brand Logo with IG INFRAS stylized mark */}
           <div 
             className="flex items-center gap-2.5 cursor-pointer group"
@@ -759,14 +760,14 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         </button>
 
         {/* Carousel Slide Container */}
-        <div className="relative z-10 w-full min-h-[490px] sm:min-h-[520px] lg:min-h-[550px] flex items-center">
+        <div className="relative z-10 w-full min-h-[380px] sm:min-h-[420px] lg:min-h-[440px] flex items-center">
           
           {/* ===================================================================
               SLIDE 1 — BUSINESS INTRODUCTION (Exact Reference Screenshot Match)
               =================================================================== */}
           <div 
             className={cn(
-              "w-full transition-all duration-700 ease-in-out relative",
+              "w-full transition-all duration-700 ease-in-out",
               currentSlide === 0
                 ? "opacity-100 z-10 translate-y-0"
                 : "opacity-0 z-0 pointer-events-none absolute translate-y-2"
@@ -777,57 +778,71 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
             aria-hidden={currentSlide !== 0}
             data-testid="hero-slide-0"
           >
-            {/* Desktop Wide Plot Property Image (Right 58%) with Left-Edge Soft Blend */}
-            <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-[58%] pointer-events-none select-none overflow-hidden">
-              <img
-                src="/images/home-hero/slide-plot.png"
-                alt="Master-planned residential plots and avenue layouts"
-                className="w-full h-full object-cover object-center"
-                loading="eager"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = '/images/customer-view/hero-real-estate.jpg';
-                }}
-              />
-              {/* Soft directional gradient to seamlessly blend into navy text column on left */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#071526] via-[#071526]/40 to-transparent w-40 pointer-events-none" />
-            </div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-7">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 max-w-6xl mx-auto">
+                {/* Text & Action Column (Left) */}
+                <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+                  {/* Badges Container */}
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-2.5">
+                    {/* Real Estate Opportunity Badge */}
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 text-[#0F2942] text-xs font-bold tracking-tight shadow-md">
+                      <TrendingUp className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+                      <span>Earn as soon as possible</span>
+                    </div>
 
-            {/* Slide 1 Floating Top-Right Badge: Single instance on Desktop */}
-            <div className="hidden lg:inline-flex absolute top-6 right-8 lg:right-10 z-20 items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 text-[#0F2942] text-xs sm:text-sm font-bold tracking-tight shadow-xl">
-              <TrendingUp className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-              <span>Earn as soon as possible</span>
-            </div>
+                    {/* Ecosystem & Informed Decisions Pill */}
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#071F2C]/80 border border-teal-500/40 text-teal-300 text-xs font-semibold tracking-wide shadow-sm backdrop-blur-xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>TRANSPARENT REAL ESTATE BUSINESS ECOSYSTEM</span>
+                      <span className="text-teal-500/50">|</span>
+                      <span className="text-slate-300 font-normal">INFORMED DECISIONS FIRST</span>
+                    </div>
+                  </div>
 
-            {/* Slide 1 Content Container */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 lg:py-12">
-              <div className="relative z-10 w-full lg:w-[58%] text-left">
-                {/* Eyebrow Pill */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#071F2C]/80 border border-teal-500/40 text-teal-300 text-xs font-semibold tracking-wide mb-3 sm:mb-4 shadow-sm backdrop-blur-xs">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>TRANSPARENT REAL ESTATE BUSINESS ECOSYSTEM</span>
-                  <span className="text-teal-500/50">|</span>
-                  <span className="text-slate-300 font-normal">INFORMED DECISIONS FIRST</span>
+                  {/* Large Bold Headline */}
+                  <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-2 max-w-5xl">
+                    <span className="hero-golden-headline">{activeData.hero.headline}</span>
+                  </h1>
+
+                  {/* Supporting Headline with green teal gradient accent */}
+                  <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight mb-3">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300">
+                      {activeData.hero.highlightHeadline}
+                    </span>
+                  </p>
+
+                  {/* Supporting Paragraph */}
+                  <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed mb-4 sm:mb-6 max-w-xl">
+                    {activeData.hero.subtitle}
+                  </p>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3 mb-2">
+                    <Button
+                      type="button"
+                      size="lg"
+                      onClick={() => handleExploreBusinessPlan(activeData.hero.primaryButtonLink)}
+                      className="bg-[#059669] hover:bg-[#10B981] text-white font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl shadow-lg shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                    >
+                      <span>{activeData.hero.primaryButtonText}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      onClick={() => scrollToSection(activeData.hero.secondaryButtonLink || 'plots-section')}
+                      className="bg-[#081C30]/80 hover:bg-[#0E2844] text-slate-100 font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
+                    >
+                      <Building2 className="w-4 h-4 text-emerald-400" />
+                      <span>{activeData.hero.secondaryButtonText}</span>
+                    </Button>
+                  </div>
                 </div>
 
-                {/* Large Bold Headline */}
-                <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-2 max-w-5xl">
-                  <span className="hero-golden-headline">{activeData.hero.headline}</span>
-                </h1>
-
-                {/* Supporting Headline with green teal gradient accent */}
-                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight mb-3">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-green-300">
-                    {activeData.hero.highlightHeadline}
-                  </span>
-                </p>
-
-                {/* Supporting Paragraph */}
-                <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed mb-4 sm:mb-6 max-w-xl">
-                  {activeData.hero.subtitle}
-                </p>
-
-                {/* Mobile & Tablet Visible Plot Image Card */}
-                <div className="lg:hidden w-full max-w-xl mx-auto my-4 sm:my-5">
+                {/* Prominent Visible Plot Image Element (Right Column) */}
+                <div className="w-full sm:w-[90%] lg:w-[48%] shrink-0">
                   <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-900 aspect-[16/10] group">
                     <img 
                       src="/images/home-hero/slide-plot.png" 
@@ -838,36 +853,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                         (e.currentTarget as HTMLImageElement).src = '/images/customer-view/hero-real-estate.jpg';
                       }}
                     />
-                    <div className="absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-[#0F2942] text-[11px] font-bold shadow-md">
-                      <TrendingUp className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
-                      <span>Earn as soon as possible</span>
-                    </div>
                     <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl pointer-events-none" />
                   </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                  <Button
-                    type="button"
-                    size="lg"
-                    onClick={() => handleExploreBusinessPlan(activeData.hero.primaryButtonLink)}
-                    className="bg-[#059669] hover:bg-[#10B981] text-white font-semibold text-sm sm:text-base px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-emerald-950/60 border border-emerald-400/30 cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
-                  >
-                    <span>{activeData.hero.primaryButtonText}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    onClick={() => scrollToSection(activeData.hero.secondaryButtonLink || 'plots-section')}
-                    className="bg-[#081C30]/80 hover:bg-[#0E2844] text-slate-100 font-semibold text-sm sm:text-base px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
-                  >
-                    <Building2 className="w-4 h-4 text-emerald-400" />
-                    <span>{activeData.hero.secondaryButtonText}</span>
-                  </Button>
                 </div>
               </div>
             </div>
@@ -889,7 +876,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
             aria-hidden={currentSlide !== 1}
             data-testid="hero-slide-1"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 lg:py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-7">
               <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 max-w-6xl mx-auto">
                 {/* Text & Action Column */}
                 <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -988,7 +975,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
             aria-hidden={currentSlide !== 2}
             data-testid="hero-slide-2"
           >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-9 lg:py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-7">
               <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8 max-w-6xl mx-auto">
                 {/* Text & Action Column */}
                 <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -1029,7 +1016,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                       type="button"
                       variant="outline"
                       size="lg"
-                      onClick={() => scrollToSection('flats-section')}
+                      onClick={() => scrollToSection('plots-section')}
                       className="bg-[#081C30]/80 hover:bg-[#0E2844] text-slate-100 font-semibold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 transform hover:-translate-y-0.5 flex items-center gap-2"
                     >
                       <Building2 className="w-4 h-4 text-amber-400" />
@@ -1076,7 +1063,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         </div>
 
         {/* Bottom Trust & Information Strip (Horizontal Strip matching reference design) */}
-        <div className="relative z-20 border-t border-white/10 bg-[#061220]/85 backdrop-blur-md py-3 sm:py-3.5 px-4 sm:px-6 lg:px-8">
+        <div className="relative z-20 border-t border-white/10 bg-[#061220]/85 backdrop-blur-md py-2.5 sm:py-3 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
             {/* 4 Trust Feature Items */}
             <div className="w-full md:w-auto grid grid-cols-2 md:flex md:items-center gap-3 md:gap-7 text-xs text-slate-300">
@@ -1131,64 +1118,66 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           3. BUSINESS PHILOSOPHY SECTION
           ========================================================================= */}
-      <section id="philosophy-section" className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-4 sm:mb-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <Compass className="w-3.5 h-3.5" />
-            <span>Core Philosophy</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
-            {activeData.philosophy.heading}
-          </h2>
-          <p className="mt-2 text-sm sm:text-base text-slate-400 leading-relaxed">
-            {activeData.philosophy.subtitle}
-          </p>
-        </div>
-
-        {/* 3 Philosophy Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-          {activeData.philosophy.cards.map((card, idx) => (
-            <div 
-              key={card.id || idx}
-              className="relative group rounded-2xl bg-gradient-to-b from-[#0C1E30]/90 to-[#071524]/90 border border-white/10 p-4 sm:p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-emerald-950/30"
-            >
-              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 mb-3.5 group-hover:scale-105 transition-transform">
-                {idx === 0 ? <ShieldCheck className="w-5 h-5 stroke-[2]" /> : idx === 1 ? <Layers className="w-5 h-5 stroke-[2]" /> : <Scale className="w-5 h-5 stroke-[2]" />}
-              </div>
-              <h3 className="text-base sm:text-lg font-bold text-white mb-1.5 tracking-tight">
-                {card.title}
-              </h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                {card.description}
-              </p>
-              <div className="mt-3.5 pt-3 border-t border-white/10 text-xs text-slate-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span>{card.highlight}</span>
-              </div>
+      <section id="philosophy-section" className="w-full bg-white py-5 sm:py-6 border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-3 sm:mb-4.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold uppercase tracking-wider mb-2">
+              <Compass className="w-3.5 h-3.5" />
+              <span>Core Philosophy</span>
             </div>
-          ))}
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2545] tracking-tight">
+              {activeData.philosophy.heading}
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-slate-600 leading-relaxed">
+              {activeData.philosophy.subtitle}
+            </p>
+          </div>
+
+          {/* 3 Philosophy Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+            {activeData.philosophy.cards.map((card, idx) => (
+              <div 
+                key={card.id || idx}
+                className="relative group rounded-2xl bg-gradient-to-b from-[#0C1E30]/90 to-[#071524]/90 border border-white/10 p-3.5 sm:p-4 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-emerald-950/30"
+              >
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 mb-2.5 group-hover:scale-105 transition-transform">
+                  {idx === 0 ? <ShieldCheck className="w-5 h-5 stroke-[2]" /> : idx === 1 ? <Layers className="w-5 h-5 stroke-[2]" /> : <Scale className="w-5 h-5 stroke-[2]" />}
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white mb-1.5 tracking-tight">
+                  {card.title}
+                </h3>
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  {card.description}
+                </p>
+                <div className="mt-2.5 pt-2.5 border-t border-white/10 text-xs text-slate-400 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span>{card.highlight}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* =========================================================================
           4. PREMIUM PLOTS GALLERY
           ========================================================================= */}
-      <section id="plots-section" className="py-7 sm:py-9 bg-[#06101B]/80 border-y border-white/10">
+      <section id="plots-section" className="w-full py-5 sm:py-6 bg-[#F8FAFC] border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-3 sm:mb-4.5 gap-3 sm:gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold uppercase tracking-wider mb-2">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>Planned Layouts</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2545] tracking-tight">
                 Explore Residential Plot Opportunities
               </h2>
-              <p className="mt-2 text-sm sm:text-base text-slate-400 max-w-2xl">
+              <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl">
                 Discover master-planned layouts featuring paved avenues, green landscaping, clear demarcation, and community infrastructure.
               </p>
             </div>
-            <div className="text-xs text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 self-start md:self-auto">
+            <div className="text-xs text-slate-600 bg-white px-3 py-1.5 rounded-lg border border-slate-200/90 shadow-2xs self-start md:self-auto">
               Visual architectural examples shown for concept clarity
             </div>
           </div>
@@ -1232,17 +1221,17 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                   </div>
 
                   {/* Card Content */}
-                  <div className="p-4 sm:p-4.5">
+                  <div className="p-3.5 sm:p-4">
                     <h3 className="text-base font-bold text-white mb-1.5 leading-snug group-hover:text-emerald-300 transition-colors">
                       {plot.title}
                     </h3>
-                    <p className="text-xs text-slate-300 leading-relaxed mb-3">
+                    <p className="text-xs text-slate-300 leading-relaxed mb-2">
                       {plot.description}
                     </p>
 
                     {/* Features Badges */}
                     {Array.isArray(plot.features) && plot.features.length > 0 && (
-                      <div className="space-y-1 pt-2.5 border-t border-white/10">
+                      <div className="space-y-1 pt-2 border-t border-white/10">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                           Infrastructure Highlights
                         </span>
@@ -1262,8 +1251,8 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-4.5 pt-0">
-                  <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                <div className="p-3.5 sm:p-4 pt-0">
+                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
                     <span className="flex items-center gap-1 text-emerald-400 font-medium">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       Planned Demarcation
@@ -1278,124 +1267,19 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       </section>
 
       {/* =========================================================================
-          5. MODERN FLATS & APARTMENTS GALLERY
+          5. HOW THE BUSINESS PLAN WORKS
           ========================================================================= */}
-      <section id="flats-section" className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-semibold uppercase tracking-wider mb-2">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Contemporary Residences</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
-              Discover Modern Living Opportunities
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-400 max-w-2xl">
-              Explore luxury apartment architecture, modern flats, premium community developments, and landscaped amenities.
-            </p>
-          </div>
-          <div className="text-xs text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10 self-start md:self-auto">
-            Illustrative examples for residential architecture
-          </div>
-        </div>
-
-        {/* Apartment Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {activeData.apartments.map((apt) => (
-            <div 
-              key={apt.id}
-              className="group rounded-2xl bg-[#091827] border border-white/10 overflow-hidden shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:border-teal-500/40 hover:shadow-2xl flex flex-col justify-between"
-            >
-              <div>
-                {/* Image Container with Fallback */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
-                  {!imageErrors[apt.id] ? (
-                    <img 
-                      src={apt.imageUrl} 
-                      alt={apt.title}
-                      onError={() => handleImageError(apt.id)}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-950 to-slate-900 p-4 text-center">
-                      <Building2 className="w-10 h-10 text-teal-400 mb-2 opacity-80" />
-                      <span className="text-xs font-semibold text-slate-300">{apt.title}</span>
-                    </div>
-                  )}
-                  <div className="absolute top-3 left-3 bg-[#071320]/80 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-teal-300">
-                    {apt.category}
-                  </div>
-                  {apt.featured && (
-                    <div className="absolute top-3 right-3 bg-amber-500 text-slate-950 font-bold text-[9.5px] px-2 py-0.5 rounded shadow flex items-center gap-1">
-                      <Star className="w-3 h-3 fill-current" />
-                      <span>Featured</span>
-                    </div>
-                  )}
-                  <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[9.5px] font-medium text-slate-300">
-                    {apt.tag || 'Illustrative Example'}
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-4 sm:p-4.5">
-                  <h3 className="text-base font-bold text-white mb-1.5 leading-snug group-hover:text-teal-300 transition-colors">
-                    {apt.title}
-                  </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-3">
-                    {apt.description}
-                  </p>
-
-                  {/* Features Badges */}
-                  {Array.isArray(apt.features) && apt.features.length > 0 && (
-                    <div className="space-y-1 pt-2.5 border-t border-white/10">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                        Key Community Features
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {apt.features.map((feat, i) => (
-                          <span 
-                            key={i} 
-                            className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-200"
-                          >
-                            <span className="w-1 h-1 rounded-full bg-teal-400" />
-                            {feat}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-4 sm:p-4.5 pt-0">
-                <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-                  <span className="flex items-center gap-1 text-teal-400 font-medium">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Modern Lifestyle
-                  </span>
-                  <span className="text-[11px] font-semibold text-slate-300">Architecture Concept</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* =========================================================================
-          6. HOW THE BUSINESS PLAN WORKS
-          ========================================================================= */}
-      <section id="how-it-works-section" className="py-7 sm:py-9 bg-[#06101B]/80 border-y border-white/10">
+      <section id="how-it-works-section" className="w-full py-5 sm:py-6 bg-[#F8FAFC] border-b border-slate-200/90">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-4 sm:mb-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
+          <div className="text-center max-w-3xl mx-auto mb-3 sm:mb-4.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold uppercase tracking-wider mb-2">
               <Layers className="w-3.5 h-3.5" />
               <span>Structured Roadmap</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2545] tracking-tight">
               {activeData.howItWorks.heading}
             </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-400 leading-relaxed">
+            <p className="mt-2 text-sm sm:text-base text-slate-600 leading-relaxed">
               {activeData.howItWorks.subtitle}
             </p>
           </div>
@@ -1408,9 +1292,9 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
               {activeData.howItWorks.steps.map((st, i) => (
                 <div 
                   key={st.id || i}
-                  className="flex flex-col items-start lg:items-center text-left lg:text-center p-3.5 sm:p-4 rounded-2xl bg-[#091827] border border-white/10 shadow-lg group hover:border-emerald-500/40 transition-colors"
+                  className="flex flex-col items-start lg:items-center text-left lg:text-center p-3 sm:p-3.5 rounded-2xl bg-[#091827] border border-white/10 shadow-lg group hover:border-emerald-500/40 transition-colors"
                 >
-                  <div className="w-11 h-11 rounded-full bg-emerald-500/15 border-2 border-emerald-400 text-emerald-300 flex items-center justify-center font-bold text-sm mb-3 shadow-sm group-hover:scale-110 transition-transform">
+                  <div className="w-11 h-11 rounded-full bg-emerald-500/15 border-2 border-emerald-400 text-emerald-300 flex items-center justify-center font-bold text-sm mb-2 shadow-sm group-hover:scale-110 transition-transform">
                     {String(st.stepNumber || i + 1).padStart(2, '0')}
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-white mb-1">{st.title}</h3>
@@ -1423,7 +1307,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
           </div>
 
           {/* Timeline Disclosure Note */}
-          <div className="mt-5 p-3 sm:p-3.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-400 text-center max-w-3xl mx-auto">
+          <div className="mt-3.5 p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200/90 text-xs text-slate-600 text-center max-w-3xl mx-auto shadow-2xs">
             <span>{activeData.howItWorks.disclaimer || 'Note: Selecting or reviewing any rank does not imply guaranteed income, automated earnings, or property ownership. All outcomes require individual active effort and compliance with plan conditions.'}</span>
           </div>
         </div>
@@ -1432,116 +1316,118 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
       {/* =========================================================================
           7. RANK & PRICE PREVIEW
           ========================================================================= */}
-      <section id="ranks-preview-section" className="py-7 sm:py-9 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2">
-              <Award className="w-3.5 h-3.5" />
-              <span>Transparent Pricing</span>
+      <section id="ranks-preview-section" className="w-full bg-white py-5 sm:py-6 border-b border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-3 sm:mb-4.5 gap-3 sm:gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold uppercase tracking-wider mb-2">
+                <Award className="w-3.5 h-3.5" />
+                <span>Transparent Pricing</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2545] tracking-tight">
+                Explore Available Ranks
+              </h2>
+              <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl">
+                Review our live configured rank hierarchy and transparent prices. Reviewing a rank is purely informational and commits you to nothing.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
-              Explore Available Ranks
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-400 max-w-2xl">
-              Review our live configured rank hierarchy and transparent prices. Reviewing a rank is purely informational and commits you to nothing.
-            </p>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 shadow-2xs self-start md:self-auto">
+              <Coins className="w-4 h-4 text-amber-500" />
+              <span>Exchange Reference: <strong>₹{exchangeRate.toFixed(2)}/USD</strong></span>
+            </div>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-slate-300 self-start md:self-auto">
-            <Coins className="w-4 h-4 text-amber-400" />
-            <span>Exchange Reference: <strong>₹{exchangeRate.toFixed(2)}/USD</strong></span>
-          </div>
-        </div>
-
-        {/* Dynamic Ranks Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
-          {computedRanks.map((rank, idx) => (
-            <div 
-              key={rank.id || idx}
-              className="group rounded-2xl bg-[#091827] border border-white/10 p-3.5 sm:p-4 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2.5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6.5 h-6.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center text-xs font-bold font-mono">
-                      {String(rank.serialNumber || idx + 1).padStart(2, '0')}
+          {/* Dynamic Ranks Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
+            {computedRanks.map((rank, idx) => (
+              <div 
+                key={rank.id || idx}
+                className="group rounded-2xl bg-[#091827] border border-white/10 p-3 sm:p-3.5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6.5 h-6.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center text-xs font-bold font-mono">
+                        {String(rank.serialNumber || idx + 1).padStart(2, '0')}
+                      </div>
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        Level {rank.serialNumber || idx + 1}
+                      </span>
                     </div>
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Level {rank.serialNumber || idx + 1}
+
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+                      Active Tier
                     </span>
                   </div>
 
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
-                    Active Tier
-                  </span>
-                </div>
+                  <h3 className="text-base sm:text-lg font-extrabold text-white mb-2 group-hover:text-amber-300 transition-colors">
+                    {rank.name}
+                  </h3>
 
-                <h3 className="text-base sm:text-lg font-extrabold text-white mb-2.5 group-hover:text-amber-300 transition-colors">
-                  {rank.name}
-                </h3>
-
-                <div className="space-y-1.5 mb-3 p-2.5 rounded-xl bg-white/5 border border-white/5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Base Price:</span>
-                    <strong className="text-white font-mono">${rank.basePrice.toLocaleString()}</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Gas Fee ({rank.networkFeePercent}%):</span>
-                    <span className="text-slate-300 font-mono">+${rank.networkFeeUSD.toLocaleString()}</span>
-                  </div>
-                  <div className="pt-1.5 border-t border-white/10 flex items-center justify-between text-xs">
-                    <span className="font-semibold text-slate-300">Total with Gas:</span>
-                    <strong className="text-emerald-400 font-bold font-mono text-sm">
-                      ${rank.totalRankCostUSD.toLocaleString()}
-                    </strong>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-400">
-                    <span>INR Equivalent:</span>
-                    <span className="font-mono text-slate-300">₹{(rank.totalRankCostUSD * exchangeRate).toLocaleString()}</span>
+                  <div className="space-y-1 mb-2.5 p-2 rounded-xl bg-white/5 border border-white/5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">Base Price:</span>
+                      <strong className="text-white font-mono">${rank.basePrice.toLocaleString()}</strong>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">Gas Fee ({rank.networkFeePercent}%):</span>
+                      <span className="text-slate-300 font-mono">+${rank.networkFeeUSD.toLocaleString()}</span>
+                    </div>
+                    <div className="pt-1.5 border-t border-white/10 flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-300">Total with Gas:</span>
+                      <strong className="text-emerald-400 font-bold font-mono text-sm">
+                        ${rank.totalRankCostUSD.toLocaleString()}
+                      </strong>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-400">
+                      <span>INR Equivalent:</span>
+                      <span className="font-mono text-slate-300">₹{(rank.totalRankCostUSD * exchangeRate).toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="pt-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedRankForModal(rank)}
-                  className="w-full h-7.5 text-xs font-semibold border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white cursor-pointer transition-all flex items-center justify-center gap-1.5"
-                >
-                  <Eye className="w-3.5 h-3.5 text-amber-400" />
-                  <span>View Details</span>
-                </Button>
+                <div className="pt-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedRankForModal(rank)}
+                    className="w-full h-7.5 text-xs font-semibold border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-amber-400" />
+                    <span>View Details</span>
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Commitment-Free Notice */}
-        <div className="mt-4 p-3 sm:p-3.5 rounded-xl bg-[#091522] border border-white/10 text-xs text-slate-300 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Reviewing rank costs does not commit you to purchasing or joining. All calculations are real-time and orderwise.</span>
+            ))}
           </div>
 
-          {onNavigateToTab && (
-            <button
-              type="button"
-              onClick={() => onNavigateToTab('ranks')}
-              className="text-xs text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
-            >
-              <span>Open Full Rank Calculator</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          )}
+          {/* Commitment-Free Notice */}
+          <div className="mt-3 p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Reviewing rank costs does not commit you to purchasing or joining. All calculations are real-time and orderwise.</span>
+            </div>
+
+            {onNavigateToTab && (
+              <button
+                type="button"
+                onClick={() => onNavigateToTab('ranks')}
+                className="text-xs text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0"
+              >
+                <span>Open Full Rank Calculator</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
       {/* =========================================================================
           8. FINAL CALL-TO-ACTION SECTION
           ========================================================================= */}
-      <section id="final-cta-section" className="relative overflow-hidden py-8 sm:py-10 lg:py-12 border-t border-white/10 bg-gradient-to-b from-[#081524] to-[#040C16]">
+      <section id="final-cta-section" className="relative overflow-hidden py-6 sm:py-7 lg:py-8 border-t border-white/10 bg-gradient-to-b from-[#081524] to-[#040C16]">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15 pointer-events-none"
           style={{
@@ -1552,19 +1438,19 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
         <div className="absolute inset-0 bg-radial-at-c from-transparent via-[#06101B]/80 to-[#040C16]/95 pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2.5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Informed Next Step</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-2.5">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-2">
             {activeData.finalCta.heading}{' '}
             <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
               {activeData.finalCta.highlightHeading}
             </span>
           </h2>
 
-          <p className="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-4 sm:mb-5">
+          <p className="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-3 sm:mb-4">
             {activeData.finalCta.subtitle}
           </p>
 
@@ -1591,7 +1477,7 @@ export function HomeTab({ userEmail, onNavigateToTab }: HomeTabProps) {
             </Button>
           </div>
 
-          <div className="mt-5 text-xs text-slate-400 flex flex-wrap items-center justify-center gap-5 sm:gap-6">
+          <div className="mt-3.5 text-xs text-slate-400 flex flex-wrap items-center justify-center gap-5 sm:gap-6">
             <span>✓ Transparent Information</span>
             <span>✓ No Mandatory Commitment</span>
             <span>✓ Authentic Project Ranks</span>

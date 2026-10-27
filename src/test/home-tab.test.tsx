@@ -50,7 +50,7 @@ describe('Real Estate Business Home Page Acceptance Tests', () => {
     expect(screen.queryByText(/We do not describe our business model as completely risk-free/i)).toBeNull();
   });
 
-  it('3. Plots & Flats Galleries: Renders residential plots and modern apartment opportunities', () => {
+  it('3. Plots Gallery: Renders residential plots and confirms modern apartment gallery is removed', () => {
     render(<HomeTab userEmail="user@example.com" />);
 
     // Plots Gallery Heading
@@ -58,10 +58,10 @@ describe('Real Estate Business Home Page Acceptance Tests', () => {
     expect(screen.getByText(/Gated Township Residential Plots/i)).toBeDefined();
     expect(screen.getByText(/Green Landscaped Enclave Plots/i)).toBeDefined();
 
-    // Flats Gallery Heading
-    expect(screen.getByText('Discover Modern Living Opportunities')).toBeDefined();
-    expect(screen.getByText(/Luxury High-Rise Sky Residences/i)).toBeDefined();
-    expect(screen.getByText(/Contemporary Garden Courtyard Flats/i)).toBeDefined();
+    // Flats Gallery Heading removed
+    expect(screen.queryByText('Discover Modern Living Opportunities')).toBeNull();
+    expect(screen.queryByText(/Luxury High-Rise Sky Residences/i)).toBeNull();
+    expect(screen.queryByText(/Contemporary Garden Courtyard Flats/i)).toBeNull();
   });
 
   it('4. How the Business Plan Works: Renders 5-step process roadmap', () => {

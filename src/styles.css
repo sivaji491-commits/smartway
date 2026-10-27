@@ -1851,6 +1851,7 @@
   overflow-x: hidden !important;
   scrollbar-width: thin !important;
   scrollbar-color: rgba(148, 163, 184, 0.3) transparent !important;
+  background: var(--background) !important;
 }
 
 .home-main-container.home-real-estate-container::-webkit-scrollbar {

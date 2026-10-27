@@ -38,8 +38,14 @@ export function validateTimeInHandConfig(config: TimeInHandConfig): TimeInHandVa
     if (typeof row.age !== 'number' || isNaN(row.age) || row.age <= 0 || row.age > 120) {
       return { valid: false, error: `Row #${i + 1}: Age must be a valid number between 1 and 120.` };
     }
+    if (!row.upTo60 || typeof row.upTo60 !== 'string' || !row.upTo60.trim()) {
+      return { valid: false, error: `Row #${i + 1}: 'Up to 60 Years In-hand' cannot be empty.` };
+    }
     if (typeof row.yearsInHand !== 'number' || isNaN(row.yearsInHand) || row.yearsInHand < 0) {
       return { valid: false, error: `Row #${i + 1}: Years in-hand must be a non-negative number.` };
+    }
+    if (row.hoursPerDay !== undefined && (typeof row.hoursPerDay !== 'number' || isNaN(row.hoursPerDay) || row.hoursPerDay <= 0 || row.hoursPerDay > 24)) {
+      return { valid: false, error: `Row #${i + 1}: Hours per day must be a number between 1 and 24.` };
     }
   }
 
@@ -95,6 +101,9 @@ export function loadTimeInHandConfig(): TimeInHandConfig {
         age: Number(r.age) || 30,
         upTo60: r.upTo60 || `${Math.max(0, 60 - (Number(r.age) || 30))} Y`,
         yearsInHand: Number(r.yearsInHand) || 10,
+        hoursPerDay: r.hoursPerDay !== undefined && !isNaN(Number(r.hoursPerDay)) 
+          ? Number(r.hoursPerDay) 
+          : (Number(parsed.hoursPerDay) || DEFAULT_TIME_IN_HAND_CONFIG.hoursPerDay),
       })),
       updatedAt: parsed.updatedAt,
       updatedBy: parsed.updatedBy,
@@ -155,6 +164,9 @@ export async function saveTimeInHandAdmin(
       age: Number(row.age),
       upTo60: row.upTo60?.trim() || `${Math.max(0, 60 - Number(row.age))} Y`,
       yearsInHand: Number(row.yearsInHand),
+      hoursPerDay: row.hoursPerDay !== undefined && !isNaN(Number(row.hoursPerDay)) 
+        ? Number(row.hoursPerDay) 
+        : (Number(config.hoursPerDay) || 8),
     })),
     updatedAt: new Date().toISOString(),
     updatedBy: adminIdentifier,

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import React from 'react';
 import { 
   DEFAULT_TIME_IN_HAND_CONFIG, 
@@ -293,9 +293,94 @@ describe('Time-In Hand / In-hand Time Feature Tests', () => {
 
       // Admin badge and buttons must be present
       expect(screen.getByText('Admin Editable')).toBeDefined();
+      expect(screen.getByRole('button', { name: /Edit First 4 Columns/i })).toBeDefined();
       expect(screen.getByRole('button', { name: /Edit Settings/i })).toBeDefined();
       expect(screen.getByRole('button', { name: /Add Row/i })).toBeDefined();
       expect(screen.getByRole('columnheader', { name: /Actions/i })).toBeDefined();
+    });
+
+    it('Admin can enter edit mode for first 4 columns, change values, and save persistently', async () => {
+      render(<TimeInHandView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      // Verify "Edit First 4 Columns" button is present
+      const editColumnsButton = screen.getByRole('button', { name: /Edit First 4 Columns/i });
+      expect(editColumnsButton).toBeDefined();
+
+      // Click to enter table editing mode
+      await act(async () => {
+        fireEvent.click(editColumnsButton);
+      });
+
+      // Verify Admin Editing Mode banner is displayed
+      expect(screen.getByText(/Admin Editing Mode:/i)).toBeDefined();
+
+      // Verify inputs are rendered for first 4 columns of Row 1
+      const ageInput = screen.getByLabelText(/Age for row 1/i);
+      const upTo60Input = screen.getByLabelText(/Up to 60 for row 1/i);
+      const yihInput = screen.getByLabelText(/Years in hand for row 1/i);
+      const hpdInput = screen.getByLabelText(/Hours per day for row 1/i);
+
+      expect(ageInput).toBeDefined();
+      expect(upTo60Input).toBeDefined();
+      expect(yihInput).toBeDefined();
+      expect(hpdInput).toBeDefined();
+
+      // Change Age to 52, Up to 60 to '8 Y', Years In-hand to 6, Hours per Day to 10
+      await act(async () => {
+        fireEvent.change(ageInput, { target: { value: '52' } });
+        fireEvent.change(upTo60Input, { target: { value: '8 Y' } });
+        fireEvent.change(yihInput, { target: { value: '6' } });
+        fireEvent.change(hpdInput, { target: { value: '10' } });
+      });
+
+      // Save changes
+      const saveButtons = screen.getAllByRole('button', { name: /Save Values/i });
+      await act(async () => {
+        fireEvent.click(saveButtons[0]);
+      });
+
+      // Check persistence in storage
+      const loaded = loadTimeInHandConfig();
+      expect(loaded.rows[0].age).toBe(52);
+      expect(loaded.rows[0].upTo60).toBe('8 Y');
+      expect(loaded.rows[0].yearsInHand).toBe(6);
+      expect(loaded.rows[0].hoursPerDay).toBe(10);
+    });
+
+    it('Regular user has no editing controls, no inputs, and sees only read-only text', () => {
+      render(<TimeInHandView isAdmin={false} userEmail="regularuser@example.com" />);
+
+      // Cannot see "Edit First 4 Columns", "Save Values", or "Cancel"
+      expect(screen.queryByRole('button', { name: /Edit First 4 Columns/i })).toBeNull();
+      expect(screen.queryByRole('button', { name: /Save Values/i })).toBeNull();
+      expect(screen.queryByText(/Admin Editing Mode:/i)).toBeNull();
+
+      // No inputs rendered in table
+      expect(screen.queryByLabelText(/Age for row 1/i)).toBeNull();
+      expect(screen.queryByLabelText(/Up to 60 for row 1/i)).toBeNull();
+      expect(screen.queryByLabelText(/Years in hand for row 1/i)).toBeNull();
+      expect(screen.queryByLabelText(/Hours per day for row 1/i)).toBeNull();
+    });
+
+    it('Validation prevents invalid or empty values in first 4 columns when saving', async () => {
+      render(<TimeInHandView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const editColumnsButton = screen.getByRole('button', { name: /Edit First 4 Columns/i });
+      await act(async () => {
+        fireEvent.click(editColumnsButton);
+      });
+
+      const ageInput = screen.getByLabelText(/Age for row 1/i);
+      await act(async () => {
+        fireEvent.change(ageInput, { target: { value: '0' } }); // invalid age
+      });
+
+      const saveButtons = screen.getAllByRole('button', { name: /Save Values/i });
+      await act(async () => {
+        fireEvent.click(saveButtons[0]);
+      });
+
+      expect(screen.getByText(/Row #1: Age must be a valid number between 1 and 120/i)).toBeDefined();
     });
   });
 });

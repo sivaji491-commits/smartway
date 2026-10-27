@@ -2,7 +2,8 @@ export interface TimeInHandRow {
   id: string;
   age: number;
   upTo60: string; // e.g. "10 Y", "15 Y", "20 Y", "25 Y", "30 Y", "35 Y"
-  yearsInHand: number; // e.g. 5, 10, 15, 20, 25, 30 (or custom from image: 5, 8, 10, 13, 15, 18)
+  yearsInHand: number; // e.g. 5, 10, 15, 20, 25, 30
+  hoursPerDay?: number; // e.g. 8 (Admin-editable column 4)
 }
 
 export interface TimeInHandConfig {

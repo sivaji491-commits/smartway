@@ -17,7 +17,7 @@ export function calculateTimeInHandRow(
   row: TimeInHandRow,
   config: Pick<TimeInHandConfig, 'hoursPerDay' | 'daysPerMonth' | 'monthsPerYear' | 'hoursInDay' | 'daysInYear'>
 ): CalculatedTimeInHandRow {
-  const hoursPerDay = Math.max(0, Number(config.hoursPerDay) || 8);
+  const hoursPerDay = Math.max(0, Number(row.hoursPerDay !== undefined && !isNaN(Number(row.hoursPerDay)) ? row.hoursPerDay : config.hoursPerDay) || 8);
   const daysPerMonth = Math.max(0, Number(config.daysPerMonth) || 30);
   const monthsPerYear = Math.max(1, Number(config.monthsPerYear) || 12);
   const hoursInDay = Math.max(1, Number(config.hoursInDay) || 24);
