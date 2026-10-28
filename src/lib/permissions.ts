@@ -1,4 +1,4 @@
-export type NavigationField = 'home' | 'users' | 'earning-opportunities' | 'status' | 'ranks' | '12-level-bonus' | 'dcb-90-days' | 'customer-view' | 'currency' | 'time-in-hand' | string;
+export type NavigationField = 'home' | 'users' | 'earning-opportunities' | 'status' | 'ranks' | '12-level-bonus' | 'dcb-90-days' | 'customer-view' | 'currency' | 'time-in-hand' | 'notice' | string;
 
 export interface NavigationFieldDef {
   id: NavigationField;
@@ -83,6 +83,12 @@ export const DEFAULT_NAVIGATION_FIELDS: NavigationFieldDef[] = [
     label: 'Key Points',
     description: 'Essential business plan key points, rules, and guidelines',
     iconName: 'KeyRound',
+  },
+  {
+    id: 'notice',
+    label: 'Notice',
+    description: 'Admin announcement and Home page scrolling marquee notice management',
+    iconName: 'Bell',
   },
   {
     id: 'time-in-hand',
@@ -197,6 +203,23 @@ export function getOrderedNavigationFields(): NavigationFieldDef[] {
           }
         }
 
+        // If notice is not in the custom saved order, place it right above time-in-hand
+        if (fieldMap.has('notice')) {
+          const noticeDef = fieldMap.get('notice')!;
+          fieldMap.delete('notice');
+          const timeInHandIdx = ordered.findIndex((f) => f.id === 'time-in-hand');
+          if (timeInHandIdx >= 0) {
+            ordered.splice(timeInHandIdx, 0, noticeDef);
+          } else {
+            const settingsIdx = ordered.findIndex((f) => f.id === 'settings');
+            if (settingsIdx >= 0) {
+              ordered.splice(settingsIdx, 0, noticeDef);
+            } else {
+              ordered.push(noticeDef);
+            }
+          }
+        }
+
         // Append any newly registered or missing fields in natural order
         fieldMap.forEach((f) => ordered.push(f));
         return ordered;
@@ -259,7 +282,7 @@ export function registerDynamicNavigationField(
  * Adds the specified navigation field to existing users in workspace storage.
  */
 export function applyNavFieldToExistingUsers(fieldId: string) {
-  if (typeof window === 'undefined' || !fieldId) return;
+  if (typeof window === 'undefined' || !fieldId || fieldId === 'notice') return;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
@@ -379,8 +402,8 @@ export function getUserAllowedTabs(identifier?: string | null): NavigationField[
             return [];
           }
           if (Array.isArray(found.permissions)) {
-            // Return only the exact navigation tabs checked by the admin for this user
-            return found.permissions;
+            // Return only the exact navigation tabs checked by the admin for this user (notice is strictly admin-only)
+            return found.permissions.filter((p: string) => p !== 'notice');
           }
           return [];
         }
@@ -398,6 +421,7 @@ export function getUserAllowedTabs(identifier?: string | null): NavigationField[
 export function isPageAllowed(identifier: string | null | undefined, pageId: string): boolean {
   if (!pageId) return false;
   if (isUserAdminOrOwner(identifier, 'sivaji491@gmail.com')) return true;
+  if (pageId === 'notice') return false; // Strictly Admin-only
   const allowed = getUserAllowedTabs(identifier);
   return allowed.includes(pageId);
 }

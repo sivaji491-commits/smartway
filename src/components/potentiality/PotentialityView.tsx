@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { OneTimeWorkHighlight } from '@/components/key-points/OneTimeWorkHighlight';
 import { 
   DropdownMenu, 
   DropdownMenuTrigger, 
@@ -407,7 +408,13 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
   const msgs = potentialityState.messages;
 
   return (
-    <div className={`bg-white rounded-xl border border-slate-200/90 shadow-2xs ${isAdmin ? 'p-2 sm:p-3 md:p-3.5 space-y-2 sm:space-y-2.5' : 'p-2 sm:p-2.5 space-y-1.5 sm:space-y-2'} w-full max-w-[940px] mx-auto animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif]`}>
+    <div className="w-full max-w-[940px] mx-auto space-y-2 animate-in fade-in duration-300">
+      {/* Top-Left Animated "ONE TIME WORK" Highlight (Identical to Key Points) */}
+      <div className="flex items-center justify-start self-start">
+        <OneTimeWorkHighlight />
+      </div>
+
+      <div className={`bg-white rounded-xl border border-slate-200/90 shadow-2xs ${isAdmin ? 'p-2 sm:p-3 md:p-3.5 space-y-2 sm:space-y-2.5' : 'p-2 sm:p-2.5 space-y-1.5 sm:space-y-2'} w-full font-['Inter',system-ui,sans-serif]`}>
       {/* Top Admin Control Panel: Header Toolbar with Title, Badges, Admin Selectors & Time Period Type Bar (Authorized Admins Only) */}
       {isAdmin && (
         <>
@@ -1744,6 +1751,7 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

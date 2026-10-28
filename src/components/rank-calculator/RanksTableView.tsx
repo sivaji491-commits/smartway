@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComputedRankItem, GrandTotals, RankItem } from '@/types/rank-calculator';
 import { formatUSD, formatINR } from '@/lib/rank-calculator-engine';
+import { OneTimeWorkHighlight } from '@/components/key-points/OneTimeWorkHighlight';
 
 export interface RanksTableViewProps {
   computedRanks: ComputedRankItem[];
@@ -155,6 +156,11 @@ export function RanksTableView({
 
   return (
     <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4 space-y-2 sm:space-y-2.5 w-full max-w-[880px] mx-auto animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif]">
+      {/* Top-Left Animated "ONE TIME WORK" Highlight */}
+      <div className="flex items-center justify-start self-start pb-0.5">
+        <OneTimeWorkHighlight />
+      </div>
+
       {/* 1. Page Header Card */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 sm:gap-3">

@@ -1106,9 +1106,9 @@
   padding-bottom: var(--sidebar-item-py, 5px);
   padding-left: 11px;
   padding-right: 8px;
-  height: var(--sidebar-item-height, 42px);
+  height: var(--sidebar-item-height, 38px);
   min-height: var(--sidebar-item-min-height, 28px);
-  max-height: 50px;
+  max-height: 44px;
   border-radius: 7px;
   font-size: var(--sidebar-item-font-size, 13px);
   font-weight: 500;
@@ -1126,69 +1126,6 @@
   white-space: nowrap;
   position: relative;
   box-sizing: border-box;
-}
-
-.sidebar-nav-btn.has-submessage {
-  height: auto;
-  min-height: var(--sidebar-item-min-height, 38px);
-  max-height: 48px;
-}
-
-.sidebar-nav-label-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-  flex: 1 1 auto;
-  text-align: left;
-  line-height: 1.25;
-}
-
-/* Sidebar Blinking Message Animation:
-   Continuous, subtle, attractive pulsing opacity with a soft amber/gold glow.
-   Does not scroll, shift, or translate horizontally. */
-@keyframes sidebar-blinking-pulse {
-  0%, 100% {
-    opacity: 1;
-    filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.55));
-  }
-  50% {
-    opacity: 0.38;
-    filter: drop-shadow(0 0 1px rgba(245, 158, 11, 0.15));
-  }
-}
-
-.sidebar-blinking-msg {
-  display: block;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.015em;
-  color: #F59E0B;
-  line-height: 1.15;
-  margin-top: 1.5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  animation: sidebar-blinking-pulse 2s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.sidebar-nav-btn.active .sidebar-blinking-msg {
-  color: #FCD34D;
-}
-
-/* Hover & Focus: Highlights color to bright gold while preserving uniform continuous animation synchronization */
-.sidebar-nav-btn:hover .sidebar-blinking-msg,
-.sidebar-nav-btn:focus-visible .sidebar-blinking-msg,
-.sidebar-blinking-msg:hover {
-  color: #FBBF24;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sidebar-blinking-msg {
-    animation: none !important;
-    opacity: 0.9 !important;
-  }
 }
 
 .sidebar-nav-btn:active {
@@ -1851,7 +1788,7 @@
   overflow-x: hidden !important;
   scrollbar-width: thin !important;
   scrollbar-color: rgba(148, 163, 184, 0.3) transparent !important;
-  background: var(--background) !important;
+  background: #FFFFFF !important;
 }
 
 .home-main-container.home-real-estate-container::-webkit-scrollbar {
@@ -4691,9 +4628,23 @@
 }
 
 /* ==========================================================================
-   Key Points & Settings – Enterprise Fintech Viewport Styling
+   Key Points – White and Light-Grey Viewport Styling (Matches Customer View)
    ========================================================================== */
-.home-main-container.key-points-container,
+.home-main-container.key-points-container {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: var(--background, #f8fafc) !important;
+  box-sizing: border-box !important;
+}
+
 .home-main-container.settings-container {
   max-width: 100% !important;
   width: 100% !important;
@@ -4707,6 +4658,289 @@
   overflow: hidden !important;
   background: #08111D !important;
   box-sizing: border-box !important;
+}
+
+/* ==========================================================================
+   Key Points - Top-Left "ONE TIME WORK" Animated Highlight Lockup
+   Faithful reproduction of Route Map first card "ONE TIME WORK" element:
+   - Deep midnight navy background (#08111D) matching Route Map's visual card
+   - Golden border with warm ambient glow
+   - Top & bottom golden lines with centered diamond star (✦)
+   - Bold uppercase golden text "ONE TIME WORK" with luminous glow
+   - Exactly two moving golden stars orbiting at 180° opposite phases
+   ========================================================================== */
+.key-points-one-time-work-badge {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 22px;
+  border-radius: 9px;
+  background: #08111D;
+  background: linear-gradient(135deg, rgba(11, 28, 42, 0.96) 0%, rgba(8, 17, 29, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 18px rgba(245, 158, 11, 0.22);
+  user-select: none;
+  box-sizing: border-box;
+  overflow: visible;
+  z-index: 10;
+  margin: 6px 0 10px 4px;
+}
+
+.key-points-one-time-work-badge .route-map-stars-overlay-lockup {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 15;
+}
+
+.key-points-one-time-work-badge .one-time-work-frame-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  line-height: 1;
+}
+
+.key-points-one-time-work-badge .frame-line-segment {
+  display: inline-block;
+  height: 1px;
+  width: 46px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.85), transparent);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.key-points-one-time-work-badge .one-time-work-text-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.key-points-one-time-work-badge .one-time-work-decor-line {
+  display: inline-block;
+  height: 1.5px;
+  width: 16px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.85), transparent);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.key-points-one-time-work-badge .frame-star {
+  font-size: 0.72rem;
+  color: #fbbf24;
+  line-height: 1;
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.95);
+  display: inline-block;
+  user-select: none;
+}
+
+.key-points-one-time-work-badge .one-time-work-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  line-height: 1.25;
+  color: #fbbf24;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FEF08A 25%, #FBBF24 65%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.9), 0 0 22px rgba(234, 179, 8, 0.6);
+  white-space: nowrap;
+  user-select: none;
+  padding: 2px 0;
+}
+
+.key-points-one-time-work-badge .one-time-work-star {
+  position: absolute;
+  color: #fbbf24;
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.95), 0 0 14px rgba(234, 179, 8, 0.7);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  display: inline-block;
+  will-change: left, top, transform, opacity;
+  font-size: 0.82rem;
+}
+
+.key-points-one-time-work-badge .route-map-moving-star-1 {
+  font-size: 0.82rem;
+  animation: keyPointsStarInsideOrbit 6s linear infinite !important;
+}
+
+.key-points-one-time-work-badge .route-map-moving-star-2 {
+  font-size: 0.82rem;
+  animation: keyPointsStarInsideOrbit 6s linear infinite !important;
+  animation-delay: -3s !important;
+}
+
+/* Smooth Circular Orbit Strictly INSIDE the Key Points Badge Border (180° Separation) */
+@keyframes keyPointsStarInsideOrbit {
+  0% {
+    left: 91%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  8.33% {
+    left: 85.5%;
+    top: 67.5%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  16.67% {
+    left: 70.5%;
+    top: 80.3%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  25% {
+    left: 50%;
+    top: 85%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  33.33% {
+    left: 29.5%;
+    top: 80.3%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  41.67% {
+    left: 14.5%;
+    top: 67.5%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  50% {
+    left: 9%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  58.33% {
+    left: 14.5%;
+    top: 32.5%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  66.67% {
+    left: 29.5%;
+    top: 19.7%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  75% {
+    left: 50%;
+    top: 15%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  83.33% {
+    left: 70.5%;
+    top: 19.7%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  91.67% {
+    left: 85.5%;
+    top: 32.5%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+
+  100% {
+    left: 91%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key-points-one-time-work-badge .route-map-moving-star-1,
+  .key-points-one-time-work-badge .route-map-moving-star-2 {
+    animation: none !important;
+  }
+  .key-points-one-time-work-badge .route-map-moving-star-1 {
+    left: 50% !important;
+    top: 15% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .key-points-one-time-work-badge .route-map-moving-star-2 {
+    left: 50% !important;
+    top: 85% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
+
+/* Tablet & Responsive Scaling */
+@media (max-width: 768px) {
+  .key-points-one-time-work-badge {
+    padding: 7px 20px;
+    margin: 4px 0 8px 3px;
+  }
+  .key-points-one-time-work-badge .frame-line-segment {
+    width: 36px;
+  }
+  .key-points-one-time-work-badge .one-time-work-decor-line {
+    width: 14px;
+  }
+  .key-points-one-time-work-badge .one-time-work-text {
+    font-size: 1.05rem;
+    letter-spacing: 0.13em;
+  }
+  .key-points-one-time-work-badge .one-time-work-star,
+  .key-points-one-time-work-badge .route-map-moving-star-1,
+  .key-points-one-time-work-badge .route-map-moving-star-2 {
+    font-size: 0.74rem;
+  }
+  .key-points-one-time-work-badge .frame-star {
+    font-size: 0.65rem;
+  }
+}
+
+/* Mobile Screens */
+@media (max-width: 480px) {
+  .key-points-one-time-work-badge {
+    padding: 5px 14px;
+    border-radius: 7px;
+    margin: 3px 0 6px 2px;
+  }
+  .key-points-one-time-work-badge .frame-line-segment {
+    width: 24px;
+  }
+  .key-points-one-time-work-badge .one-time-work-decor-line {
+    width: 10px;
+  }
+  .key-points-one-time-work-badge .one-time-work-text {
+    font-size: 0.92rem;
+    letter-spacing: 0.11em;
+  }
+  .key-points-one-time-work-badge .one-time-work-star,
+  .key-points-one-time-work-badge .route-map-moving-star-1,
+  .key-points-one-time-work-badge .route-map-moving-star-2 {
+    font-size: 0.62rem;
+  }
+  .key-points-one-time-work-badge .frame-star {
+    font-size: 0.56rem;
+  }
 }
 
 /* ==========================================================================
@@ -4798,48 +5032,28 @@
 .hero-golden-headline {
   position: relative;
   display: inline-block;
-  color: #ffffff;
-  /* Premium golden gradient with occasional shine band */
+  color: #0B2545;
+  /* High-contrast deep navy with subtle vibrant emerald-gold light sweep */
   background-image: linear-gradient(
     115deg,
-    #ffffff 0%,
-    #ffffff 36%,
-    #fef08a 44%,
-    #fbbf24 50%,
-    #fef08a 56%,
-    #ffffff 64%,
-    #ffffff 100%
+    #0B2545 0%,
+    #0B2545 36%,
+    #059669 44%,
+    #10B981 50%,
+    #059669 56%,
+    #0B2545 64%,
+    #0B2545 100%
   );
   background-size: 280% 100%;
   background-position: 0% 50%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  /* Dual animations: gentle breathing glow (3.5s) + occasional shine sweep (7s) */
-  animation:
-    heroGoldenGlow 3.5s ease-in-out infinite alternate,
-    heroGoldenShine 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  will-change: filter, background-position;
+  animation: heroGoldenShine 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: background-position;
 }
 
-/* 1. Soft golden glow fading gently in and out over ~3.5 seconds */
-@keyframes heroGoldenGlow {
-  0% {
-    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.22))
-            drop-shadow(0 0 16px rgba(251, 191, 36, 0.12));
-  }
-  50% {
-    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.55))
-            drop-shadow(0 0 28px rgba(245, 158, 11, 0.32))
-            drop-shadow(0 0 40px rgba(217, 119, 6, 0.18));
-  }
-  100% {
-    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.22))
-            drop-shadow(0 0 16px rgba(251, 191, 36, 0.12));
-  }
-}
-
-/* 2. Subtle golden light sweep across text occasionally (~every 7 seconds) */
+/* Subtle light sweep across text occasionally (~every 7 seconds) */
 @keyframes heroGoldenShine {
   0%, 68% {
     background-position: 0% 50%;
@@ -4857,7 +5071,7 @@
   .hero-golden-headline {
     animation: none !important;
     background-position: 0% 50% !important;
-    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.3)) !important;
+    -webkit-text-fill-color: #0B2545 !important;
   }
 }
 
@@ -5046,11 +5260,83 @@
   box-shadow: 0 10px 24px -4px rgba(234, 88, 12, 0.16);
 }
 
+.customer-purchase-card.theme-purple {
+  background: linear-gradient(180deg, #faf5ff 0%, #ffffff 45%, #fbf8fe 100%);
+  border: 1.5px solid #e9d5ff;
+  box-shadow: 0 4px 14px -2px rgba(147, 51, 234, 0.08);
+}
+.customer-purchase-card.theme-purple:hover {
+  border-color: #c084fc;
+  box-shadow: 0 10px 24px -4px rgba(147, 51, 234, 0.16);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .customer-purchase-card {
     transition: none !important;
   }
   .customer-purchase-card:hover {
     transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   Home Page Plot Carousel — Animated Foreground Location Pin
+   ========================================================================== */
+
+@keyframes plotPinGentleJump {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  38% {
+    transform: translateY(-12px);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+  }
+  56% {
+    transform: translateY(0);
+    animation-timing-function: ease-out;
+  }
+  68% {
+    transform: translateY(-2px);
+    animation-timing-function: ease-in;
+  }
+  78%, 100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes plotPinShadowPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  38% {
+    transform: scale(0.72);
+    opacity: 0.2;
+  }
+  56% {
+    transform: scale(1.08);
+    opacity: 0.6;
+  }
+  78%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+.plot-pin-animated {
+  animation: plotPinGentleJump 2.4s infinite;
+  will-change: transform;
+}
+
+.plot-pin-shadow {
+  animation: plotPinShadowPulse 2.4s infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plot-pin-animated,
+  .plot-pin-shadow {
+    animation: none !important;
   }
 }

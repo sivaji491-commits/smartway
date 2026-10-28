@@ -39,7 +39,8 @@ import {
   Target,
   RefreshCw,
   Route as RouteIcon,
-  Map as MapIcon
+  Map as MapIcon,
+  Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -120,6 +121,8 @@ export const NAV_ICON_MAP: Record<string, any> = {
   'time_in_hand': Clock,
   timeinhand: Clock,
   clock: Clock,
+  notice: Bell,
+  bell: Bell,
   settings: Settings,
   status: Construction,
 };
@@ -1459,7 +1462,7 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
                     Check the navigation fields to show those pages for this user:
                   </p>
                   <div className="nav-permissions-grid">
-                    {navFields.filter((f) => f.id !== 'status').map(({ id, label, description, icon: Icon }) => {
+                    {navFields.filter((f) => f.id !== 'status' && f.id !== 'notice').map(({ id, label, description, icon: Icon }) => {
                       const isChecked = createPermissions.includes(id);
                       return (
                         <label 
@@ -1699,7 +1702,7 @@ export function UserManagementTab({ currentUserEmail, isAdmin }: UserManagementT
               <div className="modal-form-body">
                 <div className="modal-field">
                   <div className="nav-permissions-grid">
-                    {navFields.filter((f) => f.id !== 'status').map(({ id, label, description, icon: Icon }) => {
+                    {navFields.filter((f) => f.id !== 'status' && f.id !== 'notice').map(({ id, label, description, icon: Icon }) => {
                       const isChecked = editPermissionsSelection.includes(id);
                       return (
                         <label 

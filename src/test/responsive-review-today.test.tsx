@@ -155,7 +155,7 @@ describe('Antigravity Responsiveness & Layout Verification (October 21, 2026 Cha
   });
 
   describe('4. Animations & Hover Consistency', () => {
-    it('maintains continuous animation without pausing sidebar blinking messages on hover', () => {
+    it('verifies sidebar navigation renders cleanly without blinking messages and supports hover', () => {
       const Component = MaintenanceRoute.options.component!;
       const { container } = render(
         <QueryClientProvider client={queryClient}>
@@ -164,19 +164,15 @@ describe('Antigravity Responsiveness & Layout Verification (October 21, 2026 Cha
       );
 
       const blinkingMsg = container.querySelector('.sidebar-blinking-msg');
-      expect(blinkingMsg).not.toBeNull();
-      expect(blinkingMsg?.textContent).toBe('One Time Work in entire life');
+      expect(blinkingMsg).toBeNull();
+      expect(container.querySelector('.app-sidebar')?.textContent).not.toContain('One Time Work in entire life');
 
-      // Hover over button and move cursor away
-      const navBtn = blinkingMsg?.closest('.sidebar-nav-btn') as HTMLElement;
+      // Verify buttons exist and support hover without error
+      const navBtn = container.querySelector('.sidebar-nav-btn') as HTMLElement;
       expect(navBtn).not.toBeNull();
 
       fireEvent.mouseEnter(navBtn);
       fireEvent.mouseLeave(navBtn);
-
-      // Verify animation class and text remain intact
-      expect(blinkingMsg?.textContent).toBe('One Time Work in entire life');
-      expect(blinkingMsg?.classList.contains('sidebar-blinking-msg')).toBe(true);
     });
 
     it('pauses HomeScrollingMarquee on touch/mouse enter and resumes seamlessly on leave/finger lift', () => {

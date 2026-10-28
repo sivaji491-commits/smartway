@@ -20,7 +20,8 @@ import {
   GripVertical,
   KeyRound,
   Settings as SettingsIcon,
-  Route as RouteIcon
+  Route as RouteIcon,
+  Bell
 } from 'lucide-react';
 import { Brand } from '@/components/brand';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ import { UserManagementTab, resolveNavIcon } from '@/components/user-management-
 import { EarningOpportunitiesView } from '@/components/earning-opportunities/EarningOpportunitiesView';
 import { KeyPointsView } from '@/components/key-points/KeyPointsView';
 import { TimeInHandView } from '@/components/time-in-hand/TimeInHandView';
+import { NoticeManagementView } from '@/components/notice/NoticeManagementView';
 import { SettingsView } from '@/components/settings/SettingsView';
 import { RankCalculatorApp } from '@/components/rank-calculator/RankCalculatorApp';
 import { TwelveLevelBonusView } from '@/components/twelve-level-bonus/TwelveLevelBonusView';
@@ -50,6 +52,26 @@ import {
 } from '@/lib/permissions';
 import { useSessionTimer } from '@/hooks/use-session-timer';
 import { loadRankCalculatorState } from '@/lib/rank-storage';
+import { DefaultPageLayout } from '@/components/common/DefaultPageLayout';
+
+const KNOWN_STATIC_TABS = new Set([
+  'ranks',
+  'potentiality',
+  'route-map',
+  '12-level-bonus',
+  'dcb-90-days',
+  'customer-view',
+  'currency',
+  'configuration',
+  'home',
+  'users',
+  'earning-opportunities',
+  'key-points',
+  'time-in-hand',
+  'notice',
+  'settings',
+  'access-denied',
+]);
 
 export const Route = createFileRoute('/_authenticated/maintenance')({
   head: () => pageMeta('Workspace Directory & Management · IG Infra', 'IG Infra connected workspace, team management, and Profile Guardian security center.'),
@@ -164,8 +186,8 @@ function Maintenance() {
       // Compute optimal per-item height and gap with comfortable minimum for smooth scrolling
       const slotHeight = availableNavHeight / visibleCount;
       const computedGap = slotHeight < 36 ? 2 : 3;
-      const computedHeight = Math.min(46, Math.max(38, Math.floor(slotHeight - computedGap)));
-      const computedPy = computedHeight < 40 ? 4 : 5;
+      const computedHeight = Math.min(40, Math.max(34, Math.floor(slotHeight - computedGap)));
+      const computedPy = computedHeight < 38 ? 4 : 5;
       const computedFontSize = 13;
 
       setSidebarNavStyle((prev) => {
@@ -559,7 +581,6 @@ function Maintenance() {
             const isDragging = draggedIndex === index;
             const isDropTargetBefore = dropTarget?.index === index && dropTarget.position === 'before';
             const isDropTargetAfter = dropTarget?.index === index && dropTarget.position === 'after';
-            const isOtherSidebarItem = item.id !== 'home';
 
             return (
               <button 
@@ -569,7 +590,7 @@ function Maintenance() {
                 data-index={index}
                 data-item-id={item.id}
                 aria-label={item.label}
-                className={`sidebar-nav-btn group ${activeTab === item.id ? 'active' : ''} ${isDragging ? 'is-dragging' : ''} ${isDropTargetBefore ? 'drop-target-before' : ''} ${isDropTargetAfter ? 'drop-target-after' : ''} ${isOtherSidebarItem ? 'has-submessage' : ''}`}
+                className={`sidebar-nav-btn group ${activeTab === item.id ? 'active' : ''} ${isDragging ? 'is-dragging' : ''} ${isDropTargetBefore ? 'drop-target-before' : ''} ${isDropTargetAfter ? 'drop-target-after' : ''}`}
                 onClick={() => handleNavButtonClick(item.id)}
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
@@ -582,17 +603,7 @@ function Maintenance() {
                 title={`Drag to reorder · ${item.label}`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
-                <div className="sidebar-nav-label-container flex flex-col min-w-0 flex-1 text-left">
-                  <span className="truncate">{item.label}</span>
-                  {isOtherSidebarItem && (
-                    <span 
-                      className="sidebar-blinking-msg"
-                      data-testid="sidebar-blinking-message"
-                    >
-                      One Time Work in entire life
-                    </span>
-                  )}
-                </div>
+                <span className="truncate flex-1 text-left">{item.label}</span>
                 <span 
                   className="sidebar-drag-handle" 
                   title="Drag to reorder"
@@ -757,6 +768,17 @@ function Maintenance() {
               >
                 <Clock className="w-3.5 h-3.5 text-white" />
                 <span className="font-semibold text-xs text-white">In-hand time</span>
+              </div>
+            )}
+
+            {/* Notice Indicator */}
+            {isAdmin && activeTab === 'notice' && (
+              <div 
+                className="topbar-ranks-badge bg-amber-600 border-amber-500"
+                title="Notice · Admin Announcement & Marquee Management"
+              >
+                <Bell className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">Notice</span>
               </div>
             )}
 
@@ -937,6 +959,15 @@ function Maintenance() {
                   />
                 </main>
               )}
+              {activeTab === 'notice' && isAdmin && allowedTabs.includes('notice') && (
+                <main className="home-main-container notice-container p-0">
+                  <NoticeManagementView 
+                    isAdmin={isAdmin} 
+                    userEmail={effectiveEmail} 
+                    onNavigateToTab={handleSelectTab} 
+                  />
+                </main>
+              )}
               {activeTab === 'settings' && allowedTabs.includes('settings') && (
                 <main className="home-main-container settings-container p-0">
                   <SettingsView 
@@ -944,6 +975,24 @@ function Maintenance() {
                     userEmail={effectiveEmail} 
                     onNavigateToTab={handleSelectTab} 
                   />
+                </main>
+              )}
+              {/* Default Automatic Fallback for Any Newly Created Future Pages/Tabs */}
+              {!KNOWN_STATIC_TABS.has(activeTab) && allowedTabs.includes(activeTab) && (
+                <main className="home-main-container ranks-container" data-testid="future-page-container">
+                  <DefaultPageLayout
+                    title={navItems.find((i) => i.id === activeTab)?.label || activeTab}
+                    description={navItems.find((i) => i.id === activeTab)?.description || 'Workspace page'}
+                  >
+                    <div className="p-4 text-center text-slate-500 text-sm">
+                      <p className="font-semibold text-slate-700">
+                        {navItems.find((i) => i.id === activeTab)?.label || activeTab}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        This page automatically inherited the ONE TIME WORK animated component by default.
+                      </p>
+                    </div>
+                  </DefaultPageLayout>
                 </main>
               )}
             </>

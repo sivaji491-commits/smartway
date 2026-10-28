@@ -40,6 +40,7 @@ import {
   resetTimeInHandDefaults, 
   TIME_IN_HAND_UPDATED_EVENT 
 } from '@/lib/time-in-hand-storage';
+import { OneTimeWorkHighlight } from '@/components/key-points/OneTimeWorkHighlight';
 
 export interface TimeInHandViewProps {
   isAdmin?: boolean;
@@ -458,6 +459,11 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3 sm:p-4 lg:p-5 space-y-4 w-full animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif]">
+      {/* Top-Left Animated "ONE TIME WORK" Highlight */}
+      <div className="flex items-center justify-start self-start pb-0.5">
+        <OneTimeWorkHighlight />
+      </div>
+
       {/* 1. Header Toolbar */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div className="flex items-start sm:items-center gap-3">

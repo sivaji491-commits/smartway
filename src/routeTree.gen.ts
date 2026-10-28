@@ -22,6 +22,7 @@ import { Route as AuthenticatedEarningOpportunitiesRouteImport } from './routes/
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedKeyPointsRouteImport } from './routes/_authenticated/key-points'
 import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
+import { Route as AuthenticatedNoticeRouteImport } from './routes/_authenticated/notice'
 import { Route as AuthenticatedPotentialityRouteImport } from './routes/_authenticated/potentiality'
 import { Route as AuthenticatedRanksRouteImport } from './routes/_authenticated/ranks'
 import { Route as AuthenticatedRouteMapRouteImport } from './routes/_authenticated/route-map'
@@ -99,6 +100,11 @@ const AuthenticatedMaintenanceRoute =
     path: '/maintenance',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedNoticeRoute = AuthenticatedNoticeRouteImport.update({
+  id: '/notice',
+  path: '/notice',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPotentialityRoute =
   AuthenticatedPotentialityRouteImport.update({
     id: '/potentiality',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/key-points': typeof AuthenticatedKeyPointsRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/notice': typeof AuthenticatedNoticeRoute
   '/potentiality': typeof AuthenticatedPotentialityRoute
   '/ranks': typeof AuthenticatedRanksRoute
   '/route-map': typeof AuthenticatedRouteMapRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/key-points': typeof AuthenticatedKeyPointsRoute
   '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/notice': typeof AuthenticatedNoticeRoute
   '/potentiality': typeof AuthenticatedPotentialityRoute
   '/ranks': typeof AuthenticatedRanksRoute
   '/route-map': typeof AuthenticatedRouteMapRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/key-points': typeof AuthenticatedKeyPointsRoute
   '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/_authenticated/notice': typeof AuthenticatedNoticeRoute
   '/_authenticated/potentiality': typeof AuthenticatedPotentialityRoute
   '/_authenticated/ranks': typeof AuthenticatedRanksRoute
   '/_authenticated/route-map': typeof AuthenticatedRouteMapRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/key-points'
     | '/maintenance'
+    | '/notice'
     | '/potentiality'
     | '/ranks'
     | '/route-map'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/key-points'
     | '/maintenance'
+    | '/notice'
     | '/potentiality'
     | '/ranks'
     | '/route-map'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/_authenticated/home'
     | '/_authenticated/key-points'
     | '/_authenticated/maintenance'
+    | '/_authenticated/notice'
     | '/_authenticated/potentiality'
     | '/_authenticated/ranks'
     | '/_authenticated/route-map'
@@ -358,6 +370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMaintenanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notice': {
+      id: '/_authenticated/notice'
+      path: '/notice'
+      fullPath: '/notice'
+      preLoaderRoute: typeof AuthenticatedNoticeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/potentiality': {
       id: '/_authenticated/potentiality'
       path: '/potentiality'
@@ -413,6 +432,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedKeyPointsRoute: typeof AuthenticatedKeyPointsRoute
   AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
+  AuthenticatedNoticeRoute: typeof AuthenticatedNoticeRoute
   AuthenticatedPotentialityRoute: typeof AuthenticatedPotentialityRoute
   AuthenticatedRanksRoute: typeof AuthenticatedRanksRoute
   AuthenticatedRouteMapRoute: typeof AuthenticatedRouteMapRoute
@@ -433,6 +453,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedKeyPointsRoute: AuthenticatedKeyPointsRoute,
   AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
+  AuthenticatedNoticeRoute: AuthenticatedNoticeRoute,
   AuthenticatedPotentialityRoute: AuthenticatedPotentialityRoute,
   AuthenticatedRanksRoute: AuthenticatedRanksRoute,
   AuthenticatedRouteMapRoute: AuthenticatedRouteMapRoute,

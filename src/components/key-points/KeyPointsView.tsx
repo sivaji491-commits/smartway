@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { KeyPointItem } from '@/types/key-points';
+import { OneTimeWorkHighlight } from './OneTimeWorkHighlight';
 import { 
   loadKeyPoints, 
   moveKeyPointUp,
@@ -218,16 +219,16 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
   };
 
   return (
-    <div className="w-full h-full min-h-0 flex flex-col bg-[#08111D] text-slate-100 select-none box-border overflow-y-auto">
+    <div className="w-full h-full min-h-0 flex flex-col bg-[#f8fafc] text-slate-900 select-none box-border overflow-y-auto">
       {/* Top Header & Breadcrumb Bar */}
-      <header className="px-4 py-2 sm:px-6 border-b border-white/10 bg-[#08121E]/95 backdrop-blur-md shrink-0">
+      <header className="px-4 py-2 sm:px-6 border-b border-slate-200/90 bg-white/95 backdrop-blur-md shrink-0">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <nav className="flex items-center gap-1.5 text-xs text-slate-400 font-medium" aria-label="Breadcrumb">
-            <span className="hover:text-white transition-colors cursor-default">Business Plan</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-            <span className="text-emerald-400 font-semibold">Key Points</span>
-            <span className="text-slate-600 mx-0.5">·</span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
+          <nav className="flex items-center gap-1.5 text-xs text-slate-500 font-medium" aria-label="Breadcrumb">
+            <span className="text-slate-600 hover:text-slate-900 transition-colors cursor-default">Business Plan</span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-emerald-700 font-semibold">Key Points</span>
+            <span className="text-slate-400 mx-0.5">·</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               Core Principles
             </span>
           </nav>
@@ -250,6 +251,11 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
 
       {/* Main Content Dashboard */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-3 sm:p-5 space-y-3 box-border flex flex-col min-h-0">
+        {/* Top-Left Animated "ONE TIME WORK" Highlight */}
+        <div className="flex items-center justify-start self-start">
+          <OneTimeWorkHighlight />
+        </div>
+
         {/* Streamlined Executive Hero Banner */}
         <section className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#0B1C2A]/95 via-[#071420]/90 to-[#040B13]/95 p-3 sm:p-4 shadow-lg backdrop-blur-xl shrink-0">
           {/* Ambient Glows */}
@@ -310,8 +316,8 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
               onClick={() => setSelectedCategory('all')}
               className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                 selectedCategory === 'all'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm'
-                  : 'bg-white/5 text-slate-400 hover:text-white border border-white/10'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-2xs'
               }`}
             >
               All Points ({items.length})
@@ -326,8 +332,8 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm'
-                      : 'bg-white/5 text-slate-400 hover:text-white border border-white/10'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs'
+                      : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-2xs'
                   }`}
                 >
                   {cat} ({count})
@@ -344,7 +350,7 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search key points..."
-              className="h-7 pl-7 text-xs bg-[#0A1422] border-white/15 text-white placeholder-slate-500 rounded-lg"
+              className="h-7 pl-7 text-xs bg-white border-slate-200 text-slate-900 placeholder-slate-400 rounded-lg shadow-2xs focus-visible:ring-1 focus-visible:ring-emerald-500"
             />
           </div>
         </div>
@@ -481,16 +487,16 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
         {/* Automatic Pagination Controls */}
         {filteredItems.length > 0 && (
           <footer 
-            className="flex flex-col sm:flex-row items-center justify-between gap-2.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 shrink-0"
+            className="flex flex-col sm:flex-row items-center justify-between gap-2.5 px-3 py-2 rounded-xl bg-white border border-slate-200/90 shadow-2xs shrink-0"
             aria-label="Key points pagination"
           >
             {/* Range & Total Summary */}
-            <div className="text-xs text-slate-300 font-medium">
-              Showing <span className="font-semibold text-emerald-300">{startIndex + 1}</span>–
-              <span className="font-semibold text-emerald-300">{Math.min(filteredItems.length, startIndex + ITEMS_PER_PAGE)}</span> of{' '}
-              <span className="font-semibold text-white">{filteredItems.length}</span> key points
+            <div className="text-xs text-slate-600 font-medium">
+              Showing <span className="font-semibold text-emerald-700">{startIndex + 1}</span>–
+              <span className="font-semibold text-emerald-700">{Math.min(filteredItems.length, startIndex + ITEMS_PER_PAGE)}</span> of{' '}
+              <span className="font-semibold text-slate-900">{filteredItems.length}</span> key points
               {totalPages > 1 && (
-                <> <span className="text-slate-400 ml-1.5 font-mono text-[11px]">(Page {currentPage} of {totalPages})</span></>
+                <> <span className="text-slate-500 ml-1.5 font-mono text-[11px]">(Page {currentPage} of {totalPages})</span></>
               )}
             </div>
 
@@ -502,7 +508,7 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="h-7 px-2.5 text-xs bg-white/5 border-white/10 text-slate-200 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                className="h-7 px-2.5 text-xs bg-white border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                 aria-label="Previous page"
               >
                 <ChevronLeft className="w-3.5 h-3.5 mr-1" />
@@ -522,8 +528,8 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
                       aria-current={isActive ? 'page' : undefined}
                       className={`w-7 h-7 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm font-bold border border-emerald-400/30'
-                          : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border border-white/10'
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs font-bold'
+                          : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
                       }`}
                     >
                       {pageNum}
@@ -538,7 +544,7 @@ export const KeyPointsView: React.FC<KeyPointsViewProps> = ({
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages || filteredItems.length === 0}
-                className="h-7 px-2.5 text-xs bg-white/5 border-white/10 text-slate-200 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                className="h-7 px-2.5 text-xs bg-white border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                 aria-label="Next page"
               >
                 <span>Next</span>

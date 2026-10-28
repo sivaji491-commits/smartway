@@ -29,6 +29,7 @@ import {
   calculateDcbBonus,
   DEFAULT_DCB_SETTINGS
 } from '@/lib/dcb-bonus-engine';
+import { OneTimeWorkHighlight } from '@/components/key-points/OneTimeWorkHighlight';
 import { DcbRankRow } from '@/types/dcb-bonus';
 
 export interface DcbNinetyDaysViewProps {
@@ -110,6 +111,11 @@ export function DcbNinetyDaysView({
 
   return (
     <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3 lg:p-3.5 space-y-2.5 w-full animate-in fade-in duration-300 font-['Inter',system-ui,sans-serif]">
+      {/* Top-Left Animated "ONE TIME WORK" Highlight */}
+      <div className="flex items-center justify-start self-start pb-0.5">
+        <OneTimeWorkHighlight />
+      </div>
+
       {/* 1. Header Toolbar with Page Title, Dynamic Rank Dropdown, and Controls */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2 pb-2 border-b border-slate-100">
         <div className="space-y-1">

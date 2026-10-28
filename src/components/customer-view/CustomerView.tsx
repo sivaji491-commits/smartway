@@ -232,9 +232,9 @@ export function CustomerView({
         </div>
       </section>
 
-      {/* 2. Three Image-Based Purchase Option Cards */}
+      {/* 2. Four Image-Based Purchase Option Cards */}
       <section 
-        className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 w-full"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 w-full"
         aria-label="Property Purchase Methods"
         data-testid="customer-purchase-cards-grid"
       >
@@ -397,6 +397,64 @@ export function CustomerView({
               <div className="text-[11px] leading-tight">
                 <div className="font-bold text-orange-950">More flexibility</div>
                 <div className="text-orange-700 text-[10.5px]">Better support</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4 — Rank Free */}
+        <div 
+          className="customer-purchase-card theme-purple"
+          data-testid="customer-purchase-card-rank-free"
+        >
+          <div>
+            <div className="flex items-start gap-2.5">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-2xs">
+                4
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+                  Rank Free
+                </h2>
+                <p className="text-[11.5px] sm:text-xs text-slate-600 mt-0.5 leading-relaxed">
+                  Explore rank progression to qualify for property opportunities.
+                </p>
+              </div>
+            </div>
+
+            <div className="my-3 rounded-xl overflow-hidden bg-white/90 border border-purple-100 aspect-[4/3] flex items-center justify-center shadow-2xs">
+              <img 
+                src="/images/customer-view/rank-free-option.jpg" 
+                alt="Rank Free - Real estate achievement milestone with golden badge and property key" 
+                className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2.5 mt-auto">
+            <button
+              type="button"
+              onClick={() => {
+                const target = document.getElementById('rank-benefits-calculator');
+                if (target) {
+                  target.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="w-full py-2.5 px-4 rounded-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-semibold text-xs sm:text-sm shadow-xs hover:shadow transition flex items-center justify-center gap-1.5 cursor-pointer"
+              aria-label="Explore Rank Free benefits and rank details"
+            >
+              <span>Explore Rank Free</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <div className="p-2 sm:p-2.5 rounded-xl bg-purple-100/60 border border-purple-200/80 flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0">
+                <Award className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-[11px] leading-tight">
+                <div className="font-bold text-purple-950">Rank-based path</div>
+                <div className="text-purple-700 text-[10.5px]">Earned progression</div>
               </div>
             </div>
           </div>

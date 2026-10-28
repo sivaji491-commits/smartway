@@ -265,6 +265,16 @@ describe('Customer View Page – Rank-Based Benefits Display', () => {
       expect(cardOurOption).toHaveTextContent(/Better support/i);
       const ourOptionImg = screen.getByAltText(/Use Our Option - Handshake partnership with residential home and location pin/i);
       expect(ourOptionImg).toHaveAttribute('src', '/images/customer-view/our-special-option.jpg');
+
+      // Card 4: Rank Free
+      const cardRankFree = screen.getByTestId('customer-purchase-card-rank-free');
+      expect(cardRankFree).toBeInTheDocument();
+      expect(cardRankFree).toHaveTextContent(/Rank Free/i);
+      expect(cardRankFree).toHaveTextContent(/Explore rank progression to qualify for property opportunities\./i);
+      expect(cardRankFree).toHaveTextContent(/Rank-based path/i);
+      expect(cardRankFree).toHaveTextContent(/Earned progression/i);
+      const rankFreeImg = screen.getByAltText(/Rank Free - Real estate achievement milestone with golden badge and property key/i);
+      expect(rankFreeImg).toHaveAttribute('src', '/images/customer-view/rank-free-option.jpg');
     });
 
     it('renders the trust and key benefits strip with 4 value propositions', () => {

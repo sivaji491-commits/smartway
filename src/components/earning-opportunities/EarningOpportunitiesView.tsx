@@ -44,6 +44,7 @@ import {
   saveEarningOpportunitiesAdmin,
   validateEarningOpportunities 
 } from '@/lib/earning-opportunities-storage';
+import { OneTimeWorkHighlight } from '@/components/key-points/OneTimeWorkHighlight';
 
 interface EarningOpportunitiesViewProps {
   isAdmin?: boolean;
@@ -824,6 +825,11 @@ export const EarningOpportunitiesView: React.FC<EarningOpportunitiesViewProps> =
       {/* Main Dashboard Content */}
       {!isEditing ? (
         <main className="flex-1 min-h-0 w-full max-w-7xl mx-auto px-3 py-1 sm:px-4 sm:py-1.5 box-border flex flex-col justify-start overflow-hidden gap-1.5 sm:gap-2">
+          {/* Top-Left Animated "ONE TIME WORK" Highlight */}
+          <div className="flex items-center justify-start self-start">
+            <OneTimeWorkHighlight />
+          </div>
+
           {/* Hero Section with Interactive 5-Segment Wheel Visualization */}
           <section className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-[#0B1C2A]/95 via-[#071420]/90 to-[#040B13]/95 p-2 sm:p-2.5 shadow-lg backdrop-blur-xl shrink-0">
             {/* Ambient Background Glows */}
