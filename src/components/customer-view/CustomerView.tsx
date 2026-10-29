@@ -45,6 +45,7 @@ import {
   DEFAULT_DCB_SETTINGS
 } from '@/lib/dcb-bonus-engine';
 import { DcbRankRow } from '@/types/dcb-bonus';
+import { AnimatedPlotLocationPin } from '@/components/common/AnimatedPlotLocationPin';
 
 export interface CustomerViewProps {
   isAdmin?: boolean;
@@ -214,7 +215,7 @@ export function CustomerView({
           </div>
 
           {/* Right Real Estate Image Banner */}
-          <div className="relative w-full lg:w-[48%] h-48 sm:h-56 lg:h-auto min-h-[200px] sm:min-h-[220px] overflow-hidden bg-slate-100">
+          <div className="relative w-full lg:w-[48%] aspect-[16/10] min-h-[200px] sm:min-h-[220px] overflow-hidden bg-slate-100">
             <img 
               src="/images/customer-view/hero-real-estate.jpg" 
               alt="Developed residential plots and luxury apartments" 
@@ -228,6 +229,8 @@ export function CustomerView({
               <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <span>Earn as soon as possible</span>
             </div>
+            {/* Animated Foreground "HERE" Location Pin (Only 1 Pin) */}
+            <AnimatedPlotLocationPin idPrefix="customer-view-plot" />
           </div>
         </div>
       </section>

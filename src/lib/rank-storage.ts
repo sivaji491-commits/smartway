@@ -9,6 +9,7 @@ import {
   DEFAULT_NOTE, 
   DEFAULT_SECONDARY_NOTE 
 } from '@/lib/rank-calculator-engine';
+import { isUserAdminOrOwner, resolveEffectiveUserIdentifier } from '@/lib/permissions';
 
 export const STORAGE_KEY = 'rank_calculator_data_v1';
 
@@ -91,9 +92,20 @@ export function loadRankCalculatorState(): RankCalculatorState {
 
 /**
  * Persists state to localStorage. Returns true if successful, false on error.
+ * When userIdentifier is supplied, strictly checks administrator permissions.
  */
-export function saveRankCalculatorState(state: RankCalculatorState): boolean {
+export function saveRankCalculatorState(
+  state: RankCalculatorState,
+  userIdentifier?: string | null
+): boolean {
   if (typeof window === 'undefined') return true;
+
+  if (userIdentifier !== undefined && userIdentifier !== null) {
+    if (!isUserAdminOrOwner(userIdentifier, 'sivaji491@gmail.com')) {
+      console.warn('Unauthorized rank modification rejected: user is not an administrator.');
+      return false;
+    }
+  }
 
   try {
     const payload = JSON.stringify({
@@ -113,10 +125,183 @@ export function saveRankCalculatorState(state: RankCalculatorState): boolean {
   }
 }
 
+export interface RankMutationResult {
+  success: boolean;
+  error?: string;
+  data?: RankCalculatorState;
+}
+
+/**
+ * Admin action: Validates and persists full rank state.
+ * Strictly verifies admin permissions; rejects regular users.
+ */
+export function saveRankCalculatorStateAdmin(
+  state: RankCalculatorState,
+  userIdentifier?: string | null
+): RankMutationResult {
+  const effectiveUser = userIdentifier ?? resolveEffectiveUserIdentifier();
+  if (!isUserAdminOrOwner(effectiveUser, 'sivaji491@gmail.com')) {
+    return {
+      success: false,
+      error: 'Unauthorized: Only administrators have permission to edit Ranks information.',
+    };
+  }
+
+  if (!state || !Array.isArray(state.ranks) || state.ranks.length === 0) {
+    return {
+      success: false,
+      error: 'At least one rank must be provided.',
+    };
+  }
+
+  for (const r of state.ranks) {
+    if (!r.name || !r.name.trim()) {
+      return { success: false, error: 'Rank name cannot be empty.' };
+    }
+    if (typeof r.basePrice !== 'number' || isNaN(r.basePrice) || r.basePrice < 0) {
+      return { success: false, error: `Invalid price for rank ${r.name}.` };
+    }
+  }
+
+  const ok = saveRankCalculatorState(state);
+  if (!ok) {
+    return { success: false, error: 'Failed to persist rank calculator state.' };
+  }
+
+  return { success: true, data: state };
+}
+
+/**
+ * Admin action: Validates and updates a single rank's base price.
+ * Strictly verifies admin permissions; rejects regular users.
+ */
+export function updateRankBasePriceAdmin(
+  rankId: string,
+  newPrice: number,
+  userIdentifier?: string | null
+): RankMutationResult {
+  const effectiveUser = userIdentifier ?? resolveEffectiveUserIdentifier();
+  if (!isUserAdminOrOwner(effectiveUser, 'sivaji491@gmail.com')) {
+    return {
+      success: false,
+      error: 'Unauthorized: Only administrators have permission to edit Ranks information.',
+    };
+  }
+
+  if (typeof newPrice !== 'number' || isNaN(newPrice) || newPrice < 0) {
+    return {
+      success: false,
+      error: 'Price must be a valid non-negative number.',
+    };
+  }
+
+  const state = loadRankCalculatorState();
+  const rankIndex = state.ranks.findIndex(
+    (r) =>
+      r.id === rankId ||
+      r.id.toLowerCase() === rankId.toLowerCase() ||
+      (rankId.startsWith('rank-') && r.id === rankId.replace('rank-', 'pba-'))
+  );
+  if (rankIndex === -1) {
+    return {
+      success: false,
+      error: `Rank with id ${rankId} not found.`,
+    };
+  }
+
+  const updatedRanks = [...state.ranks];
+  updatedRanks[rankIndex] = {
+    ...updatedRanks[rankIndex],
+    basePrice: Math.round(newPrice * 100) / 100,
+  };
+
+  const newState: RankCalculatorState = {
+    ...state,
+    ranks: updatedRanks,
+  };
+
+  const ok = saveRankCalculatorState(newState);
+  if (!ok) {
+    return { success: false, error: 'Failed to persist rank calculator state.' };
+  }
+
+  return { success: true, data: newState };
+}
+
+/**
+ * Admin action: Validates and updates rank properties (name, price, fee).
+ * Strictly verifies admin permissions; rejects regular users.
+ */
+export function updateRankItemAdmin(
+  rankId: string,
+  updates: Partial<Omit<RankItem, 'id'>>,
+  userIdentifier?: string | null
+): RankMutationResult {
+  const effectiveUser = userIdentifier ?? resolveEffectiveUserIdentifier();
+  if (!isUserAdminOrOwner(effectiveUser, 'sivaji491@gmail.com')) {
+    return {
+      success: false,
+      error: 'Unauthorized: Only administrators have permission to edit Ranks information.',
+    };
+  }
+
+  const state = loadRankCalculatorState();
+  const rankIndex = state.ranks.findIndex(
+    (r) =>
+      r.id === rankId ||
+      r.id.toLowerCase() === rankId.toLowerCase() ||
+      (rankId.startsWith('rank-') && r.id === rankId.replace('rank-', 'pba-'))
+  );
+  if (rankIndex === -1) {
+    return {
+      success: false,
+      error: `Rank with id ${rankId} not found.`,
+    };
+  }
+
+  if (updates.name !== undefined && !updates.name.trim()) {
+    return { success: false, error: 'Rank name cannot be empty.' };
+  }
+  if (updates.basePrice !== undefined && (isNaN(updates.basePrice) || updates.basePrice < 0)) {
+    return { success: false, error: 'Price must be a valid non-negative number.' };
+  }
+  if (updates.networkFeePercent !== undefined && (isNaN(updates.networkFeePercent) || updates.networkFeePercent < 0)) {
+    return { success: false, error: 'Network fee percent must be a valid non-negative number.' };
+  }
+
+  const updatedRanks = [...state.ranks];
+  updatedRanks[rankIndex] = {
+    ...updatedRanks[rankIndex],
+    ...updates,
+    name: updates.name !== undefined ? updates.name.trim() : updatedRanks[rankIndex].name,
+    basePrice: updates.basePrice !== undefined ? Math.round(updates.basePrice * 100) / 100 : updatedRanks[rankIndex].basePrice,
+    networkFeePercent: updates.networkFeePercent !== undefined ? Math.round(updates.networkFeePercent * 100) / 100 : updatedRanks[rankIndex].networkFeePercent,
+  };
+
+  const newState: RankCalculatorState = {
+    ...state,
+    ranks: updatedRanks,
+  };
+
+  const ok = saveRankCalculatorState(newState);
+  if (!ok) {
+    return { success: false, error: 'Failed to persist rank calculator state.' };
+  }
+
+  return { success: true, data: newState };
+}
+
 /**
  * Resets storage back to default 7 ranks and sample exchange rate of 100
  */
-export function resetRankCalculatorToDefault(): RankCalculatorState {
+export function resetRankCalculatorToDefault(userIdentifier?: string | null): RankCalculatorState {
+  if (userIdentifier !== undefined && userIdentifier !== null) {
+    if (!isUserAdminOrOwner(userIdentifier, 'sivaji491@gmail.com')) {
+      console.warn('Unauthorized rank reset rejected: user is not an administrator.');
+      return loadRankCalculatorState();
+    }
+  }
+
   const defaultState: RankCalculatorState = {
     ranks: DEFAULT_RANKS,
     currency: {

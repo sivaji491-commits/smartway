@@ -29,7 +29,7 @@ import { JsonRestoreModal } from './JsonRestoreModal';
 import { ResetConfirmModal } from './ResetConfirmModal';
 import { DeleteRankConfirmModal } from './DeleteRankConfirmModal';
 import { CheckCircle2 } from 'lucide-react';
-import { isUserAdminOrOwner, getUserAllowedTabs } from '@/lib/permissions';
+import { isUserAdminOrOwner, getUserAllowedTabs, resolveEffectiveUserIdentifier } from '@/lib/permissions';
 
 export interface RankCalculatorAppProps {
   initialTab?: ActiveTab;
@@ -66,12 +66,9 @@ export function RankCalculatorApp({
       return propIsAdmin;
     }
     if (typeof window === 'undefined') {
-      return true;
+      return false;
     }
-    const previewEmail = window.localStorage.getItem('nexora-preview-user-email');
-    const userEmail = window.localStorage.getItem('nexora-user-email');
-    const effectiveEmail = previewEmail || userEmail;
-
+    const effectiveEmail = resolveEffectiveUserIdentifier();
     if (effectiveEmail) {
       return isUserAdminOrOwner(effectiveEmail, 'sivaji491@gmail.com');
     }
@@ -157,10 +154,14 @@ export function RankCalculatorApp({
     }, 3500);
   }, []);
 
-  // Auto-Save Effect with Debounce
+  // Auto-Save Effect with Debounce (Admin Only)
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
+      return;
+    }
+
+    if (!isAdmin) {
       return;
     }
 
@@ -177,7 +178,7 @@ export function RankCalculatorApp({
     return () => {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [state]);
+  }, [state, isAdmin]);
 
   // Derived Computed Ranks and Grand Totals (Single Source of Truth)
   const computedRanks = useMemo(() => {
@@ -193,8 +194,12 @@ export function RankCalculatorApp({
     return generateNextRankName(state.ranks);
   }, [state.ranks]);
 
-  // Rank CRUD Handlers
+  // Rank CRUD Handlers (Protected: Admin Only)
   const handleSaveRank = (rankData: Omit<RankItem, 'id' | 'order'>, rankId?: string) => {
+    if (!isAdmin) {
+      showToast('Unauthorized: Only administrators can modify rank configuration.');
+      return;
+    }
     if (rankId) {
       // Edit existing rank
       setState((prev) => ({
@@ -222,6 +227,10 @@ export function RankCalculatorApp({
   };
 
   const handleDeleteRankConfirm = (rankId: string) => {
+    if (!isAdmin) {
+      showToast('Unauthorized: Only administrators can delete ranks.');
+      return;
+    }
     setState((prev) => {
       const remaining = prev.ranks.filter((r) => r.id !== rankId);
       // Re-normalize order
@@ -235,6 +244,7 @@ export function RankCalculatorApp({
   };
 
   const handleMoveRank = (rankId: string, direction: 'up' | 'down') => {
+    if (!isAdmin) return;
     const sorted = [...state.ranks].sort((a, b) => a.order - b.order);
     const index = sorted.findIndex((r) => r.id === rankId);
     if (index === -1) return;
@@ -269,8 +279,9 @@ export function RankCalculatorApp({
     showToast('Rank sequence updated. Cumulative order recalculated.');
   };
 
-  // Currency & Fee & Notes Handlers
+  // Currency & Fee & Notes Handlers (Protected: Admin Only)
   const handleUpdateExchangeRate = (newRate: number) => {
+    if (!isAdmin) return;
     setState((prev) => ({
       ...prev,
       currency: {
@@ -282,6 +293,7 @@ export function RankCalculatorApp({
   };
 
   const handleUpdateFeePercent = (newFeePercent: number) => {
+    if (!isAdmin) return;
     setState((prev) => ({
       ...prev,
       ranks: prev.ranks.map((r) => ({
@@ -293,6 +305,7 @@ export function RankCalculatorApp({
   };
 
   const handleUpdateRankName = (rankId: string, newName: string) => {
+    if (!isAdmin) return;
     setState((prev) => ({
       ...prev,
       ranks: prev.ranks.map((r) =>
@@ -302,6 +315,7 @@ export function RankCalculatorApp({
   };
 
   const handleUpdateRankBasePrice = (rankId: string, newPrice: number) => {
+    if (!isAdmin) return;
     setState((prev) => ({
       ...prev,
       ranks: prev.ranks.map((r) =>
@@ -311,6 +325,7 @@ export function RankCalculatorApp({
   };
 
   const handleUpdateNotes = (newPrimaryNote: string, newSecNote?: string) => {
+    if (!isAdmin) return;
     setState((prev) => ({
       ...prev,
       note: newPrimaryNote,
@@ -334,6 +349,7 @@ export function RankCalculatorApp({
   };
 
   const handleImportCSVConfirm = (importedRanks: RankItem[]) => {
+    if (!isAdmin) return;
     setState((prev) => ({
       ...prev,
       ranks: importedRanks.map((r, idx) => ({ ...r, order: idx + 1 })),
@@ -364,6 +380,7 @@ export function RankCalculatorApp({
   };
 
   const handleRestoreConfirm = (backupData: BackupData) => {
+    if (!isAdmin) return;
     setState({
       ranks: backupData.ranks,
       currency: backupData.currency,
@@ -373,8 +390,9 @@ export function RankCalculatorApp({
     showToast(`Successfully restored ${backupData.ranks.length} ranks from backup archive!`);
   };
 
-  // Reset to default
+  // Reset to default (Admin only)
   const handleResetConfirm = () => {
+    if (!isAdmin) return;
     const reset = resetRankCalculatorToDefault();
     setState(reset);
     showToast('Application reset to factory sample 7 ranks and ₹100 exchange rate.');
@@ -405,7 +423,7 @@ export function RankCalculatorApp({
       )}
 
       {/* Embedded Configuration Dropdown Overlay (Admin Config Mode) */}
-      {embedded && isConfigDropdownOpen && (
+      {embedded && isConfigDropdownOpen && isAdmin && (
         <div className="fixed inset-0 z-50 flex items-start justify-end p-4 pt-14 bg-black/20 backdrop-blur-2xs">
           <ConfigurationDropdown
             isOpen={isConfigDropdownOpen}
@@ -462,20 +480,29 @@ export function RankCalculatorApp({
             onUpdateRankBasePrice={handleUpdateRankBasePrice}
             onOpenConfigDropdown={() => setIsConfigDropdownOpen(true)}
             onAddRank={() => {
+              if (!isAdmin) return;
               setRankToEdit(null);
               setIsAddEditOpen(true);
             }}
             onEditRank={(rank) => {
+              if (!isAdmin) return;
               setRankToEdit(rank);
               setIsAddEditOpen(true);
             }}
             onDeleteRank={(rank) => {
+              if (!isAdmin) return;
               setRankToDelete(rank);
             }}
             onMoveRank={handleMoveRank}
             onExportCSV={handleExportCSV}
-            onOpenImportCSVModal={() => setIsImportCSVOpen(true)}
-            onOpenResetModal={() => setIsResetOpen(true)}
+            onOpenImportCSVModal={() => {
+              if (!isAdmin) return;
+              setIsImportCSVOpen(true);
+            }}
+            onOpenResetModal={() => {
+              if (!isAdmin) return;
+              setIsResetOpen(true);
+            }}
             onNavigateToCurrency={() => setActiveTab('currency')}
           />
         )}
@@ -489,8 +516,14 @@ export function RankCalculatorApp({
             onUpdateExchangeRate={handleUpdateExchangeRate}
             onUpdateNotes={handleUpdateNotes}
             onDownloadBackup={handleDownloadBackup}
-            onOpenRestoreModal={() => setIsRestoreJsonOpen(true)}
-            onOpenResetModal={() => setIsResetOpen(true)}
+            onOpenRestoreModal={() => {
+              if (!isAdmin) return;
+              setIsRestoreJsonOpen(true);
+            }}
+            onOpenResetModal={() => {
+              if (!isAdmin) return;
+              setIsResetOpen(true);
+            }}
           />
         )}
       </main>
@@ -507,47 +540,51 @@ export function RankCalculatorApp({
         </footer>
       )}
 
-      {/* Modals */}
-      <AddEditRankModal
-        isOpen={isAddEditOpen}
-        onClose={() => {
-          setIsAddEditOpen(false);
-          setRankToEdit(null);
-        }}
-        onSave={handleSaveRank}
-        rankToEdit={rankToEdit}
-        suggestedName={suggestedRankName}
-        defaultFeePercent={3}
-      />
+      {/* Modals - strictly restricted to Admin users */}
+      {isAdmin && (
+        <>
+          <AddEditRankModal
+            isOpen={isAddEditOpen}
+            onClose={() => {
+              setIsAddEditOpen(false);
+              setRankToEdit(null);
+            }}
+            onSave={handleSaveRank}
+            rankToEdit={rankToEdit}
+            suggestedName={suggestedRankName}
+            defaultFeePercent={3}
+          />
 
-      <CsvImportModal
-        isOpen={isImportCSVOpen}
-        onClose={() => setIsImportCSVOpen(false)}
-        onImportConfirm={handleImportCSVConfirm}
-        currentRankCount={state.ranks.length}
-      />
+          <CsvImportModal
+            isOpen={isImportCSVOpen}
+            onClose={() => setIsImportCSVOpen(false)}
+            onImportConfirm={handleImportCSVConfirm}
+            currentRankCount={state.ranks.length}
+          />
 
-      <JsonRestoreModal
-        isOpen={isRestoreJsonOpen}
-        onClose={() => setIsRestoreJsonOpen(false)}
-        onRestoreConfirm={handleRestoreConfirm}
-        onDownloadSafetyBackup={handleDownloadBackup}
-        currentRankCount={state.ranks.length}
-      />
+          <JsonRestoreModal
+            isOpen={isRestoreJsonOpen}
+            onClose={() => setIsRestoreJsonOpen(false)}
+            onRestoreConfirm={handleRestoreConfirm}
+            onDownloadSafetyBackup={handleDownloadBackup}
+            currentRankCount={state.ranks.length}
+          />
 
-      <ResetConfirmModal
-        isOpen={isResetOpen}
-        onClose={() => setIsResetOpen(false)}
-        onConfirmReset={handleResetConfirm}
-        onDownloadSafetyBackup={handleDownloadBackup}
-      />
+          <ResetConfirmModal
+            isOpen={isResetOpen}
+            onClose={() => setIsResetOpen(false)}
+            onConfirmReset={handleResetConfirm}
+            onDownloadSafetyBackup={handleDownloadBackup}
+          />
 
-      <DeleteRankConfirmModal
-        isOpen={!!rankToDelete}
-        onClose={() => setRankToDelete(null)}
-        onConfirmDelete={handleDeleteRankConfirm}
-        rank={rankToDelete}
-      />
+          <DeleteRankConfirmModal
+            isOpen={!!rankToDelete}
+            onClose={() => setRankToDelete(null)}
+            onConfirmDelete={handleDeleteRankConfirm}
+            rank={rankToDelete}
+          />
+        </>
+      )}
     </div>
   );
 }

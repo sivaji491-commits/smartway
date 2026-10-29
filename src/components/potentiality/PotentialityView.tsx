@@ -696,8 +696,11 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             {/* Selected Rank Dropdown - Synchronized with Top-Right Selector */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span 
+                data-testid="potentiality-selected-rank-label"
+                className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-amber-50 border border-amber-300/90 text-[#0B2545] font-bold text-[10.5px] sm:text-[11px] uppercase tracking-wider whitespace-nowrap shadow-2xs"
+              >
                 SELECTED RANK:
               </span>
               <div className="relative inline-flex items-center">

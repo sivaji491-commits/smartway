@@ -132,7 +132,7 @@ describe('Rank Price (USD) Column & Compact Table UI Design', () => {
     expect(thead?.className).toContain('text-white');
   });
 
-  it('applies the redesigned Rank Price input and compact layout to regular user login as well', () => {
+  it('renders read-only Rank Price and hides editing controls for regular user login', () => {
     const onUpdateRankBasePrice = vi.fn();
     render(
       <RanksTableView
@@ -157,21 +157,25 @@ describe('Rank Price (USD) Column & Compact Table UI Design', () => {
     const priceHeader = screen.getByText('Rank Price (USD)');
     expect(priceHeader).toBeDefined();
 
-    // Admin toolbar and Actions column are hidden
+    // Admin toolbar and Actions column are completely hidden
     expect(screen.queryByText(/Network Fee Percentage/i)).toBeNull();
     expect(screen.queryByText(/USD to INR Rate/i)).toBeNull();
     expect(screen.queryByText('Actions')).toBeNull();
+    expect(screen.queryByTitle(/Edit rank/i)).toBeNull();
+    expect(screen.queryByTitle(/Delete rank/i)).toBeNull();
+    expect(screen.queryByRole('button', { name: /\+ Add Rank/i })).toBeNull();
 
-    // Rank Price input boxes are rendered with the exact same modern Inter styling in user login
-    const inputs = screen.getAllByRole('textbox', { name: /Price in USD/i }) as HTMLInputElement[];
-    expect(inputs).toHaveLength(7);
-    expect(inputs[0].value).toBe('$100.00');
+    // No editable textbox for rank price in user login
+    const inputs = screen.queryAllByRole('textbox', { name: /Price in USD/i });
+    expect(inputs).toHaveLength(0);
 
-    // Focus & edit works in user login too
-    fireEvent.focus(inputs[0]);
-    expect(inputs[0].value).toBe('100');
-    fireEvent.change(inputs[0], { target: { value: '250' } });
-    fireEvent.blur(inputs[0]);
-    expect(onUpdateRankBasePrice).toHaveBeenCalledWith(computedRanks[0].id, 250);
+    // Rank Prices are displayed as read-only formatted text
+    expect(screen.getByText('$100.00')).toBeDefined();
+    expect(screen.getByText('$300.00')).toBeDefined();
+    expect(screen.getByText('$600.00')).toBeDefined();
+    expect(screen.getAllByText('$1,000.00').length).toBeGreaterThanOrEqual(1);
+
+    // No base price update callback can be triggered
+    expect(onUpdateRankBasePrice).not.toHaveBeenCalled();
   });
 });

@@ -574,6 +574,29 @@ describe('Potentiality Page Integration & Acceptance Tests', () => {
     // 5. Financial Projection Disclaimer is displayed
     expect(screen.getByText(/Illustrative Projection — Actual Results May Vary/i)).toBeDefined();
   });
+
+  it('18. Visual Enhancement: verifies SELECTED RANK label has subtle golden-amber highlight and dark navy text', () => {
+    render(<PotentialityView isAdmin={false} />);
+
+    const label = screen.getByTestId('potentiality-selected-rank-label');
+    expect(label).toBeDefined();
+    expect(label.textContent).toBe('SELECTED RANK:');
+
+    // Visual design assertions:
+    // Soft golden-yellow/light-amber background
+    expect(label.className).toContain('bg-amber-50');
+    // Slightly stronger golden border
+    expect(label.className).toContain('border-amber-300');
+    // Dark navy text color for high contrast readability
+    expect(label.className).toContain('text-[#0B2545]');
+    // Bold text
+    expect(label.className).toContain('font-bold');
+    // Rounded corners and balanced padding
+    expect(label.className).toContain('rounded-md');
+    expect(label.className).toContain('px-2');
+    // Subtle shadow
+    expect(label.className).toContain('shadow-2xs');
+  });
 });
 
 

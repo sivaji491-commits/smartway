@@ -98,7 +98,7 @@ export function RanksTableView({
   exchangeRate,
   note,
   secondaryNote,
-  isAdmin = true,
+  isAdmin = false,
   onAddRank,
   onEditRank,
   onDeleteRank,
@@ -388,39 +388,45 @@ export function RanksTableView({
                         </span>
                       </td>
 
-                      {/* Rank Price (USD) Redesigned Input Box */}
+                      {/* Rank Price (USD) - Editable input for Admin, Read-only text for regular users */}
                       <td className="py-1 px-2 text-center whitespace-nowrap">
-                        <input
-                          type="text"
-                          value={activeEditingId === rank.id ? (editingPriceMap[rank.id] ?? String(rank.basePrice)) : formatUSD(rank.basePrice)}
-                          onChange={(e) => {
-                            setEditingPriceMap((prev) => ({ ...prev, [rank.id]: e.target.value }));
-                          }}
-                          onFocus={(e) => {
-                            setActiveEditingId(rank.id);
-                            setEditingPriceMap((prev) => ({ ...prev, [rank.id]: String(rank.basePrice) }));
-                            e.target.select();
-                          }}
-                          onBlur={() => {
-                            if (activeEditingId === rank.id) {
-                              const raw = editingPriceMap[rank.id];
-                              if (raw !== undefined) {
-                                const clean = parseFloat(raw.replace(/[^0-9.]/g, ''));
-                                if (!isNaN(clean) && clean >= 0) {
-                                  onUpdateRankBasePrice?.(rank.id, clean);
+                        {isAdmin ? (
+                          <input
+                            type="text"
+                            value={activeEditingId === rank.id ? (editingPriceMap[rank.id] ?? String(rank.basePrice)) : formatUSD(rank.basePrice)}
+                            onChange={(e) => {
+                              setEditingPriceMap((prev) => ({ ...prev, [rank.id]: e.target.value }));
+                            }}
+                            onFocus={(e) => {
+                              setActiveEditingId(rank.id);
+                              setEditingPriceMap((prev) => ({ ...prev, [rank.id]: String(rank.basePrice) }));
+                              e.target.select();
+                            }}
+                            onBlur={() => {
+                              if (activeEditingId === rank.id) {
+                                const raw = editingPriceMap[rank.id];
+                                if (raw !== undefined) {
+                                  const clean = parseFloat(raw.replace(/[^0-9.]/g, ''));
+                                  if (!isNaN(clean) && clean >= 0) {
+                                    onUpdateRankBasePrice?.(rank.id, clean);
+                                  }
                                 }
+                                setActiveEditingId(null);
                               }
-                              setActiveEditingId(null);
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.currentTarget.blur();
-                            }
-                          }}
-                          className="h-[31px] w-[102px] mx-auto block px-2.5 bg-white border border-[#D6DFEA] rounded-[5px] text-[13px] font-medium text-slate-800 text-center font-['Inter',system-ui,sans-serif] tabular-nums tracking-tight shadow-none transition-colors duration-150 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 hover:border-slate-300"
-                          aria-label={`${rank.name} Price in USD`}
-                        />
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.currentTarget.blur();
+                              }
+                            }}
+                            className="h-[31px] w-[102px] mx-auto block px-2.5 bg-white border border-[#D6DFEA] rounded-[5px] text-[13px] font-medium text-slate-800 text-center font-['Inter',system-ui,sans-serif] tabular-nums tracking-tight shadow-none transition-colors duration-150 focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6]/30 hover:border-slate-300"
+                            aria-label={`${rank.name} Price in USD`}
+                          />
+                        ) : (
+                          <span className="font-['Inter',system-ui,sans-serif] font-medium text-slate-800 text-[13px] tabular-nums">
+                            {formatUSD(rank.basePrice)}
+                          </span>
+                        )}
                       </td>
 
                       {/* Network Fee (USD) */}
