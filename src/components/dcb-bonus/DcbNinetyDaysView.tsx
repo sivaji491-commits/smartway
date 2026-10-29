@@ -172,6 +172,7 @@ export function DcbNinetyDaysView({
                   {computedRanks.map((r) => (
                     <DropdownMenuItem
                       key={r.id}
+                      onSelect={() => setSelectedRankId(r.id)}
                       onClick={() => setSelectedRankId(r.id)}
                       className={cn(
                         "cursor-pointer text-xs px-2.5 py-1.5 rounded hover:bg-slate-100 focus:bg-slate-100 transition-colors flex items-center justify-between",
@@ -290,50 +291,39 @@ export function DcbNinetyDaysView({
       )}
 
       {/* 3. Main Two-Column Layout (Matching Attached Screenshot Visual Reference) */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 lg:gap-3.5 items-start">
-        {/* Left Side: Ranks Table (Reusing the Existing Ranks Table Columns & Design) */}
-        <div className="xl:col-span-5 flex flex-col">
-          <div className="h-8 flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-3.5 items-start">
+        {/* Left Side: Compact Ranks Table (S.No & Ranks) */}
+        <div className="w-full sm:w-auto lg:w-[260px] xl:w-[280px] shrink-0 flex flex-col">
+          <div className="h-8 flex items-center justify-between max-w-[280px]">
             <div className="flex items-center gap-1.5 min-w-0">
               <Layers className="w-4 h-4 text-slate-700 shrink-0" />
               <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider truncate">
                 Ranks Structure
               </h2>
               <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">
-                (Click row to select rank)
+                (Click row)
               </span>
             </div>
             {isAdmin && (
               <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
-                Single Source of Truth
+                Active
               </span>
             )}
           </div>
 
-          {/* Ranks Presentation Table */}
-          <div className="mt-2 overflow-hidden rounded-[8px] border border-slate-200 shadow-2xs">
+          {/* Ranks Presentation Table (Compact Two-Column Layout) */}
+          <div className="mt-2 overflow-hidden rounded-[8px] border border-slate-200 shadow-2xs w-full max-w-[280px]">
             <div className="overflow-x-auto dcb-ranks-table-scroll">
-              <table className="w-full border-collapse text-left text-xs min-w-full font-['Inter',system-ui,sans-serif]">
+              <table className="w-full border-collapse text-left text-xs font-['Inter',system-ui,sans-serif]">
                 {/* Brown / Dark Top Banner Header matching the screenshot */}
                 <thead className="bg-[#854d0e] text-white select-none">
                   <tr className="h-8">
-                    <th className="py-1.5 px-2.5 w-10 text-center font-semibold text-[11px] text-slate-100 align-middle">
-                      S.no
+                    <th className="py-2 px-3 w-16 text-center font-semibold text-[11px] text-slate-100 align-middle">
+                      <span className="sr-only">S.no</span>
+                      <span>S.No</span>
                     </th>
-                    <th className="py-1.5 px-2.5 font-semibold text-[11px] text-white min-w-[70px] align-middle">
+                    <th className="py-2 px-3 font-semibold text-[11px] text-white align-middle">
                       Ranks
-                    </th>
-                    <th className="py-1.5 px-2 text-right font-semibold text-[11px] text-slate-100 align-middle">
-                      $
-                    </th>
-                    <th className="py-1.5 px-2 text-right font-semibold text-[11px] text-slate-100 whitespace-nowrap align-middle">
-                      With gas fee
-                    </th>
-                    <th className="py-1.5 px-2 text-right font-semibold text-[11px] text-slate-100 whitespace-nowrap align-middle">
-                      Multi ranks
-                    </th>
-                    <th className="py-1.5 px-2 text-right font-semibold text-[11px] text-slate-100 whitespace-nowrap align-middle">
-                      In INR
                     </th>
                   </tr>
                 </thead>
@@ -342,7 +332,7 @@ export function DcbNinetyDaysView({
                 <tbody className="divide-y divide-slate-100">
                   {computedRanks.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-slate-500">
+                      <td colSpan={2} className="py-6 text-center text-slate-500">
                         <Layers className="w-6 h-6 text-slate-300 mx-auto mb-1" />
                         <p className="font-semibold text-xs text-slate-700">No ranks found</p>
                         <p className="text-[11px] text-slate-400 mt-0.5">Please check rank configuration.</p>
@@ -361,46 +351,26 @@ export function DcbNinetyDaysView({
                         <tr
                           key={rank.id}
                           onClick={() => setSelectedRankId(rank.id)}
-                          className={`h-[30px] sm:h-[31px] cursor-pointer transition-colors duration-150 border-b border-slate-100 last:border-b-0 ${
+                          className={`h-[32px] sm:h-[34px] cursor-pointer transition-colors duration-150 border-b border-slate-100 last:border-b-0 ${
                             isSelected
                               ? 'bg-amber-50/80 ring-1 ring-inset ring-amber-400/50 font-medium'
                               : 'even:bg-[#f8fafc] odd:bg-white hover:bg-slate-50'
                           }`}
                         >
-                          {/* S.no */}
-                          <td className="py-1 px-2.5 text-center font-medium text-slate-500 text-[11.5px] tabular-nums">
+                          {/* S.No */}
+                          <td className="py-1.5 px-3 text-center font-medium text-slate-500 text-[11.5px] tabular-nums w-16">
                             {rank.serialNumber}
                           </td>
 
                           {/* Ranks with pill styling */}
-                          <td className="py-1 px-2.5 whitespace-nowrap">
+                          <td className="py-1.5 px-3 whitespace-nowrap">
                             <span
-                              className={`inline-flex items-center justify-center px-2 py-0.5 rounded-[4px] text-[10.5px] font-medium border ${pillStyle.bg} ${pillStyle.text} ${pillStyle.border} ${
-                                isSelected ? 'ring-1 ring-amber-400' : ''
+                              className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-[4px] text-[10.5px] font-medium border ${pillStyle.bg} ${pillStyle.text} ${pillStyle.border} ${
+                                isSelected ? 'ring-1 ring-amber-400 font-bold' : ''
                               }`}
                             >
                               {rank.name}
                             </span>
-                          </td>
-
-                          {/* $ (Base Price) */}
-                          <td className="py-1 px-2 text-right font-medium text-slate-800 whitespace-nowrap text-[11.5px] tabular-nums">
-                            {formatUSD(rank.basePrice)}
-                          </td>
-
-                          {/* With gas fee */}
-                          <td className="py-1 px-2 text-right font-normal text-slate-700 whitespace-nowrap text-[11.5px] tabular-nums">
-                            {formatUSD(rank.totalWithGasUSD)}
-                          </td>
-
-                          {/* Multi ranks */}
-                          <td className="py-1 px-2 text-right font-semibold text-slate-800 whitespace-nowrap text-[11.5px] tabular-nums">
-                            {formatUSD(rank.multiRanksUSD)}
-                          </td>
-
-                          {/* In INR */}
-                          <td className="py-1 px-2 text-right font-semibold text-slate-900 whitespace-nowrap text-[11.5px] tabular-nums">
-                            {formatINR(rank.inINR)}
                           </td>
                         </tr>
                       );
@@ -413,20 +383,24 @@ export function DcbNinetyDaysView({
 
           {/* Reference badge block directly underneath (matches screenshot) */}
           {selectedRank && (
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2">
-              <div className="w-full sm:w-auto">
-                <div className="inline-flex rounded-md overflow-hidden shadow-2xs border border-slate-300">
+            <div className="pt-2 flex flex-col gap-1.5 max-w-[280px]">
+              <div className="w-full">
+                <div 
+                  data-testid="dcb-selected-rank-strip"
+                  className="flex rounded-md overflow-hidden shadow-2xs border border-slate-300 w-full bg-white"
+                >
                   {/* Dynamic Rank Dropdown replacing static label */}
-                  <div className="relative bg-[#0f2b5c]">
+                  <div className="relative bg-[#0f2b5c] shrink-0">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button
                           type="button"
                           id="dcb-bottom-rank-dropdown-trigger"
+                          data-testid="dcb-bottom-rank-dropdown-trigger"
                           aria-label="Choose rank trigger"
-                          className="bg-[#0f2b5c] hover:bg-[#133570] text-white font-bold text-xs pl-3.5 pr-2.5 py-2 text-center min-w-[105px] cursor-pointer inline-flex items-center justify-between gap-1.5 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-colors"
+                          className="h-full bg-[#0f2b5c] hover:bg-[#133570] text-white font-bold text-xs px-2.5 sm:px-3 py-1.5 cursor-pointer flex items-center justify-between gap-1.5 focus:outline-none focus:ring-1 focus:ring-amber-400 transition-colors whitespace-nowrap"
                         >
-                          <span>{selectedRank.name}</span>
+                          <span data-testid="dcb-bottom-rank-selected-name">{selectedRank.name}</span>
                           <ChevronDown className="w-3.5 h-3.5 text-white/80 shrink-0" />
                         </button>
                       </DropdownMenuTrigger>
@@ -440,6 +414,7 @@ export function DcbNinetyDaysView({
                         {computedRanks.map((r) => (
                           <DropdownMenuItem
                             key={r.id}
+                            onSelect={() => setSelectedRankId(r.id)}
                             onClick={() => setSelectedRankId(r.id)}
                             className={cn(
                               "cursor-pointer text-xs px-2.5 py-1.5 rounded hover:bg-[#1a448c] focus:bg-[#1a448c] text-white flex items-center justify-between transition-colors",
@@ -455,17 +430,32 @@ export function DcbNinetyDaysView({
                   </div>
 
                   {/* Value Badges beside rank badge */}
-                  <div className="bg-white px-3 py-1.5 flex items-center gap-3 border-l border-slate-200">
-                    <div className="text-right">
-                      <span className="text-[10px] text-slate-500 font-medium block">In ($)</span>
-                      <span className="font-bold text-xs text-slate-900 tabular-nums">
+                  <div className="bg-white flex items-center flex-1 border-l border-slate-200 min-w-0">
+                    {/* In ($) */}
+                    <div className="flex-1 px-2 py-1 sm:px-2.5 sm:py-1.5 text-right min-w-0">
+                      <span className="text-[9.5px] sm:text-[10px] text-slate-500 font-medium block leading-tight">
+                        In ($)
+                      </span>
+                      <span 
+                        data-testid="dcb-bottom-rank-value-usd"
+                        className="font-bold text-[11px] sm:text-xs text-slate-900 tabular-nums leading-tight block truncate"
+                      >
                         {formatUSD(dcbResult.rankValueUSD)}
                       </span>
                     </div>
-                    <div className="h-6 w-px bg-slate-200" />
-                    <div className="text-right">
-                      <span className="text-[10px] text-slate-500 font-medium block">In (₹)</span>
-                      <span className="font-bold text-xs text-slate-900 tabular-nums">
+
+                    {/* Divider */}
+                    <div className="h-6 w-px bg-slate-200 shrink-0" />
+
+                    {/* In (₹) */}
+                    <div className="flex-1 px-2 py-1 sm:px-2.5 sm:py-1.5 text-right min-w-0">
+                      <span className="text-[9.5px] sm:text-[10px] text-slate-500 font-medium block leading-tight">
+                        In (₹)
+                      </span>
+                      <span 
+                        data-testid="dcb-bottom-rank-value-inr"
+                        className="font-bold text-[11px] sm:text-xs text-slate-900 tabular-nums leading-tight block truncate"
+                      >
                         {formatINR(dcbResult.rankValueINR)}
                       </span>
                     </div>
@@ -482,7 +472,7 @@ export function DcbNinetyDaysView({
         </div>
 
         {/* Right Side: DOUBLE CONNECT BONUS (DCB 30%) Panel (Matching Screenshot Layout) */}
-        <div className="xl:col-span-7 flex flex-col">
+        <div className="flex-1 min-w-0 w-full flex flex-col">
           {/* Header Bar matching screenshot: Olive/Green header */}
           <div className="overflow-hidden rounded-[8px] border border-slate-300 shadow-2xs bg-white">
             <div className="bg-[#415328] text-white text-center py-2 px-3 shadow-inner">

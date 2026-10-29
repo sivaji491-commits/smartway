@@ -127,12 +127,13 @@ describe('DCB (90 days) Navigation & Business Calculations', () => {
       // Verify page title
       expect(screen.getByRole('heading', { name: /DCB \(90 days\)/i })).toBeDefined();
 
-      // Verify table headers
+      // Verify table headers: only S.No and Ranks are visible
       expect(screen.getByText('S.no')).toBeDefined();
+      expect(screen.getByText('S.No')).toBeDefined();
       expect(screen.getByText('Ranks')).toBeDefined();
-      expect(screen.getByText('With gas fee')).toBeDefined();
-      expect(screen.getByText('Multi ranks')).toBeDefined();
-      expect(screen.getByText('In INR')).toBeDefined();
+      expect(screen.queryByText('With gas fee')).toBeNull();
+      expect(screen.queryByText('Multi ranks')).toBeNull();
+      expect(screen.queryByText('In INR')).toBeNull();
 
       // Verify DCB 30% header and release
       expect(screen.getByText('DOUBLE CONNECT BONUS (DCB 30%)')).toBeDefined();
@@ -207,6 +208,199 @@ describe('DCB (90 days) Navigation & Business Calculations', () => {
         expect(card4.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹14,400.00');
         expect(card6.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹21,600.00');
       });
+    });
+  });
+
+  describe('5. Two-Column Table UI & Calculation Preservation', () => {
+    it('verifies that exactly two column headers (S.No and Ranks) are rendered in the table header', () => {
+      const { container } = render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const table = container.querySelector('table');
+      expect(table).not.toBeNull();
+
+      const thElements = table?.querySelectorAll('thead th');
+      expect(thElements).toHaveLength(2);
+
+      // First header is S.No (with S.no accessible fallback)
+      expect(thElements?.[0].textContent).toContain('S.No');
+      expect(thElements?.[0].textContent).toContain('S.no');
+
+      // Second header is Ranks
+      expect(thElements?.[1].textContent).toContain('Ranks');
+
+      // Ensure removed columns are not in the table
+      expect(thElements?.[0].textContent).not.toContain('With gas fee');
+      expect(thElements?.[1].textContent).not.toContain('With gas fee');
+      expect(table?.textContent).not.toContain('Multi ranks');
+      expect(table?.textContent).not.toContain('With gas fee');
+    });
+
+    it('verifies each rank row has exactly two cells (serial number and rank name)', () => {
+      const { container } = render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const table = container.querySelector('table');
+      const rows = table?.querySelectorAll('tbody tr');
+      expect(rows?.length).toBe(7);
+
+      rows?.forEach((row, idx) => {
+        const cells = row.querySelectorAll('td');
+        expect(cells).toHaveLength(2);
+
+        // Cell 0: Serial number
+        expect(cells[0].textContent?.trim()).toBe(String(idx + 1));
+
+        // Cell 1: Rank name
+        expect(cells[1].textContent?.trim()).toContain(`PBA ${idx + 1}`);
+      });
+    });
+
+    it('verifies clicking a row in the two-column table updates DCB calculations accurately', async () => {
+      const { container } = render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const table = container.querySelector('table');
+      const rows = table?.querySelectorAll('tbody tr');
+      expect(rows?.length).toBeGreaterThan(0);
+
+      // Click on row 1 (PBA 1)
+      const pba1Row = rows?.[0];
+      if (pba1Row) {
+        fireEvent.click(pba1Row);
+      }
+
+      await waitFor(() => {
+        // DCB Release (30%) for PBA 1 ($100 * 30%) = $30.00
+        expect(screen.getAllByText('$30.00').length).toBeGreaterThanOrEqual(1);
+
+        // Milestone cards for PBA 1
+        const card2 = screen.getByTestId('dcb-earnings-card-2');
+        expect(card2.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹7,200.00');
+
+        // Bottom rank badge also updates to PBA 1
+        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 1');
+        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$100.00');
+        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹10,000.00');
+      });
+    });
+
+    it('verifies compact table container and balanced column sizing without obsolete full-screen stretching', () => {
+      const { container } = render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const table = container.querySelector('table');
+      expect(table).not.toBeNull();
+
+      // Table container has compact max-width to eliminate the unused empty space
+      const tableWrapper = table?.closest('.overflow-hidden');
+      expect(tableWrapper?.className).toContain('max-w-[280px]');
+
+      // Table does not have min-w-full or full-screen grid stretching
+      expect(table?.className).not.toContain('min-w-full');
+
+      // S.No header has explicit balanced width
+      const sNoTh = table?.querySelector('thead th');
+      expect(sNoTh?.className).toContain('w-16');
+    });
+  });
+
+  describe('6. Selected Rank Controls Value Display and Compact Continuous Row', () => {
+    it('initial render displays PBA 7 with $5,000.00 and ₹5,00,000.00 in the compact continuous strip', () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const strip = screen.getByTestId('dcb-selected-rank-strip');
+      expect(strip).toBeDefined();
+
+      const rankName = screen.getByTestId('dcb-bottom-rank-selected-name');
+      expect(rankName.textContent).toBe('PBA 7');
+
+      const usdVal = screen.getByTestId('dcb-bottom-rank-value-usd');
+      expect(usdVal.textContent).toBe('$5,000.00');
+
+      const inrVal = screen.getByTestId('dcb-bottom-rank-value-inr');
+      expect(inrVal.textContent).toBe('₹5,00,000.00');
+    });
+
+    it('selecting PBA 3 immediately updates In ($) to $1,000.00 and In (₹) to ₹1,00,000.00', async () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const select = screen.getByLabelText('Select Rank:');
+      fireEvent.change(select, { target: { value: 'pba-3' } });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 3');
+        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$1,000.00');
+        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹1,00,000.00');
+      });
+    });
+
+    it('selecting PBA 5 immediately updates In ($) to $3,000.00 and In (₹) to ₹3,00,000.00', async () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const select = screen.getByLabelText('Select Rank:');
+      fireEvent.change(select, { target: { value: 'pba-5' } });
+
+      await waitFor(() => {
+        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 5');
+        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$3,000.00');
+        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹3,00,000.00');
+      });
+    });
+
+    it('changing selection multiple times (PBA 1 -> PBA 5 -> PBA 2 -> PBA 7) remains 100% synchronized', async () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const select = screen.getByLabelText('Select Rank:');
+
+      // 1. Switch to PBA 1
+      fireEvent.change(select, { target: { value: 'pba-1' } });
+      await waitFor(() => {
+        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 1');
+        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$100.00');
+        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹10,000.00');
+      });
+
+      // 2. Switch to PBA 5
+      fireEvent.change(select, { target: { value: 'pba-5' } });
+      await waitFor(() => {
+        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 5');
+        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$3,000.00');
+        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹3,00,000.00');
+      });
+
+      // 3. Switch to PBA 2
+      fireEvent.change(select, { target: { value: 'pba-2' } });
+      await waitFor(() => {
+        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 2');
+        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$400.00');
+        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹40,000.00');
+      });
+
+      // 4. Switch back to PBA 7
+      fireEvent.change(select, { target: { value: 'pba-7' } });
+      await waitFor(() => {
+        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 7');
+        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$5,000.00');
+        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹5,00,000.00');
+      });
+    });
+
+    it('verifies compact continuous row layout contains dark-blue cell, In ($), divider, and In (₹) with no unnecessary gaps', () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const strip = screen.getByTestId('dcb-selected-rank-strip');
+      expect(strip.className).toContain('flex');
+      expect(strip.className).toContain('rounded-md');
+      expect(strip.className).toContain('overflow-hidden');
+      expect(strip.className).toContain('border-slate-300');
+
+      // Dark blue cell
+      const trigger = screen.getByTestId('dcb-bottom-rank-dropdown-trigger');
+      expect(trigger.className).toContain('bg-[#0f2b5c]');
+      expect(trigger.className).toContain('text-white');
+
+      // In ($) and In (₹) are inside adjacent white flex container
+      const usdVal = screen.getByTestId('dcb-bottom-rank-value-usd');
+      const inrVal = screen.getByTestId('dcb-bottom-rank-value-inr');
+      expect(usdVal).toBeDefined();
+      expect(inrVal).toBeDefined();
     });
   });
 });
