@@ -1,9 +1,10 @@
 import { RankItem } from '@/types/rank-calculator';
 import { round2 } from '@/lib/rank-calculator-engine';
-import { 
-  DcbCalculationResult, 
-  DcbMilestone, 
-  DcbRankRow 
+import {
+  DcbCalculationResult,
+  DcbMilestone,
+  DcbRankRow,
+  DcbConfig
 } from '@/types/dcb-bonus';
 
 export const DEFAULT_DCB_SETTINGS = {
@@ -76,19 +77,32 @@ export function calculateDcbBonus(
   rankId: string,
   rankValueUSD: number,
   exchangeRate: number,
-  settings = DEFAULT_DCB_SETTINGS
+  settings: Partial<DcbConfig> | typeof DEFAULT_DCB_SETTINGS = DEFAULT_DCB_SETTINGS
 ): DcbCalculationResult {
   const safeValueUSD = Math.max(0, Number(rankValueUSD) || 0);
   const safeRate = Number.isFinite(exchangeRate) && exchangeRate > 0 ? exchangeRate : 100;
 
+  const ref1Percentage = typeof settings?.ref1Percentage === 'number' && !isNaN(settings.ref1Percentage)
+    ? settings.ref1Percentage
+    : DEFAULT_DCB_SETTINGS.ref1Percentage;
+  const ref2Percentage = typeof settings?.ref2Percentage === 'number' && !isNaN(settings.ref2Percentage)
+    ? settings.ref2Percentage
+    : DEFAULT_DCB_SETTINGS.ref2Percentage;
+  const dcbReleasePercentage = typeof settings?.dcbReleasePercentage === 'number' && !isNaN(settings.dcbReleasePercentage)
+    ? settings.dcbReleasePercentage
+    : DEFAULT_DCB_SETTINGS.dcbReleasePercentage;
+  const withdrawalFeePercentage = typeof settings?.withdrawalFeePercentage === 'number' && !isNaN(settings.withdrawalFeePercentage)
+    ? settings.withdrawalFeePercentage
+    : DEFAULT_DCB_SETTINGS.withdrawalFeePercentage;
+
   const rankValueINR = round2(safeValueUSD * safeRate);
 
-  const ref1AmountUSD = round2(safeValueUSD * (settings.ref1Percentage / 100));
-  const ref2AmountUSD = round2(safeValueUSD * (settings.ref2Percentage / 100));
-  const dcbAmountUSD = round2(safeValueUSD * (settings.dcbReleasePercentage / 100));
+  const ref1AmountUSD = round2(safeValueUSD * (ref1Percentage / 100));
+  const ref2AmountUSD = round2(safeValueUSD * (ref2Percentage / 100));
+  const dcbAmountUSD = round2(safeValueUSD * (dcbReleasePercentage / 100));
 
   const grossAmountUSD = round2(ref1AmountUSD + ref2AmountUSD + dcbAmountUSD);
-  const withdrawalFeeUSD = round2(grossAmountUSD * (settings.withdrawalFeePercentage / 100));
+  const withdrawalFeeUSD = round2(grossAmountUSD * (withdrawalFeePercentage / 100));
   const netTotalUSD = round2(grossAmountUSD - withdrawalFeeUSD);
   const netTotalINR = round2(netTotalUSD * safeRate);
 
@@ -118,14 +132,14 @@ export function calculateDcbBonus(
     rankName,
     rankValueUSD: safeValueUSD,
     rankValueINR,
-    ref1Percentage: settings.ref1Percentage,
+    ref1Percentage,
     ref1AmountUSD,
-    ref2Percentage: settings.ref2Percentage,
+    ref2Percentage,
     ref2AmountUSD,
-    dcbPercentage: settings.dcbReleasePercentage,
+    dcbPercentage: dcbReleasePercentage,
     dcbAmountUSD,
     grossAmountUSD,
-    withdrawalFeePercent: settings.withdrawalFeePercentage,
+    withdrawalFeePercent: withdrawalFeePercentage,
     withdrawalFeeUSD,
     netTotalUSD,
     netTotalINR,

@@ -135,10 +135,10 @@ describe('DCB (90 days) Navigation & Business Calculations', () => {
       expect(screen.queryByText('Multi ranks')).toBeNull();
       expect(screen.queryByText('In INR')).toBeNull();
 
-      // Verify DCB 30% header and release
+      // Verify DCB 30% header and benefit component
       expect(screen.getByText('DOUBLE CONNECT BONUS (DCB 30%)')).toBeDefined();
       expect(screen.getByText('(Automatically)')).toBeDefined();
-      expect(screen.getByText('DCB Release')).toBeDefined();
+      expect(screen.getByText('DCB BENEFIT')).toBeDefined();
 
       // Verify Important Points
       expect(screen.getByText('Important Points')).toBeDefined();
@@ -274,133 +274,171 @@ describe('DCB (90 days) Navigation & Business Calculations', () => {
         // Milestone cards for PBA 1
         const card2 = screen.getByTestId('dcb-earnings-card-2');
         expect(card2.querySelector('.dcb-earnings-amount')?.textContent).toContain('₹7,200.00');
-
-        // Bottom rank badge also updates to PBA 1
-        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 1');
-        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$100.00');
-        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹10,000.00');
       });
     });
 
-    it('verifies compact table container and balanced column sizing without obsolete full-screen stretching', () => {
+    it('verifies balanced table container and balanced column sizing without obsolete full-screen stretching', () => {
       const { container } = render(<DcbNinetyDaysView isAdmin={false} />);
 
       const table = container.querySelector('table');
       expect(table).not.toBeNull();
 
-      // Table container has compact max-width to eliminate the unused empty space
+      // Table container is enclosed in a dedicated rounded panel
       const tableWrapper = table?.closest('.overflow-hidden');
-      expect(tableWrapper?.className).toContain('max-w-[280px]');
+      expect(tableWrapper?.className).toContain('rounded-[8px]');
 
       // Table does not have min-w-full or full-screen grid stretching
       expect(table?.className).not.toContain('min-w-full');
 
       // S.No header has explicit balanced width
       const sNoTh = table?.querySelector('thead th');
-      expect(sNoTh?.className).toContain('w-16');
+      expect(sNoTh?.className).toContain('w-14');
     });
   });
 
-  describe('6. Selected Rank Controls Value Display and Compact Continuous Row', () => {
-    it('initial render displays PBA 7 with $5,000.00 and ₹5,00,000.00 in the compact continuous strip', () => {
+  describe('6. Removal of Three-Cell Summary Section Beneath Ranks Table', () => {
+    it('completely removes the three-cell summary section (dark-blue dropdown, In $, and In ₹ cells)', () => {
       render(<DcbNinetyDaysView isAdmin={false} />);
 
-      const strip = screen.getByTestId('dcb-selected-rank-strip');
-      expect(strip).toBeDefined();
-
-      const rankName = screen.getByTestId('dcb-bottom-rank-selected-name');
-      expect(rankName.textContent).toBe('PBA 7');
-
-      const usdVal = screen.getByTestId('dcb-bottom-rank-value-usd');
-      expect(usdVal.textContent).toBe('$5,000.00');
-
-      const inrVal = screen.getByTestId('dcb-bottom-rank-value-inr');
-      expect(inrVal.textContent).toBe('₹5,00,000.00');
+      // The 3-cell strip and its elements must not exist in the DOM
+      expect(screen.queryByTestId('dcb-selected-rank-strip')).toBeNull();
+      expect(screen.queryByTestId('dcb-bottom-rank-dropdown-trigger')).toBeNull();
+      expect(screen.queryByTestId('dcb-bottom-rank-selected-name')).toBeNull();
+      expect(screen.queryByTestId('dcb-bottom-rank-value-usd')).toBeNull();
+      expect(screen.queryByTestId('dcb-bottom-rank-value-inr')).toBeNull();
     });
 
-    it('selecting PBA 3 immediately updates In ($) to $1,000.00 and In (₹) to ₹1,00,000.00', async () => {
+    it('preserves the "90-Day Eligibility Cycle Active" hint directly beneath the table without blank gaps', () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      const hint = screen.getByText('90-Day Eligibility Cycle Active');
+      expect(hint).toBeDefined();
+      expect(hint).toBeInTheDocument();
+    });
+
+    it('preserves rank calculations and synchronization when selecting ranks via table row or top selector', async () => {
       render(<DcbNinetyDaysView isAdmin={false} />);
 
       const select = screen.getByLabelText('Select Rank:');
+
+      // 1. Switch to PBA 3
       fireEvent.change(select, { target: { value: 'pba-3' } });
-
       await waitFor(() => {
-        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 3');
-        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$1,000.00');
-        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹1,00,000.00');
-      });
-    });
-
-    it('selecting PBA 5 immediately updates In ($) to $3,000.00 and In (₹) to ₹3,00,000.00', async () => {
-      render(<DcbNinetyDaysView isAdmin={false} />);
-
-      const select = screen.getByLabelText('Select Rank:');
-      fireEvent.change(select, { target: { value: 'pba-5' } });
-
-      await waitFor(() => {
-        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 5');
-        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$3,000.00');
-        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹3,00,000.00');
-      });
-    });
-
-    it('changing selection multiple times (PBA 1 -> PBA 5 -> PBA 2 -> PBA 7) remains 100% synchronized', async () => {
-      render(<DcbNinetyDaysView isAdmin={false} />);
-
-      const select = screen.getByLabelText('Select Rank:');
-
-      // 1. Switch to PBA 1
-      fireEvent.change(select, { target: { value: 'pba-1' } });
-      await waitFor(() => {
-        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 1');
-        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$100.00');
-        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹10,000.00');
+        // PBA 3 ($1,000 multi-ranks cumulative value): 30% DCB = $300.00
+        expect(screen.getAllByText('$300.00').length).toBeGreaterThanOrEqual(1);
       });
 
       // 2. Switch to PBA 5
       fireEvent.change(select, { target: { value: 'pba-5' } });
       await waitFor(() => {
-        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 5');
-        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$3,000.00');
-        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹3,00,000.00');
-      });
-
-      // 3. Switch to PBA 2
-      fireEvent.change(select, { target: { value: 'pba-2' } });
-      await waitFor(() => {
-        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 2');
-        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$400.00');
-        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹40,000.00');
-      });
-
-      // 4. Switch back to PBA 7
-      fireEvent.change(select, { target: { value: 'pba-7' } });
-      await waitFor(() => {
-        expect(screen.getByTestId('dcb-bottom-rank-selected-name').textContent).toBe('PBA 7');
-        expect(screen.getByTestId('dcb-bottom-rank-value-usd').textContent).toBe('$5,000.00');
-        expect(screen.getByTestId('dcb-bottom-rank-value-inr').textContent).toBe('₹5,00,000.00');
+        // PBA 5 ($3,000 multi-ranks cumulative value): 30% DCB = $900.00
+        expect(screen.getAllByText('$900.00').length).toBeGreaterThanOrEqual(1);
       });
     });
+  });
 
-    it('verifies compact continuous row layout contains dark-blue cell, In ($), divider, and In (₹) with no unnecessary gaps', () => {
+  describe('7. Side-by-Side Balanced Layout & Header Cleanup Verification', () => {
+    it('renames heading to "CLICK ON RANK", removes old "RANKS STRUCTURE" text, "(Click row)", and "Active" badge', () => {
+      render(<DcbNinetyDaysView isAdmin={true} />);
+
+      // Heading text is exactly CLICK ON RANK
+      const leftPanel = screen.getByTestId('dcb-ranks-structure-panel');
+      expect(leftPanel).toBeInTheDocument();
+      expect(leftPanel.textContent).toContain('CLICK ON RANK');
+
+      // Old heading "RANKS STRUCTURE" is completely removed
+      expect(screen.queryByText('RANKS STRUCTURE')).toBeNull();
+      expect(screen.queryByText('Ranks Structure')).toBeNull();
+
+      // "(Click row)" is completely removed
+      expect(screen.queryByText('(Click row)')).toBeNull();
+      expect(screen.queryByText(/click row/i)).toBeNull();
+
+      // "Active" badge is completely removed even when isAdmin is true
+      expect(leftPanel.querySelector('.bg-emerald-100')).toBeNull();
+      expect(leftPanel.querySelector('.bg-emerald-50')).toBeNull();
+    });
+
+    it('positions CLICK ON RANK and DCB sections side-by-side with reduced gap and balanced height', () => {
       render(<DcbNinetyDaysView isAdmin={false} />);
 
-      const strip = screen.getByTestId('dcb-selected-rank-strip');
-      expect(strip.className).toContain('flex');
-      expect(strip.className).toContain('rounded-md');
-      expect(strip.className).toContain('overflow-hidden');
-      expect(strip.className).toContain('border-slate-300');
+      // Main layout container positions both sections side by side on md+ with items-stretch
+      const mainLayout = screen.getByTestId('dcb-main-sections-container');
+      expect(mainLayout).not.toBeNull();
+      expect(mainLayout.className).toContain('flex');
+      expect(mainLayout.className).toContain('md:flex-row');
+      expect(mainLayout.className).toContain('items-stretch');
+      expect(mainLayout.className).toContain('gap-2.5');
 
-      // Dark blue cell
-      const trigger = screen.getByTestId('dcb-bottom-rank-dropdown-trigger');
-      expect(trigger.className).toContain('bg-[#0f2b5c]');
-      expect(trigger.className).toContain('text-white');
+      // Left panel has dedicated balanced width and full height stretch
+      const leftPanel = screen.getByTestId('dcb-ranks-structure-panel');
+      expect(leftPanel).not.toBeNull();
+      expect(leftPanel.className).toContain('md:w-[210px]');
+      expect(leftPanel.className).toContain('shrink-0');
 
-      // In ($) and In (₹) are inside adjacent white flex container
-      const usdVal = screen.getByTestId('dcb-bottom-rank-value-usd');
-      const inrVal = screen.getByTestId('dcb-bottom-rank-value-inr');
-      expect(usdVal).toBeDefined();
-      expect(inrVal).toBeDefined();
+      // Right panel sits immediately beside it and expands to use available width
+      const rightPanel = screen.getByTestId('dcb-bonus-panel');
+      expect(rightPanel).not.toBeNull();
+      expect(rightPanel.className).toContain('flex-1');
+      expect(rightPanel.className).toContain('min-w-0');
+
+      // DCB content has reduced vertical gaps
+      const dcbInner = rightPanel?.querySelector('.space-y-2');
+      expect(dcbInner).not.toBeNull();
+      expect(dcbInner?.className).toContain('space-y-2');
+      expect(dcbInner?.className).toContain('p-2');
+    });
+
+    it('retains all 5 summary cards, 3 milestone cards, and Important Points with redesigned DCB BENEFIT component', () => {
+      render(<DcbNinetyDaysView isAdmin={false} />);
+
+      // Redesigned 30% DCB Benefit component with dedicated class
+      const benefitBox = screen.getByTestId('dcb-benefit-box');
+      expect(benefitBox).toBeInTheDocument();
+      expect(benefitBox.className).toContain('dcb-benefit-box');
+      expect(screen.getAllByText('30%').length).toBeGreaterThanOrEqual(2);
+      expect(screen.getByText('DCB BENEFIT')).toBeInTheDocument();
+      expect(screen.getByText('(Automatically)')).toBeInTheDocument();
+
+      // 5 premium summary cards with zoom support and individual accent classes
+      const cardRef1 = screen.getByTestId('dcb-card-ref-1');
+      const cardRef2 = screen.getByTestId('dcb-card-ref-2');
+      const cardCenter = screen.getByTestId('dcb-card-30-dcb');
+      const cardGross = screen.getByTestId('dcb-card-gross');
+      const cardNet = screen.getByTestId('dcb-card-net');
+
+      expect(cardRef1.className).toContain('dcb-summary-card');
+      expect(cardRef1.className).toContain('dcb-summary-card-ref');
+
+      expect(cardRef2.className).toContain('dcb-summary-card');
+      expect(cardRef2.className).toContain('dcb-summary-card-ref');
+
+      expect(cardCenter.className).toContain('dcb-summary-card');
+      expect(cardCenter.className).toContain('dcb-summary-card-center');
+
+      expect(cardGross.className).toContain('dcb-summary-card');
+      expect(cardGross.className).toContain('dcb-summary-card-gross');
+
+      expect(cardNet.className).toContain('dcb-summary-card');
+      expect(cardNet.className).toContain('dcb-summary-card-net');
+
+      // Labels and metrics inside cards
+      expect(screen.getByText('Ref. 1')).toBeInTheDocument();
+      expect(screen.getByText('Ref. 2')).toBeInTheDocument();
+      expect(screen.getByText('30% DCB')).toBeInTheDocument();
+      expect(screen.getByText('Gross (80%)')).toBeInTheDocument();
+      expect(screen.getByText('Before fee')).toBeInTheDocument();
+      expect(screen.getByText('Total')).toBeInTheDocument();
+      expect(screen.getByText('Net (10% fee)')).toBeInTheDocument();
+
+      // 3 milestone cards preserved
+      expect(screen.getByTestId('dcb-earnings-card-2')).toBeInTheDocument();
+      expect(screen.getByTestId('dcb-earnings-card-4')).toBeInTheDocument();
+      expect(screen.getByTestId('dcb-earnings-card-6')).toBeInTheDocument();
+
+      // Important Points preserved
+      expect(screen.getByText('Important Points')).toBeInTheDocument();
+      expect(screen.getByText('Unlimited ref..')).toBeInTheDocument();
     });
   });
 });
