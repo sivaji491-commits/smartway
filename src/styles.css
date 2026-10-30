@@ -1116,11 +1116,11 @@
   background: transparent;
   border: 1px solid transparent;
   cursor: grab;
-  transition: background 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
-              color 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
-              border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.18s ease,
-              transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.18s ease,
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: left;
   width: 100%;
   white-space: nowrap;
@@ -1305,20 +1305,25 @@
   .app-sidebar {
     padding: 10px 10px;
   }
+
   .sidebar-top {
     padding: 0 4px 8px;
     margin-bottom: 8px;
   }
+
   .sidebar-section-label {
     margin-bottom: 4px;
   }
+
   .sidebar-bottom {
     gap: 6px;
     padding-top: 8px;
   }
+
   .sidebar-growth-card {
     padding: 6px 9px;
   }
+
   .sidebar-growth-card-desc {
     display: none;
   }
@@ -1328,10 +1333,12 @@
   .sidebar-growth-card {
     display: none;
   }
+
   .sidebar-user-badge {
     padding: 4px 8px;
     font-size: 10.5px;
   }
+
   .sidebar-signout-btn {
     height: 26px !important;
     font-size: 11px !important;
@@ -1962,6 +1969,7 @@
 }
 
 @media (min-width: 1024px) {
+
   .home-main-container.ranks-container,
   .ranks-main-container {
     padding: 8px 20px 8px;
@@ -2825,6 +2833,7 @@
 }
 
 @media (max-width: 640px) {
+
   .users-header-banner-compact,
   .users-header-banner {
     flex-direction: column;
@@ -3513,18 +3522,22 @@
   .modal-backdrop {
     padding: 12px;
   }
+
   .invite-modal-card {
     max-height: calc(100vh - 24px);
     max-height: calc(100dvh - 24px);
     border-radius: 10px;
   }
+
   .modal-header {
     padding: 16px 18px 12px;
   }
+
   .modal-form-body {
     padding: 16px 18px;
     gap: 14px;
   }
+
   .modal-footer {
     padding: 12px 18px 14px;
   }
@@ -3938,17 +3951,21 @@
   .modal-backdrop {
     padding: 10px 8px !important;
   }
+
   .invite-modal-card {
     max-height: calc(100vh - 20px) !important;
     max-height: calc(100dvh - 20px) !important;
     border-radius: 10px !important;
   }
+
   .modal-header {
     padding: 14px 16px 12px !important;
   }
+
   .modal-form-body {
     padding: 12px 14px !important;
   }
+
   .modal-footer {
     padding: 12px 14px !important;
   }
@@ -3958,6 +3975,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -4261,6 +4279,7 @@
 }
 
 @media (max-width: 380px) {
+
   .session-timer-badge,
   .app-topbar .session-timer-badge,
   .app-topbar.regular-user-topbar .session-timer-badge {
@@ -4359,6 +4378,7 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
   }
+
   .home-main-container.earning-opportunities-container {
     height: auto !important;
     min-height: 100% !important;
@@ -4366,6 +4386,7 @@
     overflow-y: visible !important;
     overflow-x: hidden !important;
   }
+
   .source-structure-page {
     height: auto !important;
     min-height: 100% !important;
@@ -4429,6 +4450,7 @@
   .customer-view-card {
     transition: none !important;
   }
+
   .customer-view-card:hover {
     transform: none !important;
   }
@@ -4460,11 +4482,14 @@
    Gentle 3-4px vertical floating animation over 3.5s with soft border glow
    ========================================================================== */
 @keyframes potentiality-card-float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
     box-shadow: 0 2px 5px -1px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(59, 130, 246, 0.1);
     border-color: rgba(191, 219, 254, 0.7);
   }
+
   50% {
     transform: translateY(-4px);
     box-shadow: 0 10px 20px -3px rgba(15, 23, 42, 0.11), 0 0 14px 2px rgba(59, 130, 246, 0.18);
@@ -4493,14 +4518,17 @@
   .potentiality-zoom-card {
     transition: none !important;
   }
+
   .potentiality-zoom-card:hover,
   .potentiality-zoom-card:active {
     transform: none !important;
   }
+
   .potentiality-floating-card {
     animation: none !important;
     transform: none !important;
   }
+
   .potentiality-floating-card:hover,
   .potentiality-floating-card:active {
     transform: none !important;
@@ -4515,6 +4543,7 @@
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -4528,6 +4557,7 @@
 }
 
 @media (hover: hover) {
+
   .home-marquee-container:hover .home-marquee-track,
   .home-marquee-track:hover {
     animation-play-state: paused !important;
@@ -4559,6 +4589,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -4874,15 +4905,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .key-points-one-time-work-badge .route-map-moving-star-1,
   .key-points-one-time-work-badge .route-map-moving-star-2 {
     animation: none !important;
   }
+
   .key-points-one-time-work-badge .route-map-moving-star-1 {
     left: 50% !important;
     top: 15% !important;
     transform: translate(-50%, -50%) !important;
   }
+
   .key-points-one-time-work-badge .route-map-moving-star-2 {
     left: 50% !important;
     top: 85% !important;
@@ -4896,21 +4930,26 @@
     padding: 7px 20px;
     margin: 4px 0 8px 3px;
   }
+
   .key-points-one-time-work-badge .frame-line-segment {
     width: 36px;
   }
+
   .key-points-one-time-work-badge .one-time-work-decor-line {
     width: 14px;
   }
+
   .key-points-one-time-work-badge .one-time-work-text {
     font-size: 1.05rem;
     letter-spacing: 0.13em;
   }
+
   .key-points-one-time-work-badge .one-time-work-star,
   .key-points-one-time-work-badge .route-map-moving-star-1,
   .key-points-one-time-work-badge .route-map-moving-star-2 {
     font-size: 0.74rem;
   }
+
   .key-points-one-time-work-badge .frame-star {
     font-size: 0.65rem;
   }
@@ -4923,21 +4962,26 @@
     border-radius: 7px;
     margin: 3px 0 6px 2px;
   }
+
   .key-points-one-time-work-badge .frame-line-segment {
     width: 24px;
   }
+
   .key-points-one-time-work-badge .one-time-work-decor-line {
     width: 10px;
   }
+
   .key-points-one-time-work-badge .one-time-work-text {
     font-size: 0.92rem;
     letter-spacing: 0.11em;
   }
+
   .key-points-one-time-work-badge .one-time-work-star,
   .key-points-one-time-work-badge .route-map-moving-star-1,
   .key-points-one-time-work-badge .route-map-moving-star-2 {
     font-size: 0.62rem;
   }
+
   .key-points-one-time-work-badge .frame-star {
     font-size: 0.56rem;
   }
@@ -4967,6 +5011,7 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -4976,17 +5021,15 @@
   position: absolute;
   inset: -150%;
   pointer-events: none;
-  background: conic-gradient(
-    from 0deg at 50% 50%,
-    #f97316 0deg,
-    #f59e0b 45deg,
-    #fbbf24 90deg,
-    #f97316 135deg,
-    rgba(251, 146, 60, 0.25) 180deg,
-    transparent 225deg,
-    rgba(251, 146, 60, 0.25) 315deg,
-    #f97316 360deg
-  );
+  background: conic-gradient(from 0deg at 50% 50%,
+      #f97316 0deg,
+      #f59e0b 45deg,
+      #fbbf24 90deg,
+      #f97316 135deg,
+      rgba(251, 146, 60, 0.25) 180deg,
+      transparent 225deg,
+      rgba(251, 146, 60, 0.25) 315deg,
+      #f97316 360deg);
   animation: border-beam-travel 4s linear infinite;
   will-change: transform;
 }
@@ -5034,16 +5077,14 @@
   display: inline-block;
   color: #0B2545;
   /* High-contrast deep navy with subtle vibrant emerald-gold light sweep */
-  background-image: linear-gradient(
-    115deg,
-    #0B2545 0%,
-    #0B2545 36%,
-    #059669 44%,
-    #10B981 50%,
-    #059669 56%,
-    #0B2545 64%,
-    #0B2545 100%
-  );
+  background-image: linear-gradient(115deg,
+      #0B2545 0%,
+      #0B2545 36%,
+      #059669 44%,
+      #10B981 50%,
+      #059669 56%,
+      #0B2545 64%,
+      #0B2545 100%);
   background-size: 280% 100%;
   background-position: 0% 50%;
   -webkit-background-clip: text;
@@ -5055,12 +5096,16 @@
 
 /* Subtle light sweep across text occasionally (~every 7 seconds) */
 @keyframes heroGoldenShine {
-  0%, 68% {
+
+  0%,
+  68% {
     background-position: 0% 50%;
   }
+
   84% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 100% 50%;
   }
@@ -5083,6 +5128,7 @@
   0% {
     transform: translate(-50%, -50%) rotate(0deg);
   }
+
   100% {
     transform: translate(-50%, -50%) rotate(360deg);
   }
@@ -5116,18 +5162,16 @@
   height: 320%;
   aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%) rotate(0deg);
-  background: conic-gradient(
-    from 0deg,
-    rgba(245, 158, 11, 0.08) 0deg,
-    rgba(245, 158, 11, 0.08) 70deg,
-    rgba(251, 191, 36, 0.3) 115deg,
-    #fbbf24 150deg,
-    #f59e0b 180deg,
-    #ea580c 210deg,
-    rgba(234, 88, 12, 0.3) 245deg,
-    rgba(245, 158, 11, 0.08) 290deg,
-    rgba(245, 158, 11, 0.08) 360deg
-  );
+  background: conic-gradient(from 0deg,
+      rgba(245, 158, 11, 0.08) 0deg,
+      rgba(245, 158, 11, 0.08) 70deg,
+      rgba(251, 191, 36, 0.3) 115deg,
+      #fbbf24 150deg,
+      #f59e0b 180deg,
+      #ea580c 210deg,
+      rgba(234, 88, 12, 0.3) 245deg,
+      rgba(245, 158, 11, 0.08) 290deg,
+      rgba(245, 158, 11, 0.08) 360deg);
   animation: dcb-border-rotate 3.5s linear infinite;
   z-index: 0;
   pointer-events: none;
@@ -5182,6 +5226,7 @@
   .dcb-earnings-amount {
     font-size: 14px;
   }
+
   .dcb-earnings-label {
     font-size: 11px;
   }
@@ -5198,6 +5243,7 @@
     width: 100% !important;
     height: 100% !important;
   }
+
   .dcb-earnings-card:hover,
   .dcb-benefit-box:hover,
   .dcb-summary-card:hover {
@@ -5246,6 +5292,7 @@
   line-height: 1;
   letter-spacing: -0.02em;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+  text-align: center;
 }
 
 .dcb-benefit-label {
@@ -5256,6 +5303,102 @@
   text-transform: uppercase;
   margin-top: 3px;
   line-height: 1.2;
+  text-align: center;
+}
+
+/* Calculation Mode Switch (Cumulative / Individual) Compact & Elegant Outside Benefit Box */
+.dcb-calculation-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 7px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  gap: 2px;
+  user-select: none;
+}
+
+.dcb-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 2.5px 7.5px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.dcb-mode-btn-active {
+  background: #ffffff;
+  color: #065f46;
+  font-weight: 700;
+  border-color: rgba(226, 232, 240, 0.9);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(16, 185, 129, 0.15);
+}
+
+.dcb-mode-btn-inactive {
+  background: transparent;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.dcb-mode-btn-inactive:hover {
+  background: rgba(255, 255, 255, 0.7);
+  color: #1e293b;
+}
+
+@media (max-width: 480px) {
+  .dcb-benefit-box {
+    padding: 5px 14px;
+    min-width: 120px;
+  }
+
+  .dcb-benefit-value {
+    font-size: 15px;
+  }
+
+  .dcb-benefit-label {
+    font-size: 9.5px;
+  }
+
+  .dcb-calculation-mode-switch {
+    padding: 1.5px;
+  }
+
+  .dcb-mode-btn {
+    padding: 2px 5.5px;
+    font-size: 10px;
+    gap: 2.5px;
+  }
+}
+
+@media (max-width: 360px) {
+  .dcb-benefit-box {
+    padding: 4px 10px;
+    min-width: 105px;
+  }
+
+  .dcb-benefit-value {
+    font-size: 14px;
+  }
+
+  .dcb-benefit-label {
+    font-size: 9px;
+  }
+
+  .dcb-mode-btn {
+    padding: 1.5px 4.5px;
+    font-size: 9.5px;
+    gap: 2px;
+  }
 }
 
 /* Five Summary Cards Shared Base */
@@ -5367,15 +5510,19 @@
   .dcb-card-amount {
     font-size: 14px;
   }
+
   .dcb-card-badge {
     font-size: 10.5px;
   }
+
   .dcb-card-caption {
     font-size: 9.5px;
   }
+
   .dcb-benefit-value {
     font-size: 18px;
   }
+
   .dcb-benefit-label {
     font-size: 11px;
   }
@@ -5385,9 +5532,11 @@
   .dcb-card-amount {
     font-size: 15px;
   }
+
   .dcb-card-badge {
     font-size: 11px;
   }
+
   .dcb-card-caption {
     font-size: 10px;
   }
@@ -5425,6 +5574,7 @@
   border: 1.5px solid #bfdbfe;
   box-shadow: 0 4px 14px -2px rgba(37, 99, 235, 0.08);
 }
+
 .customer-purchase-card.theme-blue:hover {
   border-color: #60a5fa;
   box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.16);
@@ -5435,6 +5585,7 @@
   border: 1.5px solid #bbf7d0;
   box-shadow: 0 4px 14px -2px rgba(22, 163, 74, 0.08);
 }
+
 .customer-purchase-card.theme-green:hover {
   border-color: #4ade80;
   box-shadow: 0 10px 24px -4px rgba(22, 163, 74, 0.16);
@@ -5445,6 +5596,7 @@
   border: 1.5px solid #fed7aa;
   box-shadow: 0 4px 14px -2px rgba(234, 88, 12, 0.08);
 }
+
 .customer-purchase-card.theme-orange:hover {
   border-color: #fb923c;
   box-shadow: 0 10px 24px -4px rgba(234, 88, 12, 0.16);
@@ -5455,6 +5607,7 @@
   border: 1.5px solid #e9d5ff;
   box-shadow: 0 4px 14px -2px rgba(147, 51, 234, 0.08);
 }
+
 .customer-purchase-card.theme-purple:hover {
   border-color: #c084fc;
   box-shadow: 0 10px 24px -4px rgba(147, 51, 234, 0.16);
@@ -5464,6 +5617,7 @@
   .customer-purchase-card {
     transition: none !important;
   }
+
   .customer-purchase-card:hover {
     transform: none !important;
   }
@@ -5474,41 +5628,54 @@
    ========================================================================== */
 
 @keyframes plotPinGentleJump {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
     animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
   }
+
   38% {
     transform: translateY(-12px);
     animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
   }
+
   56% {
     transform: translateY(0);
     animation-timing-function: ease-out;
   }
+
   68% {
     transform: translateY(-2px);
     animation-timing-function: ease-in;
   }
-  78%, 100% {
+
+  78%,
+  100% {
     transform: translateY(0);
   }
 }
 
 @keyframes plotPinShadowPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.5;
   }
+
   38% {
     transform: scale(0.72);
     opacity: 0.2;
   }
+
   56% {
     transform: scale(1.08);
     opacity: 0.6;
   }
-  78%, 100% {
+
+  78%,
+  100% {
     transform: scale(1);
     opacity: 0.5;
   }
@@ -5525,6 +5692,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .plot-pin-animated,
   .plot-pin-shadow {
     animation: none !important;

@@ -49,10 +49,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { OneTimeWorkHighlight } from '@/components/key-points/OneTimeWorkHighlight';
 import { DcbRankRow, DcbConfig } from '@/types/dcb-bonus';
 
+export type DcbCalculationMode = 'cumulative' | 'individual';
+
 export interface DcbNinetyDaysViewProps {
   isAdmin?: boolean;
   userEmail?: string | null;
   isMobile?: boolean;
+  initialMode?: DcbCalculationMode;
 }
 
 function useIsMobileView(customIsMobile?: boolean): boolean {
@@ -86,12 +89,16 @@ export function DcbNinetyDaysView({
   isAdmin = false,
   userEmail,
   isMobile: propIsMobile,
+  initialMode = 'cumulative',
 }: DcbNinetyDaysViewProps) {
   // Authoritative admin verification
   const isUserAdmin = Boolean(isAdmin || isUserAdminOrOwner(userEmail, 'sivaji491@gmail.com'));
 
   // Responsive mobile vs desktop view check (breakpoint: 768px)
   const isMobile = useIsMobileView(propIsMobile);
+
+  // Calculation mode: 'cumulative' (default) vs 'individual'
+  const [calcMode, setCalcMode] = useState<DcbCalculationMode>(initialMode);
 
   // 1. Data synchronization with single source of truth in Rank Calculator state
   const [state, setState] = useState(() => loadRankCalculatorState());
@@ -214,7 +221,15 @@ export function DcbNinetyDaysView({
   // Active settings: when admin is actively editing, live preview uses draftConfig; otherwise published dcbConfig
   const activeSettings = isUserAdmin && isEditing ? draftConfig : dcbConfig;
 
-  // Calculate DCB for active rank dynamically using multiRanksUSD (cumulative base price) and active settings
+  // Target rank value based on calculation mode:
+  // - Cumulative: multiRanksUSD (cumulative sum of base prices up to selected rank)
+  // - Individual: basePrice (standalone base price of selected rank only)
+  const targetRankValueUSD = useMemo(() => {
+    if (!selectedRank) return 100;
+    return calcMode === 'cumulative' ? selectedRank.multiRanksUSD : selectedRank.basePrice;
+  }, [selectedRank, calcMode]);
+
+  // Calculate DCB for active rank dynamically using targetRankValueUSD and active settings
   const dcbResult = useMemo(() => {
     if (!selectedRank) {
       return calculateDcbBonus('PBA 1', '', 100, exchangeRate, activeSettings);
@@ -222,11 +237,11 @@ export function DcbNinetyDaysView({
     return calculateDcbBonus(
       selectedRank.name,
       selectedRank.id,
-      selectedRank.multiRanksUSD,
+      targetRankValueUSD,
       exchangeRate,
       activeSettings
     );
-}, [selectedRank, exchangeRate, activeSettings]);
+  }, [selectedRank, targetRankValueUSD, exchangeRate, activeSettings]);
 
 // Admin action handlers
 const handleStartEdit = () => {
@@ -405,7 +420,7 @@ return (
                 >
                   <span className="truncate">
                     {selectedRank
-                      ? `${selectedRank.name} — ${formatUSD(selectedRank.multiRanksUSD)}`
+                      ? `${selectedRank.name} — ${formatUSD(calcMode === 'cumulative' ? selectedRank.multiRanksUSD : selectedRank.basePrice)}`
                       : 'No Ranks Available'}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -429,7 +444,7 @@ return (
                     )}
                   >
                     <span className="truncate">
-                      {r.name} — {formatUSD(r.multiRanksUSD)} (With Gas: {formatUSD(r.totalWithGasUSD)})
+                      {r.name} — {formatUSD(calcMode === 'cumulative' ? r.multiRanksUSD : r.basePrice)} (With Gas: {formatUSD(r.totalWithGasUSD)})
                     </span>
                     {selectedRank?.id === r.id && <Check className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
                   </DropdownMenuItem>
@@ -452,7 +467,7 @@ return (
               ) : (
                 computedRanks.map((r) => (
                   <option key={r.id} value={r.id}>
-                    {r.name} — {formatUSD(r.multiRanksUSD)}
+                    {r.name} — {formatUSD(calcMode === 'cumulative' ? r.multiRanksUSD : r.basePrice)}
                   </option>
                 ))
               )}
@@ -701,7 +716,9 @@ return (
           <span className="text-xs sm:text-[13px] font-bold text-blue-900 mt-0.5 block tabular-nums">
             {formatUSD(dcbResult.rankValueUSD)}
           </span>
-          <span className="text-[9.5px] text-blue-600">Multi ranks cumulative</span>
+          <span className="text-[9.5px] text-blue-600">
+            {calcMode === 'cumulative' ? 'Multi ranks cumulative' : 'Individual rank base'}
+          </span>
         </div>
 
         {/* Rank Value In INR */}
@@ -860,21 +877,77 @@ return (
         </div>
 
         <div className="p-2 sm:p-2.5 md:p-3 bg-[#fbfdf9] flex-1 flex flex-col justify-between space-y-2 sm:space-y-2.5">
-          {/* Top Subtitle & Highlighted DCB Benefit Component */}
-          <div className="flex flex-col items-center justify-center">
+          {/* Top Subtitle & Highlighted DCB Benefit Component with Far-Right Mode Switch */}
+          <div className="flex flex-col items-center justify-center w-full">
             <span className="text-[10px] sm:text-[10.5px] font-semibold text-slate-500 mb-1 tracking-wide">
               (Automatically)
             </span>
-            <div
-              className="dcb-benefit-box"
-              data-testid="dcb-benefit-box"
-              title={`${activeSettings.dcbReleasePercentage}% Double Connect Bonus Benefit`}
-            >
-              <div className="dcb-benefit-value">
-                {activeSettings.dcbReleasePercentage}%
+
+            {/* Container spanning full width: 30% card centered directly above Card 3, mode switch at far right */}
+            <div className="relative w-full flex items-center justify-center">
+              {/* 1. Centered 30% DCB BENEFIT card directly above the 3rd card in the 5-card row */}
+              <div
+                className="dcb-benefit-box"
+                data-testid="dcb-benefit-box"
+                title={`${activeSettings.dcbReleasePercentage}% Double Connect Bonus Benefit`}
+              >
+                <div className="dcb-benefit-value">
+                  {activeSettings.dcbReleasePercentage}%
+                </div>
+                <div className="dcb-benefit-label">
+                  DCB BENEFIT
+                </div>
               </div>
-              <div className="dcb-benefit-label">
-                DCB BENEFIT
+
+              {/* 2. Cumulative / Individual mode switch aligned completely to the FAR RIGHT of the entire section */}
+              <div
+                className="dcb-calculation-mode-switch absolute right-0 top-1/2 -translate-y-1/2"
+                role="radiogroup"
+                aria-label="DCB Calculation Mode Switch"
+                data-testid="dcb-calculation-mode-switch"
+              >
+                <button
+                  type="button"
+                  data-testid="dcb-mode-cumulative-btn"
+                  role="radio"
+                  aria-checked={calcMode === 'cumulative'}
+                  onClick={() => setCalcMode('cumulative')}
+                  className={cn(
+                    "dcb-mode-btn",
+                    calcMode === 'cumulative'
+                      ? "dcb-mode-btn-active font-bold text-emerald-800"
+                      : "dcb-mode-btn-inactive"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full shrink-0 transition-colors",
+                      calcMode === 'cumulative' ? "bg-emerald-600" : "bg-transparent opacity-0"
+                    )}
+                  />
+                  <span>Cumulative</span>
+                </button>
+                <button
+                  type="button"
+                  data-testid="dcb-mode-individual-btn"
+                  role="radio"
+                  aria-checked={calcMode === 'individual'}
+                  onClick={() => setCalcMode('individual')}
+                  className={cn(
+                    "dcb-mode-btn",
+                    calcMode === 'individual'
+                      ? "dcb-mode-btn-active font-bold text-emerald-800"
+                      : "dcb-mode-btn-inactive"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full shrink-0 transition-colors",
+                      calcMode === 'individual' ? "bg-emerald-600" : "bg-transparent opacity-0"
+                    )}
+                  />
+                  <span>Individual</span>
+                </button>
               </div>
             </div>
           </div>
