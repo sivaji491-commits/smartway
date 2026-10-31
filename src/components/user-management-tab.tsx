@@ -40,7 +40,8 @@ import {
   RefreshCw,
   Route as RouteIcon,
   Map as MapIcon,
-  Bell
+  Bell,
+  Lightbulb
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,6 +86,8 @@ export interface NavigationFieldDef {
 
 export const NAV_ICON_MAP: Record<string, any> = {
   home: Home,
+  why: Lightbulb,
+  lightbulb: Lightbulb,
   users: Users,
   'earning-opportunities': TrendingUp,
   earning_opportunities: TrendingUp,

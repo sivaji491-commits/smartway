@@ -1,0 +1,276 @@
+/* ==========================================================================
+   Why Page Styles — Land is a Gift of God · Build Your Own Land Bank
+   ========================================================================== */
+
+.why-page-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+  padding: 4px 8px 6px;
+  box-sizing: border-box;
+  overflow: hidden;
+  animation: whyPageFadeIn 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes whyPageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Compact Top Header */
+.why-compact-header {
+  min-height: 34px;
+  margin-bottom: 4px;
+}
+
+/* Main Visual Area — Fills all available vertical space */
+.why-main-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Light ray rotation animation around the divine hand & floating land */
+@keyframes whyRaysRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Subtle breathing glow around the divine land core */
+@keyframes whyGlowPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.05);
+  }
+}
+
+/* Main Visual Card Container */
+.why-visual-wrapper {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #07121e;
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 
+    0 8px 28px -6px rgba(0, 0, 0, 0.5),
+    0 2px 16px -2px rgba(245, 158, 11, 0.22),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1), border-color 280ms ease;
+  user-select: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .why-visual-wrapper:hover {
+    transform: translateY(-2px);
+    border-color: rgba(251, 191, 36, 0.65);
+    box-shadow: 
+      0 16px 40px -8px rgba(0, 0, 0, 0.6),
+      0 6px 24px -2px rgba(245, 158, 11, 0.35),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Main Image */
+.why-main-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+
+/* Gentle light-ray rotating effect positioned around the divine hand presenting the land */
+.why-light-rays-effect {
+  position: absolute;
+  top: -8%;
+  left: 8%;
+  width: 50%;
+  height: 58%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(251, 191, 36, 0.18) 35deg,
+    transparent 70deg,
+    rgba(245, 158, 11, 0.22) 130deg,
+    transparent 165deg,
+    rgba(251, 191, 36, 0.18) 220deg,
+    transparent 255deg,
+    rgba(245, 158, 11, 0.18) 310deg,
+    transparent 345deg
+  );
+  filter: blur(12px);
+  pointer-events: none;
+  animation: whyRaysRotate 24s linear infinite;
+  mix-blend-mode: screen;
+  z-index: 2;
+}
+
+/* Central radial pulse over the floating land */
+.why-land-glow-core {
+  position: absolute;
+  top: 6%;
+  left: 18%;
+  width: 32%;
+  height: 38%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.4) 0%, rgba(245, 158, 11, 0.18) 45%, transparent 75%);
+  filter: blur(14px);
+  pointer-events: none;
+  animation: whyGlowPulse 4.5s ease-in-out infinite;
+  mix-blend-mode: screen;
+  z-index: 2;
+}
+
+/* Corner Zoom / Full View Trigger Button */
+.why-zoom-trigger {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(11, 28, 42, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: all 180ms ease-in-out;
+}
+
+.why-zoom-trigger:hover {
+  background: rgba(245, 158, 11, 0.9);
+  color: #0f172a;
+  border-color: #fbbf24;
+}
+
+/* Bottom Compact Pill Badges */
+.why-bottom-bar {
+  min-height: 24px;
+  margin-top: 4px;
+}
+
+.why-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 160ms ease;
+  user-select: none;
+}
+
+.why-badge-pill:hover {
+  background: #ffffff;
+  border-color: #fbbf24;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .why-page-container {
+    height: auto;
+    min-height: 100%;
+    padding: 6px 6px 14px;
+    overflow-y: auto;
+  }
+
+  .why-main-area {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .why-visual-wrapper {
+    height: auto;
+    max-height: none;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .why-main-image {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
+
+  .why-zoom-trigger {
+    top: 6px;
+    right: 6px;
+    padding: 3px 7px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .why-light-rays-effect {
+    filter: blur(8px);
+    opacity: 0.75;
+  }
+
+  .why-land-glow-core {
+    filter: blur(10px);
+    opacity: 0.75;
+  }
+
+  .why-badge-pill {
+    font-size: 10px;
+    padding: 2px 7px;
+  }
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .why-page-container,
+  .why-visual-wrapper,
+  .why-light-rays-effect,
+  .why-land-glow-core {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,4 +1,4 @@
-export type NavigationField = 'home' | 'users' | 'earning-opportunities' | 'status' | 'ranks' | '12-level-bonus' | 'dcb-90-days' | 'customer-view' | 'currency' | 'time-in-hand' | 'notice' | string;
+export type NavigationField = 'home' | 'why' | 'users' | 'earning-opportunities' | 'status' | 'ranks' | '12-level-bonus' | 'dcb-90-days' | 'customer-view' | 'currency' | 'time-in-hand' | 'notice' | string;
 
 export interface NavigationFieldDef {
   id: NavigationField;
@@ -17,6 +17,12 @@ export const DEFAULT_NAVIGATION_FIELDS: NavigationFieldDef[] = [
     label: 'Home',
     description: 'Workspace dashboard and summary',
     iconName: 'Home',
+  },
+  {
+    id: 'why',
+    label: 'Why',
+    description: 'Why property ownership, land bank, and business vision',
+    iconName: 'Lightbulb',
   },
   {
     id: 'users',

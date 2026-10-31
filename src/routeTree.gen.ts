@@ -29,6 +29,7 @@ import { Route as AuthenticatedRouteMapRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedTimeInHandRouteImport } from './routes/_authenticated/time-in-hand'
 import { Route as AuthenticatedUserManagementRouteImport } from './routes/_authenticated/user-management'
+import { Route as AuthenticatedWhyRouteImport } from './routes/_authenticated/why'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -137,6 +138,11 @@ const AuthenticatedUserManagementRoute =
     path: '/user-management',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedWhyRoute = AuthenticatedWhyRouteImport.update({
+  id: '/why',
+  path: '/why',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
+  '/why': typeof AuthenticatedWhyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/user-management': typeof AuthenticatedUserManagementRoute
+  '/why': typeof AuthenticatedWhyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/time-in-hand': typeof AuthenticatedTimeInHandRoute
   '/_authenticated/user-management': typeof AuthenticatedUserManagementRoute
+  '/_authenticated/why': typeof AuthenticatedWhyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-in-hand'
     | '/user-management'
+    | '/why'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/time-in-hand'
     | '/user-management'
+    | '/why'
   id:
     | '__root__'
     | '/'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/time-in-hand'
     | '/_authenticated/user-management'
+    | '/_authenticated/why'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -419,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUserManagementRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/why': {
+      id: '/_authenticated/why'
+      path: '/why'
+      fullPath: '/why'
+      preLoaderRoute: typeof AuthenticatedWhyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -439,6 +458,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTimeInHandRoute: typeof AuthenticatedTimeInHandRoute
   AuthenticatedUserManagementRoute: typeof AuthenticatedUserManagementRoute
+  AuthenticatedWhyRoute: typeof AuthenticatedWhyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -460,6 +480,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTimeInHandRoute: AuthenticatedTimeInHandRoute,
   AuthenticatedUserManagementRoute: AuthenticatedUserManagementRoute,
+  AuthenticatedWhyRoute: AuthenticatedWhyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

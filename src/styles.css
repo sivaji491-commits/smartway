@@ -4350,6 +4350,46 @@
   height: 0 !important;
 }
 
+/* Why tab: edge-to-edge seamless viewport fit without right-side vertical scrollbar */
+.app-tab-body.why-tab-body {
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.app-tab-body.why-tab-body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.home-main-container.why-container {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 768px) {
+  .app-tab-body.why-tab-body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .home-main-container.why-container {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: visible !important;
+  }
+}
+
 .source-structure-page {
   background: radial-gradient(ellipse at 50% 0%, #0F2538 0%, #091522 45%, #060D17 100%) !important;
   background-image: radial-gradient(ellipse at 50% 0%, #0F2538 0%, #091522 45%, #060D17 100%) !important;

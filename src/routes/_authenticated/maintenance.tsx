@@ -21,11 +21,13 @@ import {
   KeyRound,
   Settings as SettingsIcon,
   Route as RouteIcon,
-  Bell
+  Bell,
+  Lightbulb
 } from 'lucide-react';
 import { Brand } from '@/components/brand';
 import { Button } from '@/components/ui/button';
 import { HomeTab } from '@/components/home-tab';
+import { WhyView } from '@/components/why/WhyView';
 import { UserManagementTab, resolveNavIcon } from '@/components/user-management-tab';
 import { EarningOpportunitiesView } from '@/components/earning-opportunities/EarningOpportunitiesView';
 import { KeyPointsView } from '@/components/key-points/KeyPointsView';
@@ -64,6 +66,7 @@ const KNOWN_STATIC_TABS = new Set([
   'currency',
   'configuration',
   'home',
+  'why',
   'users',
   'earning-opportunities',
   'key-points',
@@ -682,26 +685,6 @@ function Maintenance() {
                 </svg>
               )}
             </button>
-            {isAdmin && (
-              <nav className="topbar-nav-tabs" aria-label="Top Tabs Navigation">
-                {navItems.map((item) => {
-                  if (!allowedTabs.includes(item.id)) return null;
-                  const Icon = item.icon;
-                  const isSelected = activeTab === item.id;
-                  return (
-                    <button
-                      key={`top-${item.id}`}
-                      type="button"
-                      className={`topbar-tab-item ${isSelected ? 'active' : ''}`}
-                      onClick={() => handleSelectTab(item.id)}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-            )}
           </div>
           <div className="topbar-actions">
             {/* Green Ranks Indicator (e.g. Ranks 7) */}
@@ -804,6 +787,17 @@ function Maintenance() {
               </div>
             )}
 
+            {/* Why Indicator */}
+            {isAdmin && activeTab === 'why' && (
+              <div 
+                className="topbar-ranks-badge bg-amber-600 border-amber-500"
+                title="Why · Land is a Gift of God"
+              >
+                <Lightbulb className="w-3.5 h-3.5 text-white" />
+                <span className="font-semibold text-xs text-white">Why</span>
+              </div>
+            )}
+
             {/* Live Access Time Countdown Widget */}
             {effectiveEmail && (
               <div 
@@ -863,7 +857,7 @@ function Maintenance() {
         )}
 
         {/* Tab Content */}
-        <div className={`app-tab-body ${activeTab === 'home' ? 'home-tab-body' : ''} ${activeTab === 'route-map' ? 'route-map-tab-body' : ''} ${activeTab === 'earning-opportunities' ? 'earning-opportunities-body' : ''} ${activeTab === 'users' ? 'users-tab-body' : ''} ${activeTab === '12-level-bonus' ? 'twelve-bonus-tab-body' : ''}`}>
+        <div className={`app-tab-body ${activeTab === 'home' ? 'home-tab-body' : ''} ${activeTab === 'route-map' ? 'route-map-tab-body' : ''} ${activeTab === 'earning-opportunities' ? 'earning-opportunities-body' : ''} ${activeTab === 'users' ? 'users-tab-body' : ''} ${activeTab === '12-level-bonus' ? 'twelve-bonus-tab-body' : ''} ${activeTab === 'why' ? 'why-tab-body' : ''}`}>
           {activeTab === 'access-denied' || effectiveAllowed.length === 0 || !allowedTabs.includes(activeTab) ? (
             <AccessDeniedView
               pageName={activeTab !== 'access-denied' ? (navItems.find((i) => i.id === activeTab)?.label || activeTab) : undefined}
@@ -926,6 +920,15 @@ function Maintenance() {
               {activeTab === 'home' && allowedTabs.includes('home') && (
                 <main className="home-main-container home-real-estate-container p-0">
                   <HomeTab 
+                    userEmail={effectiveEmail} 
+                    onNavigateToTab={handleSelectTab} 
+                  />
+                </main>
+              )}
+              {activeTab === 'why' && allowedTabs.includes('why') && (
+                <main className="home-main-container why-container p-0">
+                  <WhyView 
+                    isAdmin={isAdmin} 
                     userEmail={effectiveEmail} 
                     onNavigateToTab={handleSelectTab} 
                   />
