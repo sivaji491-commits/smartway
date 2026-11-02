@@ -26,10 +26,120 @@
   }
 }
 
-/* Compact Top Header */
+/* Compact Top Header Bar */
 .why-compact-header {
-  min-height: 34px;
   margin-bottom: 4px;
+  width: 100%;
+}
+
+.why-header-cards-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+/* ==========================================================================
+   Why Page Title Card — "Why IG INFRA.... For LAND BANK CREATION"
+   Matches the design, overall height, background, border, and glow of ONE TIME WORK
+   ========================================================================== */
+.why-title-card {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 22px;
+  border-radius: 9px;
+  background: #08111D;
+  background: linear-gradient(135deg, rgba(11, 28, 42, 0.96) 0%, rgba(8, 17, 29, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 18px rgba(245, 158, 11, 0.22);
+  user-select: none;
+  box-sizing: border-box;
+  overflow: visible;
+  z-index: 10;
+  margin: 6px 0 10px 0;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.why-title-card:hover {
+  border-color: rgba(251, 191, 36, 0.65);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5), 0 0 24px rgba(245, 158, 11, 0.32);
+}
+
+.why-title-frame-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  line-height: 1;
+}
+
+.why-frame-line-segment {
+  display: inline-block;
+  height: 1px;
+  flex: 1;
+  max-width: 120px;
+  min-width: 24px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.85), transparent);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.why-frame-star {
+  font-size: 0.72rem;
+  color: #fbbf24;
+  line-height: 1;
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.95);
+  display: inline-block;
+  user-select: none;
+}
+
+.why-title-text-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.why-title-decor-line {
+  display: inline-block;
+  height: 1.5px;
+  width: 16px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.85), transparent);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.why-title-heading {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.why-title-gold-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.25;
+  color: #fbbf24;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FEF08A 25%, #FBBF24 65%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.9), 0 0 22px rgba(234, 179, 8, 0.6);
+  white-space: nowrap;
+  user-select: none;
+  padding: 2px 0;
+  margin: 0;
 }
 
 /* Main Visual Area — Fills all available vertical space */
@@ -220,6 +330,37 @@
     overflow-y: auto;
   }
 
+  .why-compact-header {
+    margin-bottom: 2px;
+  }
+
+  .why-header-cards-group {
+    gap: 8px;
+  }
+
+  .why-title-card {
+    padding: 7px 18px;
+    margin: 4px 0 8px 0;
+  }
+
+  .why-frame-line-segment {
+    max-width: 80px;
+    min-width: 16px;
+  }
+
+  .why-title-decor-line {
+    width: 12px;
+  }
+
+  .why-title-gold-text {
+    font-size: 0.88rem;
+    letter-spacing: 0.03em;
+  }
+
+  .why-frame-star {
+    font-size: 0.65rem;
+  }
+
   .why-main-area {
     height: auto;
     min-height: auto;
@@ -247,7 +388,47 @@
   }
 }
 
+@media (max-width: 640px) {
+  .why-compact-header {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .why-header-cards-group {
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+}
+
 @media (max-width: 480px) {
+  .why-title-card {
+    padding: 5px 12px;
+    border-radius: 7px;
+    margin: 3px 0 6px 0;
+    max-width: 100%;
+  }
+
+  .why-frame-line-segment {
+    max-width: 45px;
+    min-width: 8px;
+  }
+
+  .why-title-decor-line {
+    width: 8px;
+  }
+
+  .why-title-gold-text {
+    font-size: 0.74rem;
+    letter-spacing: 0.01em;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .why-frame-star {
+    font-size: 0.56rem;
+  }
+
   .why-light-rays-effect {
     filter: blur(8px);
     opacity: 0.75;

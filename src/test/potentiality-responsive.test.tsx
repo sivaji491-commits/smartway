@@ -114,4 +114,50 @@ describe('Potentiality Table Responsive Layout Verification', () => {
       expect(td.className).toMatch(/px-0\.5|px-1|pl-0\.5|pl-1/);
     });
   });
+
+  describe('8. Mobile-Only Potentiality 3-Card Arrangement (SUCCESS RATIO -> SMART WORK -> JUST 3 MONTHS)', () => {
+    it('applies CSS responsive ordering so SUCCESS RATIO is 1st, SMART WORK is 2nd, and JUST 3 MONTHS is 3rd on mobile', () => {
+      render(<PotentialityView isAdmin={false} />);
+
+      const grid = screen.getByTestId('potentiality-cards-grid');
+      expect(grid).toBeInTheDocument();
+      expect(grid.className).toContain('potentiality-cards-grid');
+      expect(grid.className).toContain('gap-1.5');
+
+      const cardPeriod = screen.getByTestId('potentiality-card-period');
+      const cardSmartWork = screen.getByTestId('potentiality-card-smart-work');
+      const cardSuccessRatio = screen.getByTestId('potentiality-card-success-ratio');
+
+      expect(cardPeriod).toBeInTheDocument();
+      expect(cardSmartWork).toBeInTheDocument();
+      expect(cardSuccessRatio).toBeInTheDocument();
+
+      // Mobile order: Success Ratio (order-1), Smart Work (order-2), Period (order-3)
+      expect(cardSuccessRatio.className).toContain('order-1');
+      expect(cardSuccessRatio.className).toContain('md:order-3');
+
+      expect(cardSmartWork.className).toContain('order-2');
+      expect(cardSmartWork.className).toContain('md:order-2');
+
+      expect(cardPeriod.className).toContain('order-3');
+      expect(cardPeriod.className).toContain('md:order-1');
+    });
+
+    it('preserves desktop column spanning (col-span-3, col-span-6, col-span-3) for desktop/laptop/tablet', () => {
+      render(<PotentialityView isAdmin={true} />);
+
+      const cardPeriod = screen.getByTestId('potentiality-card-period');
+      const cardSmartWork = screen.getByTestId('potentiality-card-smart-work');
+      const cardSuccessRatio = screen.getByTestId('potentiality-card-success-ratio');
+
+      expect(cardPeriod.className).toContain('md:col-span-3');
+      expect(cardSmartWork.className).toContain('md:col-span-6');
+      expect(cardSuccessRatio.className).toContain('md:col-span-3');
+
+      // Verify text content of all three cards remains intact
+      expect(cardPeriod.textContent).toContain('PBA 1');
+      expect(cardSmartWork.textContent).toContain('ONE TIME SMART WORK');
+      expect(cardSuccessRatio.textContent).toContain('5 Cr.');
+    });
+  });
 });

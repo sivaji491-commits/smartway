@@ -74,9 +74,34 @@ describe('Why Menu Item & Why Presentation Page Acceptance Tests', () => {
       render(<WhyView isAdmin={true} />);
 
       expect(screen.getByTestId('why-view-container')).toBeInTheDocument();
-      expect(screen.getByText('Why Smartway')).toBeInTheDocument();
-      expect(screen.getByText('Land Bank Vision')).toBeInTheDocument();
+      expect(screen.getByTestId('why-title-card')).toBeInTheDocument();
+      expect(screen.getByText(/Why IG INFRA\.\.\.\. For LAND BANK CREATION/i)).toBeInTheDocument();
+      expect(screen.queryByText('Land Bank Vision')).toBeNull();
+      expect(screen.queryByText('Why Smartway')).toBeNull();
       expect(screen.getByText(/Think Beyond Money\.\.\. Think Property Ownership/i)).toBeInTheDocument();
+    });
+
+    it('renders the "Why IG INFRA.... For LAND BANK CREATION" title card matching ONE TIME WORK framing and styling', () => {
+      render(<WhyView isAdmin={true} />);
+
+      const titleCard = screen.getByTestId('why-title-card');
+      expect(titleCard).toBeInTheDocument();
+
+      // Heading text
+      const heading = screen.getByTestId('why-title-heading');
+      expect(heading).toBeInTheDocument();
+      expect(heading.textContent).toBe('Why IG INFRA.... For LAND BANK CREATION');
+
+      // Top and bottom golden framing lines with stars
+      const topLine = titleCard.querySelector('.why-title-frame-line.top-line');
+      const bottomLine = titleCard.querySelector('.why-title-frame-line.bottom-line');
+      expect(topLine).not.toBeNull();
+      expect(bottomLine).not.toBeNull();
+      expect(topLine?.querySelector('.why-frame-star')?.textContent).toBe('✦');
+      expect(bottomLine?.querySelector('.why-frame-star')?.textContent).toBe('✦');
+
+      // Old badge "Land Bank Vision" completely removed
+      expect(screen.queryByText('Land Bank Vision')).toBeNull();
     });
 
     it('renders the exact approved promotional image with full alt text containing all message pillars', () => {
@@ -91,6 +116,7 @@ describe('Why Menu Item & Why Presentation Page Acceptance Tests', () => {
       expect(altText).toContain('Land is a Gift of God');
       expect(altText).toContain('Build Your Own Land Bank');
       expect(altText).toContain('Think Beyond Money... Think Property Ownership');
+      expect(altText).toContain('A Property Ownership Opportunity for Everyday Earners');
       expect(altText).toContain('Just 2 Referrals in Your Life');
       expect(altText).toContain('A House + A Land');
       expect(altText).toContain('Secure Your Future');

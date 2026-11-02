@@ -4,6 +4,7 @@ import {
   Maximize2,
   X,
   Home,
+  Users,
   MapPin,
   ShieldCheck,
   ArrowRight
@@ -39,23 +40,42 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
 
   return (
     <div className="why-page-container font-['Inter',system-ui,sans-serif]" data-testid="why-view-container">
-      {/* Compact Top Header Bar: ONE TIME WORK + Title Badge + Zoom Trigger */}
+      {/* Compact Top Header Bar: ONE TIME WORK + Title Card + Zoom Trigger */}
       <header className="why-compact-header shrink-0 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+        <div className="why-header-cards-group flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap sm:flex-nowrap">
           <OneTimeWorkHighlight forceRender={true} />
           
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#142D50] border border-amber-500/30 text-white shadow-2xs">
-            <Lightbulb className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-            <span className="text-xs sm:text-[13px] font-bold text-white tracking-tight whitespace-nowrap">
-              Why Smartway
-            </span>
-            <span className="hidden sm:inline-block text-[10px] font-semibold text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded ml-1 border border-amber-400/30">
-              Land Bank Vision
-            </span>
+          <div
+            className="why-title-card"
+            data-testid="why-title-card"
+            aria-label="Why IG INFRA.... For LAND BANK CREATION"
+          >
+            {/* Top decorative golden line with centered diamond star */}
+            <div className="why-title-frame-line top-line" aria-hidden="true">
+              <span className="why-frame-line-segment" />
+              <span className="why-frame-star">✦</span>
+              <span className="why-frame-line-segment" />
+            </div>
+
+            {/* Center text row with decorative flanking lines */}
+            <div className="why-title-text-row">
+              <span className="why-title-decor-line line-left" aria-hidden="true" />
+              <h1 className="why-title-heading" data-testid="why-title-heading">
+                <span className="why-title-gold-text">Why IG INFRA.... For LAND BANK CREATION</span>
+              </h1>
+              <span className="why-title-decor-line line-right" aria-hidden="true" />
+            </div>
+
+            {/* Bottom decorative golden line with centered diamond star */}
+            <div className="why-title-frame-line bottom-line" aria-hidden="true">
+              <span className="why-frame-line-segment" />
+              <span className="why-frame-star">✦</span>
+              <span className="why-frame-line-segment" />
+            </div>
           </div>
 
           <span className="sr-only">
-            Think Beyond Money... Think Property Ownership · Just 2 Referrals in Your Life
+            Land is a Gift of God · Build Your Own Land Bank · Think Beyond Money... Think Property Ownership · A Property Ownership Opportunity for Everyday Earners · Just 2 Referrals in Your Life · A House + A Land · Secure Your Future
           </span>
         </div>
 
@@ -91,7 +111,7 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
         <section
           className="why-visual-wrapper group"
           data-testid="why-image-card"
-          aria-label="Why Smartway - Land is a Gift of God Visual Presentation"
+          aria-label="Why IG INFRA - Land is a Gift of God Visual Presentation"
         >
           {/* Subtle rotating light rays around the divine hand & floating land */}
           <div className="why-light-rays-effect" aria-hidden="true" />
@@ -110,10 +130,10 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
             <span className="hidden sm:inline">Expand</span>
           </button>
 
-          {/* Exact Approved Promotional Image */}
+          {/* Newly Attached Approved Promotional Image */}
           <img
             src={whyLandBankAsset}
-            alt="Land is a Gift of God - Build Your Own Land Bank - Think Beyond Money... Think Property Ownership - Just 2 Referrals in Your Life - A House + A Land - Secure Your Future"
+            alt="Land is a Gift of God - Build Your Own Land Bank - Think Beyond Money... Think Property Ownership - A Property Ownership Opportunity for Everyday Earners - Just 2 Referrals in Your Life - A House + A Land - Secure Your Future"
             className="why-main-image"
             data-testid="why-main-img"
             loading="eager"
@@ -131,9 +151,9 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
           data-testid="why-badge-referrals"
           title="View Route Map for 2 Referrals Plan"
         >
-          <Home className="w-3 h-3 text-blue-600" />
+          <Users className="w-3 h-3 text-blue-600" />
           <span className="font-semibold text-slate-800">Just 2 Referrals</span>
-          <span className="text-slate-500 hidden sm:inline">· In Your Lifetime</span>
+          <span className="text-slate-500 hidden sm:inline">· In Your Life</span>
         </button>
 
         <button
@@ -143,7 +163,7 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
           data-testid="why-badge-property"
           title="View Customer Property Benefits"
         >
-          <MapPin className="w-3 h-3 text-amber-600" />
+          <Home className="w-3 h-3 text-amber-600" />
           <span className="font-semibold text-slate-800">A House + A Land</span>
           <span className="text-slate-500 hidden sm:inline">· Property Ownership</span>
         </button>
@@ -157,7 +177,7 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
         >
           <ShieldCheck className="w-3 h-3 text-emerald-600" />
           <span className="font-semibold text-slate-800">Secure Your Future</span>
-          <span className="text-slate-500 hidden sm:inline">· Wealth & Freedom</span>
+          <span className="text-slate-500 hidden sm:inline">· Everyday Earners</span>
         </button>
       </footer>
 
@@ -169,7 +189,7 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
           data-testid="why-zoom-modal"
           role="dialog"
           aria-modal="true"
-          aria-label="Why Smartway full-resolution presentation"
+          aria-label="Why IG INFRA full-resolution presentation"
         >
           <div
             className="relative max-w-7xl w-full max-h-[96vh] flex flex-col items-center justify-center"
@@ -188,7 +208,7 @@ export function WhyView({ isAdmin = false, userEmail, onNavigateToTab }: WhyView
             <div className="rounded-xl overflow-hidden border border-amber-500/40 shadow-2xl bg-black max-h-[90vh] flex items-center justify-center">
               <img
                 src={whyLandBankAsset}
-                alt="Land is a Gift of God - Full Resolution"
+                alt="Land is a Gift of God - Build Your Own Land Bank - A Property Ownership Opportunity for Everyday Earners - Full Resolution"
                 className="w-full h-auto max-h-[90vh] object-contain"
               />
             </div>

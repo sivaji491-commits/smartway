@@ -4576,6 +4576,63 @@
 }
 
 /* ==========================================================================
+   Potentiality 3 Summary Cards Mobile Ordering:
+   Mobile Only (< 768px):
+     1. SUCCESS RATIO WITH 2 REF. - 5 Cr. (order: 1)
+     2. ONE TIME SMART WORK (order: 2)
+     3. JUST 3 MONTHS - PBA 1 (order: 3)
+   Desktop / Laptop / Tablet (>= 768px):
+     1. JUST 3 MONTHS - PBA 1 (order: 1)
+     2. ONE TIME SMART WORK (order: 2)
+     3. SUCCESS RATIO WITH 2 REF. - 5 Cr. (order: 3)
+   ========================================================================== */
+@media (max-width: 767.98px) {
+  .potentiality-cards-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+
+  .potentiality-card-success-ratio {
+    order: 1 !important;
+  }
+
+  .potentiality-card-smart-work {
+    order: 2 !important;
+  }
+
+  .potentiality-card-period {
+    order: 3 !important;
+  }
+
+  .home-main-container.potentiality-container {
+    padding-bottom: 8px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .potentiality-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+  }
+
+  .potentiality-card-period {
+    order: 1 !important;
+    grid-column: span 3 / span 3 !important;
+  }
+
+  .potentiality-card-smart-work {
+    order: 2 !important;
+    grid-column: span 6 / span 6 !important;
+  }
+
+  .potentiality-card-success-ratio {
+    order: 3 !important;
+    grid-column: span 3 / span 3 !important;
+  }
+}
+
+/* ==========================================================================
    Home Page Scrolling Marquee Animation
    Continuous seamless horizontal scrolling from right to left with hover pause
    ========================================================================== */

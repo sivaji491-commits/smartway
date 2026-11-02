@@ -1174,11 +1174,17 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
       </div>
 
       {/* 4. Bottom Presentation Cards & Motivational Banners (Matching Exact Reference Screenshot) */}
-      <div className="space-y-2 pt-1 font-['Inter',system-ui,sans-serif]">
+      <div className="space-y-1.5 md:space-y-2 pt-1 font-['Inter',system-ui,sans-serif]">
         {/* Banner Layer: Navy/Royal Blue Period Summary + Teal/Emerald Smart Work Banner + Floating Success Ratio */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-stretch">
+        <div 
+          className="potentiality-cards-grid grid grid-cols-1 md:grid-cols-12 gap-1.5 md:gap-2 items-stretch"
+          data-testid="potentiality-cards-grid"
+        >
           {/* Card 1: Left Deep Navy into Royal Blue Gradient Card with Subtle Highlights */}
-          <div className="potentiality-zoom-card md:col-span-3 bg-gradient-to-br from-[#0c1e3d] via-[#112d58] to-[#1e40af] border border-blue-400/25 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-sm relative overflow-hidden">
+          <div 
+            className="potentiality-zoom-card potentiality-card-period order-3 md:order-1 md:col-span-3 bg-gradient-to-br from-[#0c1e3d] via-[#112d58] to-[#1e40af] border border-blue-400/25 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-sm relative overflow-hidden"
+            data-testid="potentiality-card-period"
+          >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300/15 via-transparent to-transparent pointer-events-none rounded-[8px]" />
             <span className="relative z-1 text-[12px] sm:text-[13px] font-extrabold tracking-wide uppercase text-blue-100">
               {currentPeriodConfig.summary || msgs.monthsBadge}
@@ -1189,7 +1195,10 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
           </div>
 
           {/* Card 2: Center Deep Teal & Emerald Green Gradient Card */}
-          <div className="potentiality-zoom-card md:col-span-6 bg-gradient-to-br from-[#042f2e] via-[#064e3b] to-[#047857] border border-emerald-400/30 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-md relative overflow-hidden">
+          <div 
+            className="potentiality-zoom-card potentiality-card-smart-work order-2 md:order-2 md:col-span-6 bg-gradient-to-br from-[#042f2e] via-[#064e3b] to-[#047857] border border-emerald-400/30 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-md relative overflow-hidden"
+            data-testid="potentiality-card-smart-work"
+          >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-300/15 via-transparent to-transparent pointer-events-none rounded-[8px]" />
             <span className="relative z-1 text-[13px] sm:text-[15px] font-black tracking-wider uppercase text-emerald-50 drop-shadow-xs">
               {msgs.bannerTitle}
@@ -1203,7 +1212,10 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
           </div>
 
           {/* Card 3: Right Success Ratio Card with Special Floating Pulse Effect & Soft Border Glow */}
-          <div className="potentiality-zoom-card potentiality-floating-card md:col-span-3 bg-gradient-to-b from-white via-slate-50 to-slate-100/90 border border-slate-200/90 rounded-[8px] p-2 sm:p-2.5 flex flex-col justify-center items-center text-center shadow-xs">
+          <div 
+            className="potentiality-zoom-card potentiality-floating-card potentiality-card-success-ratio order-1 md:order-3 md:col-span-3 bg-gradient-to-b from-white via-slate-50 to-slate-100/90 border border-slate-200/90 rounded-[8px] p-2 sm:p-2.5 flex flex-col justify-center items-center text-center shadow-xs"
+            data-testid="potentiality-card-success-ratio"
+          >
             <span className="text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">
               {msgs.successRatioTitle}
             </span>
@@ -1214,7 +1226,7 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
         </div>
 
         {/* Banner Layer 3: Bottom Guidance & Reinvestment Note */}
-        <div className="bg-[#fffbeb] border border-[#fef08a] rounded-[8px] p-2.5 sm:p-3 text-slate-800 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+        <div className="bg-[#fffbeb] border border-[#fef08a] rounded-[8px] p-2 sm:p-2.5 md:p-3 text-slate-800 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-2.5">
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center text-[10px] font-bold shrink-0">
