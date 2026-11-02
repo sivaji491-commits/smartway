@@ -4576,33 +4576,42 @@
 }
 
 /* ==========================================================================
-   Potentiality 3 Summary Cards Mobile Ordering:
+   Potentiality Presentation Cards Mobile vs Desktop Arrangement
    Mobile Only (< 768px):
-     1. SUCCESS RATIO WITH 2 REF. - 5 Cr. (order: 1)
-     2. ONE TIME SMART WORK (order: 2)
-     3. JUST 3 MONTHS - PBA 1 (order: 3)
+     Row 1 (Side-by-Side 50% width each, equal height):
+       1. JUST 3 MONTHS - PBA 1 (order: 1, span 1)
+       2. SUCCESS RATIO WITH 2 REF. - 5 Cr. (order: 2, span 1)
+     Row 2 (Full Width 100%):
+       3. ONE TIME SMART WORK (order: 3, span 2)
    Desktop / Laptop / Tablet (>= 768px):
-     1. JUST 3 MONTHS - PBA 1 (order: 1)
-     2. ONE TIME SMART WORK (order: 2)
-     3. SUCCESS RATIO WITH 2 REF. - 5 Cr. (order: 3)
+     1. JUST 3 MONTHS - PBA 1 (order: 1, span 3)
+     2. ONE TIME SMART WORK (order: 2, span 6)
+     3. SUCCESS RATIO WITH 2 REF. - 5 Cr. (order: 3, span 3)
    ========================================================================== */
 @media (max-width: 767.98px) {
   .potentiality-cards-grid {
-    display: flex !important;
-    flex-direction: column !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 6px !important;
-  }
-
-  .potentiality-card-success-ratio {
-    order: 1 !important;
-  }
-
-  .potentiality-card-smart-work {
-    order: 2 !important;
+    align-items: stretch !important;
   }
 
   .potentiality-card-period {
+    order: 1 !important;
+    grid-column: span 1 / span 1 !important;
+    height: 100% !important;
+  }
+
+  .potentiality-card-success-ratio {
+    order: 2 !important;
+    grid-column: span 1 / span 1 !important;
+    height: 100% !important;
+  }
+
+  .potentiality-card-smart-work {
     order: 3 !important;
+    grid-column: span 2 / span 2 !important;
+    width: 100% !important;
   }
 
   .home-main-container.potentiality-container {
@@ -4614,21 +4623,25 @@
   .potentiality-cards-grid {
     display: grid !important;
     grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 8px !important;
   }
 
   .potentiality-card-period {
     order: 1 !important;
     grid-column: span 3 / span 3 !important;
+    height: auto !important;
   }
 
   .potentiality-card-smart-work {
     order: 2 !important;
     grid-column: span 6 / span 6 !important;
+    width: auto !important;
   }
 
   .potentiality-card-success-ratio {
     order: 3 !important;
     grid-column: span 3 / span 3 !important;
+    height: auto !important;
   }
 }
 

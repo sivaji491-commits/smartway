@@ -115,13 +115,15 @@ describe('Potentiality Table Responsive Layout Verification', () => {
     });
   });
 
-  describe('8. Mobile-Only Potentiality 3-Card Arrangement (SUCCESS RATIO -> SMART WORK -> JUST 3 MONTHS)', () => {
-    it('applies CSS responsive ordering so SUCCESS RATIO is 1st, SMART WORK is 2nd, and JUST 3 MONTHS is 3rd on mobile', () => {
+  describe('8. Mobile-Only Potentiality 2-Row Arrangement (Row 1: 50/50 Cards Side-by-Side, Row 2: Smart Work Full-Width)', () => {
+    it('applies responsive classes so Row 1 has JUST 3 MONTHS and SUCCESS RATIO side by side, and Row 2 has ONE TIME SMART WORK full width', () => {
       render(<PotentialityView isAdmin={false} />);
 
       const grid = screen.getByTestId('potentiality-cards-grid');
       expect(grid).toBeInTheDocument();
       expect(grid.className).toContain('potentiality-cards-grid');
+      expect(grid.className).toContain('grid-cols-2');
+      expect(grid.className).toContain('md:grid-cols-12');
       expect(grid.className).toContain('gap-1.5');
 
       const cardPeriod = screen.getByTestId('potentiality-card-period');
@@ -132,15 +134,26 @@ describe('Potentiality Table Responsive Layout Verification', () => {
       expect(cardSmartWork).toBeInTheDocument();
       expect(cardSuccessRatio).toBeInTheDocument();
 
-      // Mobile order: Success Ratio (order-1), Smart Work (order-2), Period (order-3)
-      expect(cardSuccessRatio.className).toContain('order-1');
-      expect(cardSuccessRatio.className).toContain('md:order-3');
-
-      expect(cardSmartWork.className).toContain('order-2');
-      expect(cardSmartWork.className).toContain('md:order-2');
-
-      expect(cardPeriod.className).toContain('order-3');
+      // Mobile Row 1 Left: Period Card (order-1, col-span-1, h-full)
+      expect(cardPeriod.className).toContain('order-1');
+      expect(cardPeriod.className).toContain('col-span-1');
+      expect(cardPeriod.className).toContain('h-full');
       expect(cardPeriod.className).toContain('md:order-1');
+      expect(cardPeriod.className).toContain('md:col-span-3');
+
+      // Mobile Row 1 Right: Success Ratio Card (order-2, col-span-1, h-full)
+      expect(cardSuccessRatio.className).toContain('order-2');
+      expect(cardSuccessRatio.className).toContain('col-span-1');
+      expect(cardSuccessRatio.className).toContain('h-full');
+      expect(cardSuccessRatio.className).toContain('md:order-3');
+      expect(cardSuccessRatio.className).toContain('md:col-span-3');
+
+      // Mobile Row 2 Full Width: Smart Work Card (order-3, col-span-2, w-full)
+      expect(cardSmartWork.className).toContain('order-3');
+      expect(cardSmartWork.className).toContain('col-span-2');
+      expect(cardSmartWork.className).toContain('w-full');
+      expect(cardSmartWork.className).toContain('md:order-2');
+      expect(cardSmartWork.className).toContain('md:col-span-6');
     });
 
     it('preserves desktop column spanning (col-span-3, col-span-6, col-span-3) for desktop/laptop/tablet', () => {

@@ -1177,26 +1177,26 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
       <div className="space-y-1.5 md:space-y-2 pt-1 font-['Inter',system-ui,sans-serif]">
         {/* Banner Layer: Navy/Royal Blue Period Summary + Teal/Emerald Smart Work Banner + Floating Success Ratio */}
         <div 
-          className="potentiality-cards-grid grid grid-cols-1 md:grid-cols-12 gap-1.5 md:gap-2 items-stretch"
+          className="potentiality-cards-grid grid grid-cols-2 md:grid-cols-12 gap-1.5 md:gap-2 items-stretch"
           data-testid="potentiality-cards-grid"
         >
           {/* Card 1: Left Deep Navy into Royal Blue Gradient Card with Subtle Highlights */}
           <div 
-            className="potentiality-zoom-card potentiality-card-period order-3 md:order-1 md:col-span-3 bg-gradient-to-br from-[#0c1e3d] via-[#112d58] to-[#1e40af] border border-blue-400/25 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-sm relative overflow-hidden"
+            className="potentiality-zoom-card potentiality-card-period col-span-1 md:col-span-3 order-1 md:order-1 h-full bg-gradient-to-br from-[#0c1e3d] via-[#112d58] to-[#1e40af] border border-blue-400/25 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-sm relative overflow-hidden"
             data-testid="potentiality-card-period"
           >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-300/15 via-transparent to-transparent pointer-events-none rounded-[8px]" />
-            <span className="relative z-1 text-[12px] sm:text-[13px] font-extrabold tracking-wide uppercase text-blue-100">
+            <span className="relative z-1 text-[11.5px] min-[360px]:text-[12px] sm:text-[13px] font-extrabold tracking-wide uppercase text-blue-100 text-center">
               {currentPeriodConfig.summary || msgs.monthsBadge}
             </span>
-            <span className="relative z-1 text-[16px] sm:text-[18px] font-black tracking-tight mt-0.5 text-white drop-shadow-xs">
+            <span className="relative z-1 text-[15px] min-[360px]:text-[16px] sm:text-[18px] font-black tracking-tight mt-0.5 text-white drop-shadow-xs">
               {summary.selectedRankName}
             </span>
           </div>
 
           {/* Card 2: Center Deep Teal & Emerald Green Gradient Card */}
           <div 
-            className="potentiality-zoom-card potentiality-card-smart-work order-2 md:order-2 md:col-span-6 bg-gradient-to-br from-[#042f2e] via-[#064e3b] to-[#047857] border border-emerald-400/30 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-md relative overflow-hidden"
+            className="potentiality-zoom-card potentiality-card-smart-work col-span-2 md:col-span-6 order-3 md:order-2 w-full bg-gradient-to-br from-[#042f2e] via-[#064e3b] to-[#047857] border border-emerald-400/30 text-white rounded-[8px] p-2 sm:p-2.5 text-center flex flex-col justify-center items-center shadow-md relative overflow-hidden"
             data-testid="potentiality-card-smart-work"
           >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-300/15 via-transparent to-transparent pointer-events-none rounded-[8px]" />
@@ -1213,10 +1213,10 @@ export function PotentialityView({ isAdmin = false }: PotentialityViewProps) {
 
           {/* Card 3: Right Success Ratio Card with Special Floating Pulse Effect & Soft Border Glow */}
           <div 
-            className="potentiality-zoom-card potentiality-floating-card potentiality-card-success-ratio order-1 md:order-3 md:col-span-3 bg-gradient-to-b from-white via-slate-50 to-slate-100/90 border border-slate-200/90 rounded-[8px] p-2 sm:p-2.5 flex flex-col justify-center items-center text-center shadow-xs"
+            className="potentiality-zoom-card potentiality-floating-card potentiality-card-success-ratio col-span-1 md:col-span-3 order-2 md:order-3 h-full bg-gradient-to-b from-white via-slate-50 to-slate-100/90 border border-slate-200/90 rounded-[8px] p-2 sm:p-2.5 flex flex-col justify-center items-center text-center shadow-xs"
             data-testid="potentiality-card-success-ratio"
           >
-            <span className="text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-[9.5px] min-[360px]:text-[10px] sm:text-[10.5px] font-bold text-slate-500 uppercase tracking-wider text-center">
               {msgs.successRatioTitle}
             </span>
             <span className="text-[17px] sm:text-[19px] font-black text-[#F97316] tracking-tight mt-0.5">
