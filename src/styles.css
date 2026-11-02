@@ -5225,6 +5225,69 @@
 }
 
 /* ==========================================================================
+   Time In-hand Promotional Slogans Single-Line Mobile Responsive Typography
+   Ensures red and black sentences stay strictly on ONE horizontal line on mobile
+   without wrapping, clipping, or causing horizontal/vertical scrollbars.
+   ========================================================================== */
+.time-in-hand-quote-red {
+  color: #dc2626; /* text-rose-600 / red-600 */
+  font-weight: 700;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  font-size: clamp(8px, 2.5vw, 15px);
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .time-in-hand-quote-red {
+    font-size: 14px;
+    letter-spacing: normal;
+  }
+}
+
+@media (min-width: 768px) {
+  .time-in-hand-quote-red {
+    font-size: 16px;
+    letter-spacing: normal;
+  }
+}
+
+.time-in-hand-quote-black {
+  color: #0f172a; /* text-slate-900 / black */
+  font-weight: 800;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  font-size: clamp(8px, 2.5vw, 17px);
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 640px) {
+  .time-in-hand-quote-black {
+    font-size: 15px;
+    letter-spacing: normal;
+  }
+}
+
+@media (min-width: 768px) {
+  .time-in-hand-quote-black {
+    font-size: 18px;
+    letter-spacing: normal;
+  }
+}
+
+/* ==========================================================================
    Home Page Hero Headline — Subtle Golden Glow & Occasional Light Sweep
    ========================================================================== */
 

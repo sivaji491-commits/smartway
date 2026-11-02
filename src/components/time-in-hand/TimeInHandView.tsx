@@ -5,6 +5,7 @@ import {
   Plus, 
   Trash2, 
   Edit2, 
+  Check,
   CheckCircle2, 
   AlertCircle, 
   RotateCcw, 
@@ -88,6 +89,12 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
   // Table inline editing state for first 4 columns (Admin only)
   const [isEditingTable, setIsEditingTable] = useState<boolean>(false);
   const [tableDraftRows, setTableDraftRows] = useState<TimeInHandRow[]>([]);
+
+  // States for independent editing of bottom promotional sentences (Admin only)
+  const [isEditingRedQuote, setIsEditingRedQuote] = useState<boolean>(false);
+  const [draftRedQuote, setDraftRedQuote] = useState<string>('');
+  const [isEditingBlackQuote, setIsEditingBlackQuote] = useState<boolean>(false);
+  const [draftBlackQuote, setDraftBlackQuote] = useState<string>('');
 
   // Feedback notifications
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -316,6 +323,80 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
       });
     } else {
       setFeedback({ type: 'error', message: res.error || 'Failed to save table changes.' });
+    }
+  };
+
+  // Start/Cancel/Save Red Slogan (Quote 2)
+  const handleStartEditRedQuote = () => {
+    if (!isAdmin) return;
+    const currentRed = config.quote2 
+      ? (config.quote2.includes('👈') ? config.quote2.replace('👈', '').trim() : config.quote2.includes('👉') ? config.quote2.replace('👉', '').trim() : config.quote2.trim()) 
+      : 'Invest your idea and leisure time on the right platform, not money.';
+    setDraftRedQuote(currentRed);
+    setIsEditingRedQuote(true);
+  };
+
+  const handleCancelEditRedQuote = () => {
+    setIsEditingRedQuote(false);
+    setDraftRedQuote('');
+  };
+
+  const handleSaveRedQuote = async () => {
+    if (!isAdmin) return;
+    if (!draftRedQuote.trim()) {
+      setFeedback({ type: 'error', message: 'Red promotional sentence cannot be empty.' });
+      return;
+    }
+    setIsSaving(true);
+    setFeedback(null);
+    const updatedConfig: TimeInHandConfig = {
+      ...config,
+      quote2: draftRedQuote.trim(),
+    };
+    const res = await saveTimeInHandAdmin(updatedConfig, userEmail || 'sivaji491@gmail.com');
+    setIsSaving(false);
+    if (res.success && res.data) {
+      setConfig(res.data);
+      setIsEditingRedQuote(false);
+      setFeedback({ type: 'success', message: 'Red promotional sentence updated successfully.' });
+    } else {
+      setFeedback({ type: 'error', message: res.error || 'Failed to update red sentence.' });
+    }
+  };
+
+  // Start/Cancel/Save Black Slogan (Quote 3)
+  const handleStartEditBlackQuote = () => {
+    if (!isAdmin) return;
+    const currentBlack = config.quote3?.trim() || "Everything is smart nowadays, so why shouldn't earning also be smart?";
+    setDraftBlackQuote(currentBlack);
+    setIsEditingBlackQuote(true);
+  };
+
+  const handleCancelEditBlackQuote = () => {
+    setIsEditingBlackQuote(false);
+    setDraftBlackQuote('');
+  };
+
+  const handleSaveBlackQuote = async () => {
+    if (!isAdmin) return;
+    if (!draftBlackQuote.trim()) {
+      setFeedback({ type: 'error', message: 'Black motivational sentence cannot be empty.' });
+      return;
+    }
+    setIsSaving(true);
+    setFeedback(null);
+    const updatedConfig: TimeInHandConfig = {
+      ...config,
+      quote3: draftBlackQuote.trim(),
+    };
+    const res = await saveTimeInHandAdmin(updatedConfig, userEmail || 'sivaji491@gmail.com');
+    setIsSaving(false);
+    if (res.success && res.data) {
+      setConfig(res.data);
+      setIsEditingBlackQuote(false);
+      setFeedback({ type: 'success', message: 'Black motivational sentence updated successfully.' });
+    } else {
+      setFeedback({ type: 'error', message: res.error || 'Failed to update black sentence.' });
     }
   };
 
@@ -1077,19 +1158,146 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
       </div>
 
       {/* 4. Promotional & Motivational Quotes matching reference screenshot */}
-      <div className="pt-2 pb-1 text-center space-y-2 break-words px-2 max-w-full overflow-hidden">
+      <div className="pt-2 pb-1 text-center space-y-1.5 px-2 max-w-full overflow-hidden">
+        {/* Grey Slogan */}
         <p className="text-slate-800 text-xs sm:text-sm md:text-base font-medium break-words">
           {config.quote1 || 'Just give 2 perfect referrals, your life will be settled financially.'}
         </p>
 
-        <p className="text-rose-600 text-xs sm:text-sm md:text-base font-bold flex items-center justify-center gap-1.5 flex-wrap break-words">
-          <span>{config.quote2 ? (config.quote2.includes('👈') ? config.quote2.replace('👈', '').trim() : config.quote2.trim()) : ''}</span>
-          <span className="text-lg leading-none" role="img" aria-label="point left">👈</span>
-        </p>
+        {/* Red Slogan - Strictly Single Horizontal Line on Mobile, Editable by Admin */}
+        <div className="w-full flex flex-col items-center justify-center my-0.5">
+          {isAdmin && isEditingRedQuote ? (
+            <div className="w-full max-w-xl mx-auto flex flex-col sm:flex-row items-center gap-1.5 p-2 bg-rose-50/90 border border-rose-300 rounded-lg shadow-xs">
+              <Input
+                type="text"
+                value={draftRedQuote}
+                onChange={(e) => setDraftRedQuote(e.target.value)}
+                className="h-8 text-xs font-bold text-rose-700 bg-white border-rose-300 focus:border-rose-500 w-full"
+                placeholder="Edit red promotional sentence..."
+                aria-label="Edit red sentence input"
+                data-testid="red-quote-input"
+              />
+              <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleSaveRedQuote}
+                  disabled={isSaving}
+                  className="h-7 px-2.5 text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold shadow-xs"
+                  data-testid="save-red-quote-btn"
+                >
+                  <Check className="w-3.5 h-3.5 mr-1" />
+                  Save
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCancelEditRedQuote}
+                  disabled={isSaving}
+                  className="h-7 px-2.5 text-xs border-slate-300 text-slate-700 hover:bg-slate-100"
+                  data-testid="cancel-red-quote-btn"
+                >
+                  <X className="w-3.5 h-3.5 mr-1" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full flex items-center justify-center gap-1 overflow-hidden">
+              <span 
+                className="time-in-hand-quote-red" 
+                data-testid="time-in-hand-red-sentence"
+                title={config.quote2 ? (config.quote2.includes('👈') ? config.quote2.replace('👈', '').trim() : config.quote2.includes('👉') ? config.quote2.replace('👉', '').trim() : config.quote2.trim()) : 'Invest your idea and leisure time on the right platform, not money.'}
+              >
+                {config.quote2 ? (config.quote2.includes('👈') ? config.quote2.replace('👈', '').trim() : config.quote2.includes('👉') ? config.quote2.replace('👉', '').trim() : config.quote2.trim()) : 'Invest your idea and leisure time on the right platform, not money.'}
+              </span>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleStartEditRedQuote}
+                  data-testid="edit-red-quote-btn"
+                  className="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded px-1.5 py-0.5 shadow-2xs transition-colors cursor-pointer"
+                  title="Edit Red Sentence"
+                  aria-label="Edit Red Sentence"
+                >
+                  <Edit2 className="w-2.5 h-2.5" />
+                  <span>Edit</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
 
-        <p className="text-slate-900 text-sm sm:text-base md:text-lg font-extrabold tracking-tight break-words">
-          {config.quote3 || "Everything is smart nowadays, so why shouldn't earning also be smart?"}
-        </p>
+        {/* Hand Icon pointing to the Black Sentence */}
+        <div className="text-base sm:text-lg leading-none py-0.5 text-center select-none" role="img" aria-label="pointing hand">
+          👉
+        </div>
+
+        {/* Black Slogan - Strictly Single Horizontal Line on Mobile, Editable by Admin */}
+        <div className="w-full flex flex-col items-center justify-center my-0.5">
+          {isAdmin && isEditingBlackQuote ? (
+            <div className="w-full max-w-xl mx-auto flex flex-col sm:flex-row items-center gap-1.5 p-2 bg-slate-50 border border-slate-300 rounded-lg shadow-xs">
+              <Input
+                type="text"
+                value={draftBlackQuote}
+                onChange={(e) => setDraftBlackQuote(e.target.value)}
+                className="h-8 text-xs font-extrabold text-slate-900 bg-white border-slate-300 focus:border-slate-500 w-full"
+                placeholder="Edit black motivational sentence..."
+                aria-label="Edit black sentence input"
+                data-testid="black-quote-input"
+              />
+              <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleSaveBlackQuote}
+                  disabled={isSaving}
+                  className="h-7 px-2.5 text-xs bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-xs"
+                  data-testid="save-black-quote-btn"
+                >
+                  <Check className="w-3.5 h-3.5 mr-1" />
+                  Save
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCancelEditBlackQuote}
+                  disabled={isSaving}
+                  className="h-7 px-2.5 text-xs border-slate-300 text-slate-700 hover:bg-slate-100"
+                  data-testid="cancel-black-quote-btn"
+                >
+                  <X className="w-3.5 h-3.5 mr-1" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full flex items-center justify-center gap-1 overflow-hidden">
+              <span 
+                className="time-in-hand-quote-black" 
+                data-testid="time-in-hand-black-sentence"
+                title={config.quote3 || "Everything is smart nowadays, so why shouldn't earning also be smart?"}
+              >
+                {config.quote3 || "Everything is smart nowadays, so why shouldn't earning also be smart?"}
+              </span>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={handleStartEditBlackQuote}
+                  data-testid="edit-black-quote-btn"
+                  className="shrink-0 inline-flex items-center gap-1 text-[10px] font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded px-1.5 py-0.5 shadow-2xs transition-colors cursor-pointer"
+                  title="Edit Black Sentence"
+                  aria-label="Edit Black Sentence"
+                >
+                  <Edit2 className="w-2.5 h-2.5" />
+                  <span>Edit</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 5. Admin Settings Modal */}

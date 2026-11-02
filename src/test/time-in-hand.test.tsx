@@ -410,4 +410,133 @@ describe('Time-In Hand / In-hand Time Feature Tests', () => {
       expect(daysOnlyCard?.className).not.toContain('time-in-hand-heartbeat-card');
     });
   });
+
+  // -------------------------------------------------------------
+  describe('9. Bottom Promotional Slogans Single-Line Responsive Display & Admin Editing', () => {
+    it('User login: renders both sentences with single-line responsive classes and without edit controls', () => {
+      render(<TimeInHandView isAdmin={false} userEmail="regular@example.com" />);
+
+      const redSentence = screen.getByTestId('time-in-hand-red-sentence');
+      const blackSentence = screen.getByTestId('time-in-hand-black-sentence');
+
+      expect(redSentence).toBeInTheDocument();
+      expect(blackSentence).toBeInTheDocument();
+
+      // Check responsive single-line classes
+      expect(redSentence.className).toContain('time-in-hand-quote-red');
+      expect(blackSentence.className).toContain('time-in-hand-quote-black');
+
+      // Text content matches
+      expect(redSentence.textContent).toContain('Invest your idea and leisure time on the right platform, not money.');
+      expect(blackSentence.textContent).toContain("Everything is smart nowadays, so why shouldn't earning also be smart?");
+
+      // Regular user MUST NOT see Edit, Save, Cancel, or Input controls
+      expect(screen.queryByTestId('edit-red-quote-btn')).toBeNull();
+      expect(screen.queryByTestId('edit-black-quote-btn')).toBeNull();
+      expect(screen.queryByTestId('red-quote-input')).toBeNull();
+      expect(screen.queryByTestId('black-quote-input')).toBeNull();
+      expect(screen.queryByTestId('save-red-quote-btn')).toBeNull();
+      expect(screen.queryByTestId('save-black-quote-btn')).toBeNull();
+    });
+
+    it('Admin login: displays Edit buttons for both sentences independently', () => {
+      render(<TimeInHandView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      expect(screen.getByTestId('edit-red-quote-btn')).toBeInTheDocument();
+      expect(screen.getByTestId('edit-black-quote-btn')).toBeInTheDocument();
+    });
+
+    it('Admin login: allows editing and saving red sentence independently with persistence', async () => {
+      const { unmount } = render(<TimeInHandView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const editRedBtn = screen.getByTestId('edit-red-quote-btn');
+      await act(async () => {
+        fireEvent.click(editRedBtn);
+      });
+
+      // Input and Save/Cancel appear
+      const redInput = screen.getByTestId('red-quote-input');
+      expect(redInput).toBeInTheDocument();
+      expect(screen.getByTestId('save-red-quote-btn')).toBeInTheDocument();
+      expect(screen.getByTestId('cancel-red-quote-btn')).toBeInTheDocument();
+
+      // Change text and save
+      await act(async () => {
+        fireEvent.change(redInput, {
+          target: { value: 'Work smart, invest your wisdom on the right platform.' },
+        });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('save-red-quote-btn'));
+      });
+
+      // Verify updated text is displayed
+      const updatedRed = screen.getByTestId('time-in-hand-red-sentence');
+      expect(updatedRed.textContent).toBe('Work smart, invest your wisdom on the right platform.');
+
+      unmount();
+
+      // Rerender as normal user to verify persistence
+      render(<TimeInHandView isAdmin={false} userEmail="member@example.com" />);
+      const persistedRed = screen.getByTestId('time-in-hand-red-sentence');
+      expect(persistedRed.textContent).toBe('Work smart, invest your wisdom on the right platform.');
+    });
+
+    it('Admin login: allows editing and saving black sentence independently with persistence', async () => {
+      const { unmount } = render(<TimeInHandView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const editBlackBtn = screen.getByTestId('edit-black-quote-btn');
+      await act(async () => {
+        fireEvent.click(editBlackBtn);
+      });
+
+      const blackInput = screen.getByTestId('black-quote-input');
+      expect(blackInput).toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.change(blackInput, {
+          target: { value: 'Smart platforms empower smart earners worldwide.' },
+        });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('save-black-quote-btn'));
+      });
+
+      const updatedBlack = screen.getByTestId('time-in-hand-black-sentence');
+      expect(updatedBlack.textContent).toBe('Smart platforms empower smart earners worldwide.');
+
+      unmount();
+
+      // Rerender as regular user
+      render(<TimeInHandView isAdmin={false} userEmail="customer@example.com" />);
+      const persistedBlack = screen.getByTestId('time-in-hand-black-sentence');
+      expect(persistedBlack.textContent).toBe('Smart platforms empower smart earners worldwide.');
+      expect(screen.queryByTestId('edit-black-quote-btn')).toBeNull();
+    });
+
+    it('Admin login: cancelling edit leaves the original text unchanged', async () => {
+      render(<TimeInHandView isAdmin={true} userEmail="sivaji491@gmail.com" />);
+
+      const editRedBtn = screen.getByTestId('edit-red-quote-btn');
+      await act(async () => {
+        fireEvent.click(editRedBtn);
+      });
+
+      const redInput = screen.getByTestId('red-quote-input');
+      await act(async () => {
+        fireEvent.change(redInput, { target: { value: 'Temporary text that should be cancelled' } });
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('cancel-red-quote-btn'));
+      });
+
+      // Returns to display mode without saving the temporary text
+      expect(screen.queryByTestId('red-quote-input')).toBeNull();
+      const currentRed = screen.getByTestId('time-in-hand-red-sentence');
+      expect(currentRed.textContent).not.toBe('Temporary text that should be cancelled');
+    });
+  });
 });

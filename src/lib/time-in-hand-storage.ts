@@ -159,6 +159,9 @@ export async function saveTimeInHandAdmin(
     monthsPerYear: Number(config.monthsPerYear) || 12,
     hoursInDay: Number(config.hoursInDay) || 24,
     daysInYear: Number(config.daysInYear) || 365,
+    quote1: config.quote1?.trim() || DEFAULT_TIME_IN_HAND_CONFIG.quote1,
+    quote2: config.quote2?.trim() || DEFAULT_TIME_IN_HAND_CONFIG.quote2,
+    quote3: config.quote3?.trim() || DEFAULT_TIME_IN_HAND_CONFIG.quote3,
     rows: config.rows.map((row, idx) => ({
       id: row.id || `row-${idx + 1}`,
       age: Number(row.age),
