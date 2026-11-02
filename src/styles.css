@@ -5150,6 +5150,52 @@
   }
 }
 
+/* ==========================================================================
+   Time In-hand Hero Card Premium Heartbeat Pulse Animation
+   Anatomical double-beat pulse (1.0 -> 1.035 -> 1.0 -> 1.02 -> 1.0 -> rest)
+   with soft orange glow and elevated 3D shadow over a 2s cycle.
+   ========================================================================== */
+@keyframes time-in-hand-heartbeat-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 22px -2px rgba(249, 115, 22, 0.35);
+  }
+  14% {
+    transform: scale(1.035);
+    box-shadow: 0 10px 28px -2px rgba(249, 115, 22, 0.50), 0 0 18px 2px rgba(249, 115, 22, 0.35);
+  }
+  28% {
+    transform: scale(1);
+    box-shadow: 0 4px 22px -2px rgba(249, 115, 22, 0.35);
+  }
+  42% {
+    transform: scale(1.02);
+    box-shadow: 0 7px 24px -2px rgba(249, 115, 22, 0.42), 0 0 12px 1px rgba(249, 115, 22, 0.25);
+  }
+  56% {
+    transform: scale(1);
+    box-shadow: 0 4px 22px -2px rgba(249, 115, 22, 0.35);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 22px -2px rgba(249, 115, 22, 0.35);
+  }
+}
+
+.time-in-hand-heartbeat-card {
+  animation: time-in-hand-heartbeat-pulse 2s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform, box-shadow;
+  z-index: 10;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .time-in-hand-heartbeat-card {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 /* Responsive Grid for In-Hand Summary Cards */
 .time-in-hand-summary-grid {
   display: grid;

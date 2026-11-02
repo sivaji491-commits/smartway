@@ -383,4 +383,31 @@ describe('Time-In Hand / In-hand Time Feature Tests', () => {
       expect(screen.getByText(/Row #1: Age must be a valid number between 1 and 120/i)).toBeDefined();
     });
   });
+
+  // -------------------------------------------------------------
+  describe('8. Time In-hand Hero Card Premium Heartbeat Pulse Animation', () => {
+    it('applies time-in-hand-heartbeat-card and motion-reduce:animate-none to the Time In-hand hero card only', () => {
+      render(<TimeInHandView isAdmin={false} userEmail="member@example.com" />);
+
+      const heroCard = screen.getByTestId('time-in-hand-hero-card');
+      expect(heroCard).toBeInTheDocument();
+      expect(heroCard.className).toContain('time-in-hand-heartbeat-card');
+      expect(heroCard.className).toContain('motion-reduce:animate-none');
+
+      // Traveling animated border is preserved inside
+      const borderBeam = heroCard.querySelector('.time-in-hand-animated-border');
+      expect(borderBeam).not.toBeNull();
+
+      // Selected badge and Timer icon exist
+      expect(heroCard.textContent).toContain('Time In-hand');
+      expect(heroCard.textContent).toContain('Selected');
+      expect(heroCard.textContent).toContain('3.2877');
+      expect(heroCard.textContent).toContain('years');
+      expect(heroCard.textContent).toContain('Active Row:');
+
+      // The Days Only card must NOT have the heartbeat class
+      const daysOnlyCard = screen.getByText('Days Only').closest('div');
+      expect(daysOnlyCard?.className).not.toContain('time-in-hand-heartbeat-card');
+    });
+  });
 });

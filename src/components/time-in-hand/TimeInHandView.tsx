@@ -696,9 +696,10 @@ export const TimeInHandView: React.FC<TimeInHandViewProps> = ({
           </div>
         </div>
 
-        {/* 6. Time In-hand (Animated Scrolling Border Hero Card with Flowing Conic Gradient Beam) */}
+        {/* 6. Time In-hand (Animated Scrolling Border Hero Card with Flowing Conic Gradient Beam + Premium Heartbeat Pulse) */}
         <div 
-          className="relative rounded-xl p-[2px] overflow-hidden shadow-[0_4px_22px_-2px_rgba(249,115,22,0.35)] flex flex-col justify-between transition-all duration-300 group"
+          className="time-in-hand-heartbeat-card motion-reduce:animate-none relative rounded-xl p-[2px] overflow-hidden shadow-[0_4px_22px_-2px_rgba(249,115,22,0.35)] flex flex-col justify-between transition-all duration-300 group"
+          data-testid="time-in-hand-hero-card"
         >
           {/* Continuously traveling glowing orange-to-amber-gold gradient border highlight */}
           <div className="time-in-hand-animated-border motion-reduce:animate-none" />
