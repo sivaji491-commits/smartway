@@ -102,6 +102,46 @@ describe('Rank Management & Cost Calculator Engine', () => {
       expect(grandTotals.totalInvestmentUSD).toBe(lastRank.cumulativeTotalUSD);
       expect(grandTotals.totalInvestmentINR).toBe(lastRank.cumulativeTotalINR);
     });
+
+    it('calculates Net INR correctly for all seven ranks excluding cumulative network fee in USD * exchange rate', () => {
+      const computed = computeRankTotals(DEFAULT_RANKS, 100);
+      expect(computed).toHaveLength(7);
+
+      // Rank 1: PBA 1 (Base $100, Fee $3) -> INR Value: 10,300, Fee in INR: 300 -> Net INR: 10,000
+      expect(computed[0]?.cumulativeNetworkFeeUSD).toBe(3);
+      expect(computed[0]?.netINR).toBe(10000);
+      expect(formatINR(computed[0]?.netINR!)).toContain('10,000.00');
+
+      // Rank 2: PBA 2 (Base $300, Fee $9) -> Acc Fee: $12 -> INR Value: 41,200, Fee in INR: 1,200 -> Net INR: 40,000
+      expect(computed[1]?.cumulativeNetworkFeeUSD).toBe(12);
+      expect(computed[1]?.netINR).toBe(40000);
+      expect(formatINR(computed[1]?.netINR!)).toContain('40,000.00');
+
+      // Rank 3: PBA 3 (Base $600, Fee $18) -> Acc Fee: $30 -> INR Value: 103,000, Fee in INR: 3,000 -> Net INR: 100,000
+      expect(computed[2]?.cumulativeNetworkFeeUSD).toBe(30);
+      expect(computed[2]?.netINR).toBe(100000);
+      expect(formatINR(computed[2]?.netINR!)).toContain('1,00,000.00');
+
+      // Rank 4: PBA 4 (Base $1000, Fee $30) -> Acc Fee: $60 -> INR Value: 206,000, Fee in INR: 6,000 -> Net INR: 200,000
+      expect(computed[3]?.cumulativeNetworkFeeUSD).toBe(60);
+      expect(computed[3]?.netINR).toBe(200000);
+      expect(formatINR(computed[3]?.netINR!)).toContain('2,00,000.00');
+
+      // Rank 5: PBA 5 (Base $1000, Fee $30) -> Acc Fee: $90 -> INR Value: 309,000, Fee in INR: 9,000 -> Net INR: 300,000
+      expect(computed[4]?.cumulativeNetworkFeeUSD).toBe(90);
+      expect(computed[4]?.netINR).toBe(300000);
+      expect(formatINR(computed[4]?.netINR!)).toContain('3,00,000.00');
+
+      // Rank 6: PBA 6 (Base $1000, Fee $30) -> Acc Fee: $120 -> INR Value: 412,000, Fee in INR: 12,000 -> Net INR: 400,000
+      expect(computed[5]?.cumulativeNetworkFeeUSD).toBe(120);
+      expect(computed[5]?.netINR).toBe(400000);
+      expect(formatINR(computed[5]?.netINR!)).toContain('4,00,000.00');
+
+      // Rank 7: PBA 7 (Base $1000, Fee $30) -> Acc Fee: $150 -> INR Value: 515,000, Fee in INR: 15,000 -> Net INR: 500,000
+      expect(computed[6]?.cumulativeNetworkFeeUSD).toBe(150);
+      expect(computed[6]?.netINR).toBe(500000);
+      expect(formatINR(computed[6]?.netINR!)).toContain('5,00,000.00');
+    });
   });
 
   describe('Section 4: Exchange Rate Dynamics', () => {

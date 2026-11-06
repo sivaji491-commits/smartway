@@ -19,7 +19,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ComputedRankItem, GrandTotals, RankItem } from '@/types/rank-calculator';
-import { formatUSD, formatINR } from '@/lib/rank-calculator-engine';
+import { formatUSD, formatINR, round2 } from '@/lib/rank-calculator-engine';
 import { OneTimeWorkHighlight } from '@/components/key-points/OneTimeWorkHighlight';
 
 export interface RanksTableViewProps {
@@ -287,14 +287,15 @@ export function RanksTableView({
         <div className="overflow-x-auto relative w-full scrollbar-thin">
           <table className="w-full border-collapse text-left text-xs font-['Inter',system-ui,sans-serif] table-fixed min-w-[680px] sm:min-w-full">
             <colgroup>
-              <col className={isAdmin ? "w-[46px]" : "w-[50px]"} />
-              <col className={isAdmin ? "w-[90px]" : "w-[96px]"} />
-              <col className={isAdmin ? "w-[120px]" : "w-[128px]"} />
-              <col className={isAdmin ? "w-[114px]" : "w-[120px]"} />
-              <col className={isAdmin ? "w-[104px]" : "w-[110px]"} />
-              <col className={isAdmin ? "w-[128px]" : "w-[136px]"} />
+              <col className={isAdmin ? "w-[42px]" : "w-[46px]"} />
+              <col className={isAdmin ? "w-[84px]" : "w-[88px]"} />
+              <col className={isAdmin ? "w-[110px]" : "w-[116px]"} />
+              <col className={isAdmin ? "w-[106px]" : "w-[112px]"} />
+              <col className={isAdmin ? "w-[98px]" : "w-[104px]"} />
               <col className={isAdmin ? "w-[118px]" : "w-[124px]"} />
-              {isAdmin && <col className="w-[82px]" />}
+              <col className={isAdmin ? "w-[112px]" : "w-[118px]"} />
+              <col className={isAdmin ? "w-[112px]" : "w-[118px]"} />
+              {isAdmin && <col className="w-[78px]" />}
             </colgroup>
 
             {/* Navy Blue Table Header with Professional Stacked Labels */}
@@ -341,6 +342,13 @@ export function RanksTableView({
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(₹)</span>
                   </span>
                 </th>
+                <th className="py-2 px-2.5 sm:px-3 text-right font-semibold text-[12px] text-slate-100">
+                  <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
+                    <span className="sr-only">Net INR (₹)</span>
+                    <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Net INR</span>
+                    <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(₹)</span>
+                  </span>
+                </th>
                 {isAdmin && (
                   <th className="py-2.5 px-2 text-center font-semibold text-[12px] text-slate-200">
                     Actions
@@ -353,7 +361,7 @@ export function RanksTableView({
             <tbody className="divide-y divide-slate-100">
               {filteredRanks.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? 8 : 7} className="py-8 text-center text-slate-500">
+                  <td colSpan={isAdmin ? 9 : 8} className="py-8 text-center text-slate-500">
                     <Layers className="w-7 h-7 text-slate-300 mx-auto mb-1.5" />
                     <p className="font-semibold text-xs text-slate-700">No ranks found</p>
                     <p className="text-[11px] text-slate-400 mt-0.5">Try resetting or adding a new rank.</p>
@@ -447,6 +455,11 @@ export function RanksTableView({
                       {/* INR Value (₹) */}
                       <td className="py-1.5 px-2.5 sm:px-3 text-right font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatINR(rank.cumulativeTotalINR)}
+                      </td>
+
+                      {/* Net INR (₹) */}
+                      <td className="py-1.5 px-2.5 sm:px-3 text-right font-['Inter',system-ui,sans-serif] font-bold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                        {formatINR(rank.netINR ?? round2(rank.cumulativeTotalINR - round2((rank.cumulativeNetworkFeeUSD ?? rank.networkFeeUSD) * exchangeRate)))}
                       </td>
 
                       {/* Actions - Only shown for Admin */}

@@ -396,9 +396,9 @@ describe('Ranks Page Edit Option Permissions: Admin vs Regular User', () => {
         </div>
       );
 
-      // Verify 7 table columns are present (46px..118px cols without the 8th Actions col)
+      // Verify 8 table columns are present (without the 9th Actions col)
       const cols = container.querySelectorAll('colgroup col');
-      expect(cols).toHaveLength(7);
+      expect(cols).toHaveLength(8);
 
       // No Edit button or input box
       expect(screen.queryByTitle('Edit rank')).toBeNull();

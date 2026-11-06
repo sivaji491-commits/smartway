@@ -12,6 +12,8 @@ export interface ComputedRankItem extends RankItem {
   totalRankCostUSD: number;
   cumulativeTotalUSD: number;
   cumulativeTotalINR: number;
+  cumulativeNetworkFeeUSD?: number;
+  netINR?: number;
 }
 
 export interface CurrencySettings {

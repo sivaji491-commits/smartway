@@ -45,6 +45,7 @@ export function computeRankTotals(ranks: RankItem[], exchangeRate: number): Comp
   const sorted = [...ranks].sort((a, b) => a.order - b.order);
 
   let runningCumulativeUSD = 0;
+  let runningCumulativeNetworkFeeUSD = 0;
 
   return sorted.map((rank, index) => {
     const serialNumber = index + 1;
@@ -55,8 +56,14 @@ export function computeRankTotals(ranks: RankItem[], exchangeRate: number): Comp
     const totalRankCostUSD = round2(basePrice + networkFeeUSD);
     
     runningCumulativeUSD = round2(runningCumulativeUSD + totalRankCostUSD);
+    runningCumulativeNetworkFeeUSD = round2(runningCumulativeNetworkFeeUSD + networkFeeUSD);
+
     const cumulativeTotalUSD = runningCumulativeUSD;
     const cumulativeTotalINR = round2(cumulativeTotalUSD * safeRate);
+    const cumulativeNetworkFeeUSD = runningCumulativeNetworkFeeUSD;
+
+    // Net INR excludes cumulative network fee in USD multiplied by conversion rate
+    const netINR = round2(cumulativeTotalINR - round2(cumulativeNetworkFeeUSD * safeRate));
 
     return {
       ...rank,
@@ -67,6 +74,8 @@ export function computeRankTotals(ranks: RankItem[], exchangeRate: number): Comp
       totalRankCostUSD,
       cumulativeTotalUSD,
       cumulativeTotalINR,
+      cumulativeNetworkFeeUSD,
+      netINR,
     };
   });
 }

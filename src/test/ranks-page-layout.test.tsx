@@ -112,9 +112,57 @@ describe('Ranks Page Layout & Compact Viewport Design (1366x768)', () => {
     expect(screen.getByText('Total (USD)')).toBeDefined();
     expect(screen.getByText('Accumulated Total (USD)')).toBeDefined();
     expect(screen.getByText('INR Value (₹)')).toBeDefined();
+    expect(screen.getByText('Net INR (₹)')).toBeDefined();
 
     // Verify Final Rank Cost summary card exists with correct totals
     expect(screen.getByText('TOTAL (USD)')).toBeDefined();
     expect(screen.getByText('TOTAL (INR)')).toBeDefined();
+  });
+
+  it('renders Net INR (₹) column immediately after INR Value (₹) with bold formatting and accurate calculations', () => {
+    const { container } = render(
+      <RanksTableView
+        computedRanks={computedRanks}
+        grandTotals={grandTotals}
+        exchangeRate={100}
+        note="Test notes"
+        isAdmin={true}
+        onAddRank={vi.fn()}
+        onEditRank={vi.fn()}
+        onDeleteRank={vi.fn()}
+        onMoveRank={vi.fn()}
+        onExportCSV={vi.fn()}
+        onOpenImportCSVModal={vi.fn()}
+        onOpenResetModal={vi.fn()}
+        onNavigateToCurrency={vi.fn()}
+      />
+    );
+
+    // Verify header column sequence: INR Value (₹) followed by Net INR (₹) then Actions
+    const headers = Array.from(container.querySelectorAll('thead th')).map((th) => th.textContent?.trim());
+    const inrValueIndex = headers.findIndex((h) => h?.includes('INR Value'));
+    const netInrIndex = headers.findIndex((h) => h?.includes('Net INR'));
+    const actionsIndex = headers.findIndex((h) => h?.includes('Actions'));
+
+    expect(inrValueIndex).toBeGreaterThan(-1);
+    expect(netInrIndex).toBe(inrValueIndex + 1);
+    expect(actionsIndex).toBe(netInrIndex + 1);
+
+    // Verify bold class on Net INR cells
+    const rows = container.querySelectorAll('tbody tr');
+    expect(rows).toHaveLength(7);
+
+    // Check PBA 1 Net INR = ₹10,000.00
+    const row1Cells = rows[0]?.querySelectorAll('td');
+    // S.No(0), Rank Name(1), Rank Price(2), Network Fee(3), Total(4), Accumulated Total(5), INR Value(6), Net INR(7), Actions(8)
+    const netInrCell1 = row1Cells?.[7];
+    expect(netInrCell1?.textContent).toContain('10,000.00');
+    expect(netInrCell1?.className).toContain('font-bold');
+
+    // Check PBA 7 Net INR = ₹5,00,000.00
+    const row7Cells = rows[6]?.querySelectorAll('td');
+    const netInrCell7 = row7Cells?.[7];
+    expect(netInrCell7?.textContent).toContain('5,00,000.00');
+    expect(netInrCell7?.className).toContain('font-bold');
   });
 });
