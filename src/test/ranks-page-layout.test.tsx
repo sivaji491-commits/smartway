@@ -165,4 +165,43 @@ describe('Ranks Page Layout & Compact Viewport Design (1366x768)', () => {
     expect(netInrCell7?.textContent).toContain('5,00,000.00');
     expect(netInrCell7?.className).toContain('font-bold');
   });
+
+  it('verifies balanced column spacing with reduced Network Fee column width and stacked subtitle', () => {
+    const { container } = render(
+      <RanksTableView
+        computedRanks={computedRanks}
+        grandTotals={grandTotals}
+        exchangeRate={100}
+        note="Test notes"
+        isAdmin={true}
+        onAddRank={vi.fn()}
+        onEditRank={vi.fn()}
+        onDeleteRank={vi.fn()}
+        onMoveRank={vi.fn()}
+        onExportCSV={vi.fn()}
+        onOpenImportCSVModal={vi.fn()}
+        onOpenResetModal={vi.fn()}
+        onNavigateToCurrency={vi.fn()}
+      />
+    );
+
+    // Verify colgroup widths: Network Fee has reduced width (w-[76px])
+    const cols = container.querySelectorAll('colgroup col');
+    expect(cols).toHaveLength(9);
+    expect(cols[3].className).toContain('w-[76px]');
+
+    // Verify Network Fee header has stacked text with (3%) (USD) clearly readable
+    const ths = container.querySelectorAll('thead th');
+    const networkFeeTh = ths[3];
+    expect(networkFeeTh.textContent).toContain('Network Fee');
+    expect(networkFeeTh.textContent).toContain('(3%) (USD)');
+
+    // Verify Actions column exists with move, edit, and delete buttons
+    const actionsTh = ths[8];
+    expect(actionsTh.textContent).toContain('Actions');
+    expect(screen.getAllByTitle('Move up')).toHaveLength(7);
+    expect(screen.getAllByTitle('Move down')).toHaveLength(7);
+    expect(screen.getAllByTitle('Edit rank')).toHaveLength(7);
+    expect(screen.getAllByTitle('Delete rank')).toHaveLength(7);
+  });
 });

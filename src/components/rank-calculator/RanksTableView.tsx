@@ -287,62 +287,64 @@ export function RanksTableView({
         <div className="overflow-x-auto relative w-full scrollbar-thin">
           <table className="w-full border-collapse text-left text-xs font-['Inter',system-ui,sans-serif] table-fixed min-w-[680px] sm:min-w-full">
             <colgroup>
-              <col className={isAdmin ? "w-[42px]" : "w-[46px]"} />
-              <col className={isAdmin ? "w-[84px]" : "w-[88px]"} />
+              <col className={isAdmin ? "w-[36px]" : "w-[40px]"} />
+              <col className={isAdmin ? "w-[92px]" : "w-[96px]"} />
+              <col className={isAdmin ? "w-[108px]" : "w-[104px]"} />
+              <col className={isAdmin ? "w-[76px]" : "w-[80px]"} />
+              <col className={isAdmin ? "w-[80px]" : "w-[84px]"} />
               <col className={isAdmin ? "w-[110px]" : "w-[116px]"} />
               <col className={isAdmin ? "w-[106px]" : "w-[112px]"} />
-              <col className={isAdmin ? "w-[98px]" : "w-[104px]"} />
-              <col className={isAdmin ? "w-[118px]" : "w-[124px]"} />
-              <col className={isAdmin ? "w-[112px]" : "w-[118px]"} />
-              <col className={isAdmin ? "w-[112px]" : "w-[118px]"} />
-              {isAdmin && <col className="w-[78px]" />}
+              <col className={isAdmin ? "w-[106px]" : "w-[112px]"} />
+              {isAdmin && <col className="w-[84px]" />}
             </colgroup>
 
             {/* Navy Blue Table Header with Professional Stacked Labels */}
             <thead className="bg-[#142D50] text-white select-none">
               <tr>
-                <th className="py-2.5 px-2 text-center font-semibold text-[12px] text-slate-100">
+                <th className="py-2.5 px-1.5 text-center font-semibold text-[12px] text-slate-100">
                   S.No
                 </th>
-                <th className="py-2.5 px-3 text-left font-semibold text-[12px] text-white">
+                <th className="py-2.5 px-2.5 sm:px-3 text-left font-semibold text-[12px] text-white whitespace-nowrap">
                   Rank Name
                 </th>
-                <th className="py-2 px-2 text-center font-semibold text-[12px] text-slate-100">
+                <th className="py-2 px-1 text-center font-semibold text-[12px] text-slate-100">
                   <span className="inline-flex flex-col items-center justify-center leading-tight">
                     <span className="sr-only">Rank Price (USD)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white">Rank Price</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(USD)</span>
                   </span>
                 </th>
-                <th className="py-2 px-2.5 sm:px-3 text-right font-semibold text-[12px] text-slate-100">
+                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
                   <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
                     <span className="sr-only">Network Fee ({currentFeePercent}%) (USD)</span>
-                    <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Network Fee ({currentFeePercent}%)</span>
-                    <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(USD)</span>
+                    <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Network Fee</span>
+                    <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal whitespace-nowrap">
+                      ({currentFeePercent}%) (USD)
+                    </span>
                   </span>
                 </th>
-                <th className="py-2 px-2.5 sm:px-3 text-right font-semibold text-[12px] text-slate-100">
+                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
                   <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
                     <span className="sr-only">Total (USD)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white">Total</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(USD)</span>
                   </span>
                 </th>
-                <th className="py-2 px-2.5 sm:px-3 text-right font-semibold text-[12px] text-slate-100">
+                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
                   <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
                     <span className="sr-only">Accumulated Total (USD)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Accumulated Total</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(USD)</span>
                   </span>
                 </th>
-                <th className="py-2 px-2.5 sm:px-3 text-right font-semibold text-[12px] text-slate-100">
+                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
                   <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
                     <span className="sr-only">INR Value (₹)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">INR Value</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(₹)</span>
                   </span>
                 </th>
-                <th className="py-2 px-2.5 sm:px-3 text-right font-semibold text-[12px] text-slate-100">
+                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
                   <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
                     <span className="sr-only">Net INR (₹)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Net INR</span>
@@ -350,7 +352,7 @@ export function RanksTableView({
                   </span>
                 </th>
                 {isAdmin && (
-                  <th className="py-2.5 px-2 text-center font-semibold text-[12px] text-slate-200">
+                  <th className="py-2.5 px-1 text-center font-semibold text-[12px] text-slate-200 whitespace-nowrap">
                     Actions
                   </th>
                 )}
@@ -438,39 +440,39 @@ export function RanksTableView({
                       </td>
 
                       {/* Network Fee (USD) */}
-                      <td className="py-1.5 px-2.5 sm:px-3 text-right font-['Inter',system-ui,sans-serif] font-normal text-slate-600 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-normal text-slate-600 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatUSD(rank.networkFeeUSD)}
                       </td>
 
                       {/* Total (USD) */}
-                      <td className="py-1.5 px-2.5 sm:px-3 text-right font-['Inter',system-ui,sans-serif] font-medium text-slate-800 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-medium text-slate-800 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatUSD(rank.totalRankCostUSD)}
                       </td>
 
                       {/* Accumulated Total (USD) */}
-                      <td className="py-1.5 px-2.5 sm:px-3 text-right font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatUSD(rank.cumulativeTotalUSD)}
                       </td>
 
                       {/* INR Value (₹) */}
-                      <td className="py-1.5 px-2.5 sm:px-3 text-right font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatINR(rank.cumulativeTotalINR)}
                       </td>
 
                       {/* Net INR (₹) */}
-                      <td className="py-1.5 px-2.5 sm:px-3 text-right font-['Inter',system-ui,sans-serif] font-bold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-bold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatINR(rank.netINR ?? round2(rank.cumulativeTotalINR - round2((rank.cumulativeNetworkFeeUSD ?? rank.networkFeeUSD) * exchangeRate)))}
                       </td>
 
                       {/* Actions - Only shown for Admin */}
                       {isAdmin && (
-                        <td className="py-1 px-2 text-center whitespace-nowrap">
-                          <div className="inline-flex items-center gap-1">
+                        <td className="py-1 px-1 text-center whitespace-nowrap">
+                          <div className="inline-flex items-center justify-center gap-0.5 sm:gap-1">
                             <button
                               type="button"
                               onClick={() => onMoveRank(rank.id, 'up')}
                               disabled={isFirst}
-                              className="p-0.5 rounded text-slate-400 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:cursor-not-allowed transition"
+                              className="p-1 rounded text-slate-400 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:cursor-not-allowed transition cursor-pointer"
                               title="Move up"
                             >
                               <ArrowUp className="w-3.5 h-3.5" />
@@ -479,7 +481,7 @@ export function RanksTableView({
                               type="button"
                               onClick={() => onMoveRank(rank.id, 'down')}
                               disabled={isLast}
-                              className="p-0.5 rounded text-slate-400 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:cursor-not-allowed transition"
+                              className="p-1 rounded text-slate-400 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-25 disabled:cursor-not-allowed transition cursor-pointer"
                               title="Move down"
                             >
                               <ArrowDown className="w-3.5 h-3.5" />
@@ -487,7 +489,7 @@ export function RanksTableView({
                             <button
                               type="button"
                               onClick={() => onEditRank(rank)}
-                              className="p-0.5 rounded text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition"
+                              className="p-1 rounded text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition cursor-pointer"
                               title="Edit rank"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
@@ -495,7 +497,7 @@ export function RanksTableView({
                             <button
                               type="button"
                               onClick={() => onDeleteRank(rank)}
-                              className="p-0.5 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition"
+                              className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
                               title="Delete rank"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
