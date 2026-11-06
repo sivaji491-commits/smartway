@@ -285,37 +285,37 @@ export function RanksTableView({
       {/* 3. 7-Rank Presentation Data Table */}
       <div className="overflow-hidden rounded-[10px] border border-slate-200 shadow-2xs w-full">
         <div className="overflow-x-auto relative w-full scrollbar-thin">
-          <table className="w-full border-collapse text-left text-xs font-['Inter',system-ui,sans-serif] table-fixed min-w-[680px] sm:min-w-full">
+          <table className="w-full border-collapse text-center text-xs font-['Inter',system-ui,sans-serif] table-fixed min-w-[680px] sm:min-w-full">
             <colgroup>
               <col className={isAdmin ? "w-[36px]" : "w-[40px]"} />
-              <col className={isAdmin ? "w-[92px]" : "w-[96px]"} />
-              <col className={isAdmin ? "w-[108px]" : "w-[104px]"} />
+              <col className={isAdmin ? "w-[88px]" : "w-[94px]"} />
+              <col className={isAdmin ? "w-[106px]" : "w-[106px]"} />
               <col className={isAdmin ? "w-[76px]" : "w-[80px]"} />
-              <col className={isAdmin ? "w-[80px]" : "w-[84px]"} />
-              <col className={isAdmin ? "w-[110px]" : "w-[116px]"} />
-              <col className={isAdmin ? "w-[106px]" : "w-[112px]"} />
-              <col className={isAdmin ? "w-[106px]" : "w-[112px]"} />
-              {isAdmin && <col className="w-[84px]" />}
+              <col className={isAdmin ? "w-[78px]" : "w-[82px]"} />
+              <col className={isAdmin ? "w-[104px]" : "w-[110px]"} />
+              <col className={isAdmin ? "w-[102px]" : "w-[108px]"} />
+              <col className={isAdmin ? "w-[102px]" : "w-[108px]"} />
+              {isAdmin && <col className="w-[82px]" />}
             </colgroup>
 
             {/* Navy Blue Table Header with Professional Stacked Labels */}
             <thead className="bg-[#142D50] text-white select-none">
               <tr>
-                <th className="py-2.5 px-1.5 text-center font-semibold text-[12px] text-slate-100">
+                <th className="py-2.5 px-1 text-center font-semibold text-[12px] text-slate-100">
                   S.No
                 </th>
-                <th className="py-2.5 px-2.5 sm:px-3 text-left font-semibold text-[12px] text-white whitespace-nowrap">
+                <th className="py-2.5 px-1.5 sm:px-2 text-center font-semibold text-[12px] text-white whitespace-nowrap">
                   Rank Name
                 </th>
                 <th className="py-2 px-1 text-center font-semibold text-[12px] text-slate-100">
-                  <span className="inline-flex flex-col items-center justify-center leading-tight">
+                  <span className="inline-flex flex-col items-center justify-center leading-tight mx-auto">
                     <span className="sr-only">Rank Price (USD)</span>
-                    <span aria-hidden="true" className="font-semibold text-[12px] text-white">Rank Price</span>
+                    <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Rank Price</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(USD)</span>
                   </span>
                 </th>
-                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
-                  <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
+                <th className="py-2 px-1 text-center font-semibold text-[12px] text-slate-100">
+                  <span className="inline-flex flex-col items-center justify-center leading-tight mx-auto">
                     <span className="sr-only">Network Fee ({currentFeePercent}%) (USD)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Network Fee</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal whitespace-nowrap">
@@ -323,29 +323,29 @@ export function RanksTableView({
                     </span>
                   </span>
                 </th>
-                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
-                  <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
+                <th className="py-2 px-1 text-center font-semibold text-[12px] text-slate-100">
+                  <span className="inline-flex flex-col items-center justify-center leading-tight mx-auto">
                     <span className="sr-only">Total (USD)</span>
-                    <span aria-hidden="true" className="font-semibold text-[12px] text-white">Total</span>
+                    <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Total</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(USD)</span>
                   </span>
                 </th>
-                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
-                  <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
+                <th className="py-2 px-1 text-center font-semibold text-[12px] text-slate-100">
+                  <span className="inline-flex flex-col items-center justify-center leading-tight mx-auto">
                     <span className="sr-only">Accumulated Total (USD)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Accumulated Total</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(USD)</span>
                   </span>
                 </th>
-                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
-                  <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
+                <th className="py-2 px-1 text-center font-semibold text-[12px] text-slate-100">
+                  <span className="inline-flex flex-col items-center justify-center leading-tight mx-auto">
                     <span className="sr-only">INR Value (₹)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">INR Value</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(₹)</span>
                   </span>
                 </th>
-                <th className="py-2 px-1.5 sm:px-2 text-right font-semibold text-[12px] text-slate-100">
-                  <span className="inline-flex flex-col items-end justify-center leading-tight ml-auto">
+                <th className="py-2 px-1 text-center font-semibold text-[12px] text-slate-100">
+                  <span className="inline-flex flex-col items-center justify-center leading-tight mx-auto">
                     <span className="sr-only">Net INR (₹)</span>
                     <span aria-hidden="true" className="font-semibold text-[12px] text-white whitespace-nowrap">Net INR</span>
                     <span aria-hidden="true" className="text-[10px] sm:text-[10.5px] font-normal text-slate-300 tracking-normal">(₹)</span>
@@ -385,12 +385,12 @@ export function RanksTableView({
                       className="h-[38px] sm:h-[40px] even:bg-[#f8fafc] odd:bg-white hover:bg-blue-50/25 transition-colors border-b border-slate-100 last:border-b-0"
                     >
                       {/* S.No */}
-                      <td className="py-1.5 px-2 text-center font-['Inter',system-ui,sans-serif] font-medium text-slate-500 text-[13px] tabular-nums">
+                      <td className="py-1.5 px-1 text-center font-['Inter',system-ui,sans-serif] font-medium text-slate-500 text-[13px] tabular-nums">
                         {rank.serialNumber}
                       </td>
 
                       {/* Rank Name with Exact Pill Badge Colors */}
-                      <td className="py-1.5 px-3 whitespace-nowrap text-left">
+                      <td className="py-1.5 px-1.5 sm:px-2 whitespace-nowrap text-center">
                         <span 
                           className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-[5px] text-[12px] font-medium border ${pillStyle.bg} ${pillStyle.text} ${pillStyle.border}`}
                         >
@@ -399,7 +399,7 @@ export function RanksTableView({
                       </td>
 
                       {/* Rank Price (USD) - Editable input for Admin, Read-only text for regular users */}
-                      <td className="py-1 px-2 text-center whitespace-nowrap">
+                      <td className="py-1 px-1.5 text-center whitespace-nowrap">
                         {isAdmin ? (
                           <input
                             type="text"
@@ -440,27 +440,27 @@ export function RanksTableView({
                       </td>
 
                       {/* Network Fee (USD) */}
-                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-normal text-slate-600 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1 text-center font-['Inter',system-ui,sans-serif] font-normal text-slate-600 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatUSD(rank.networkFeeUSD)}
                       </td>
 
                       {/* Total (USD) */}
-                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-medium text-slate-800 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1 text-center font-['Inter',system-ui,sans-serif] font-medium text-slate-800 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatUSD(rank.totalRankCostUSD)}
                       </td>
 
                       {/* Accumulated Total (USD) */}
-                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1 text-center font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatUSD(rank.cumulativeTotalUSD)}
                       </td>
 
                       {/* INR Value (₹) */}
-                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1 text-center font-['Inter',system-ui,sans-serif] font-semibold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatINR(rank.cumulativeTotalINR)}
                       </td>
 
                       {/* Net INR (₹) */}
-                      <td className="py-1.5 px-1.5 sm:px-2 text-right font-['Inter',system-ui,sans-serif] font-bold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
+                      <td className="py-1.5 px-1 text-center font-['Inter',system-ui,sans-serif] font-bold text-slate-900 whitespace-nowrap text-[13px] sm:text-[13.5px] tabular-nums">
                         {formatINR(rank.netINR ?? round2(rank.cumulativeTotalINR - round2((rank.cumulativeNetworkFeeUSD ?? rank.networkFeeUSD) * exchangeRate)))}
                       </td>
 

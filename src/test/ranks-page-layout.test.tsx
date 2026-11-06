@@ -204,4 +204,50 @@ describe('Ranks Page Layout & Compact Viewport Design (1366x768)', () => {
     expect(screen.getAllByTitle('Edit rank')).toHaveLength(7);
     expect(screen.getAllByTitle('Delete rank')).toHaveLength(7);
   });
+
+  it('verifies center alignment across all column headings and corresponding cell values with balanced proportions', () => {
+    const { container } = render(
+      <RanksTableView
+        computedRanks={computedRanks}
+        grandTotals={grandTotals}
+        exchangeRate={100}
+        note="Test notes"
+        isAdmin={true}
+        onAddRank={vi.fn()}
+        onEditRank={vi.fn()}
+        onDeleteRank={vi.fn()}
+        onMoveRank={vi.fn()}
+        onExportCSV={vi.fn()}
+        onOpenImportCSVModal={vi.fn()}
+        onOpenResetModal={vi.fn()}
+        onNavigateToCurrency={vi.fn()}
+      />
+    );
+
+    // Verify all 9 table headers have text-center class
+    const ths = container.querySelectorAll('thead th');
+    expect(ths).toHaveLength(9);
+    ths.forEach((th) => {
+      expect(th.className).toContain('text-center');
+    });
+
+    // Verify all cells in every row have text-center class
+    const rows = container.querySelectorAll('tbody tr');
+    expect(rows).toHaveLength(7);
+    rows.forEach((row) => {
+      const tds = row.querySelectorAll('td');
+      expect(tds).toHaveLength(9);
+      tds.forEach((td) => {
+        expect(td.className).toContain('text-center');
+      });
+    });
+
+    // Verify Accumulated Total column has compact balanced width (w-[104px])
+    const cols = container.querySelectorAll('colgroup col');
+    expect(cols[5].className).toContain('w-[104px]');
+
+    // Verify INR Value and Net INR have balanced symmetric widths (w-[102px])
+    expect(cols[6].className).toContain('w-[102px]');
+    expect(cols[7].className).toContain('w-[102px]');
+  });
 });
